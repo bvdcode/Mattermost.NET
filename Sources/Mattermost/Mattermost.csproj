@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Nullable>enable</Nullable>
+		<Authors>Vadim Belov</Authors>
+		<Company>bvdcode</Company>
+		<Product>Mattermost.NET</Product>
+		<Description>Ready-to-use library for convenient development of Mattermost bots.</Description>
+		<Copyright>Copyright © Vadim Belov 2024</Copyright>
+		<Summary>Ready-to-use library for convenient development of Mattermost bots.</Summary>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<Title>Mattermost.NET</Title>
+		<PackageId>Mattermost.NET</PackageId>
+		<PackageTags>mattermost</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>packageIcon.png</PackageIcon>
+		<PackageIconUrl>https://raw.githubusercontent.com/bvdcode/Mattermost.NET/main/Sources/Mattermost/packageIcon.png</PackageIconUrl>
+		<PackageProjectUrl>https://github.com/bvdcode/Mattermost.NET</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/bvdcode/Mattermost.NET</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<RootNamespace>Mattermost</RootNamespace>
+		<AssemblyName>Mattermost.NET</AssemblyName>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+		<None Include="packageIcon.png" Pack="true" PackagePath="\" />
+		<None Include="..\..\LICENSE.md" Pack="true" PackagePath="LICENSE.md" />
+		<PackageReference Include="System.Text.Json" Version="8.0.4" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+	</ItemGroup>
+</Project>
