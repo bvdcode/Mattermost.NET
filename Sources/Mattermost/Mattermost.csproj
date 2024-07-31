@@ -14,7 +14,7 @@
 		<PackageTags>mattermost</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>packageIcon.png</PackageIcon>
-		<PackageIconUrl>https://raw.githubusercontent.com/bvdcode/Mattermost.NET/main/Sources/Mattermost/packageIcon.png</PackageIconUrl>
+		<PackageIconUrl>https://media.githubusercontent.com/media/bvdcode/Mattermost.NET/main/Sources/Mattermost/packageIcon.png</PackageIconUrl>
 		<PackageProjectUrl>https://github.com/bvdcode/Mattermost.NET</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/bvdcode/Mattermost.NET</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
