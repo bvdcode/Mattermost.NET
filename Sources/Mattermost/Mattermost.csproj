@@ -5,9 +5,9 @@
 		<Authors>Vadim Belov</Authors>
 		<Company>bvdcode</Company>
 		<Product>Mattermost.NET</Product>
-		<Description>Ready-to-use library for convenient development of Mattermost bots.</Description>
+		<Description>Ready-to-use library for convenient development of Mattermost bots with real-time updates.</Description>
 		<Copyright>Copyright © Vadim Belov 2024</Copyright>
-		<Summary>Ready-to-use library for convenient development of Mattermost bots.</Summary>
+		<Summary>Ready-to-use library for convenient development of Mattermost bots with real-time updates.</Summary>
 		<NeutralLanguage>en-US</NeutralLanguage>
 		<Title>Mattermost.NET</Title>
 		<PackageId>Mattermost.NET</PackageId>
