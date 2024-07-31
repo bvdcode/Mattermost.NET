@@ -13,7 +13,7 @@
 		<PackageId>Mattermost.NET</PackageId>
 		<PackageTags>mattermost</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageIconUrl>https://media.githubusercontent.com/media/bvdcode/Mattermost.NET/main/Sources/Mattermost/packageIcon.png</PackageIconUrl>
+		<PackageIcon>packageIcon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/bvdcode/Mattermost.NET</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/bvdcode/Mattermost.NET</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -26,6 +26,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+		<None Include="packageIcon.png" Pack="true" PackagePath="\" />
 		<None Include="..\..\LICENSE.md" Pack="true" PackagePath="LICENSE.md" />
 		<PackageReference Include="System.Text.Json" Version="8.0.4" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
