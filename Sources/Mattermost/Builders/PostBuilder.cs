@@ -111,7 +111,7 @@ namespace Mattermost.Builders
         /// <summary>
         /// Sent completed post to specified channel.
         /// </summary>
-        /// <returns></returns>
+        /// <returns> Created post. </returns>
         /// <exception cref="ArgumentException"></exception>
         public Task<Post> SendMessageAsync()
         {

@@ -470,7 +470,7 @@ namespace Mattermost
                         progressChanged?.Invoke(result);
                     }
                     await Task.Delay(100);
-                    if (token.IsCancellationRequested || result == 100)
+                    if (token.IsCancellationRequested || result >= 100)
                     {
                         break;
                     }
