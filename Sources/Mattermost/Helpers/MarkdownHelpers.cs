@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mattermost.Models.Enums;
+using System;
 
 namespace Mattermost.Helpers
 {
@@ -40,7 +41,7 @@ namespace Mattermost.Helpers
             return $"`{text}`";
         }
 
-        internal static string CodeBlock(string text, string language = "")
+        internal static string CodeBlock(string text, CodeLanguage language = CodeLanguage.Text)
         {
             if (string.IsNullOrEmpty(text))
             {
