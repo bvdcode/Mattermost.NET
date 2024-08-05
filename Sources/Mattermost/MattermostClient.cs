@@ -49,11 +49,12 @@ namespace Mattermost
         public Uri ServerAddress => _serverUri;
 
         private User _botUserInfo;
+        private ClientWebSocket _ws;
         private readonly Uri _serverUri;
         private readonly string _apiToken;
         private readonly HttpClient _http;
         private readonly Uri _websocketUri;
-        private ClientWebSocket _ws;
+        private CancellationTokenSource _receivingTokenSource;
 
         /// <summary>
         /// Create <see cref="MattermostClient"/> with specified JWT access token.
@@ -102,25 +103,47 @@ namespace Mattermost
         /// <exception cref="ApiKeyException"></exception>
         public async Task StartReceivingAsync(CancellationToken cancellationToken)
         {
+            await StopReceivingAsync();
+            _ws = new ClientWebSocket();
+            _receivingTokenSource = new CancellationTokenSource();
+            var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken).Token;
             _botUserInfo = await GetBotUserInfoAsync();
             OnLogMessage?.Invoke(this, new LogEventArgs("Receiving started as user " + _botUserInfo.Username));
-            while (!cancellationToken.IsCancellationRequested)
+            while (!mergedToken.IsCancellationRequested)
             {
                 try
                 {
                     if (_ws.State != WebSocketState.Open)
                     {
-                        await ConnectAsync(cancellationToken);
+                        await ConnectAsync(mergedToken);
                     }
-                    var response = await _ws.ReceiveAsync(cancellationToken);
-                    await HandleResponseAsync(response, cancellationToken);
+                    var response = await _ws.ReceiveAsync(mergedToken);
+                    await HandleResponseAsync(response, mergedToken);
                 }
                 catch (Exception ex)
                 {
                     OnLogMessage?.Invoke(this, new LogEventArgs(ex.Message));
-                    await Task.Delay(60_000);
+                    await Task.Delay(1_000);
                 }
             }
+        }
+
+        /// <summary>
+        /// Stop receiving messages.
+        /// </summary>
+        public async Task StopReceivingAsync()
+        {
+            _receivingTokenSource.Cancel();
+            try
+            {
+                await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", CancellationToken.None);
+                _ws.Dispose();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
         }
 
         /// <summary>
