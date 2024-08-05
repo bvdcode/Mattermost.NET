@@ -15,12 +15,12 @@ namespace Mattermost.ConsoleTest
 
         private static void OnLogMessage(object? sender, LogEventArgs e)
         {
-            Console.WriteLine($"Log: {e.Message}");
+            Console.WriteLine($"[LOG]: {e.Message}");
         }
 
         private static void OnMessageReceived(object? sender, MessageEventArgs e)
         {
-            Console.WriteLine($"Message: {e.Message.Post.Text}");
+            Console.WriteLine($"Received message: {e.Message.Post.Text ?? "empty"}");
         }
     }
 }

@@ -91,14 +91,14 @@ namespace Mattermost
         }
 
         /// <summary>
-        /// Create receiver <see cref="Task"/> with websocket polling.
+        /// Start receiving messages asynchronously.
         /// </summary>
         /// <returns> Receiver task. </returns>
         /// <exception cref="ApiKeyException"></exception>
         public Task StartReceivingAsync() => StartReceivingAsync(CancellationToken.None);
 
         /// <summary>
-        /// Create receiver <see cref="Task"/> with websocket polling.
+        /// Start receiving messages asynchronously with cancellation token.
         /// </summary>
         /// <returns> Receiver task. </returns>
         /// <exception cref="ApiKeyException"></exception>
@@ -109,24 +109,27 @@ namespace Mattermost
             _receivingTokenSource = new CancellationTokenSource();
             var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken).Token;
             _userInfo = await GetBotUserInfoAsync();
-            OnLogMessage?.Invoke(this, new LogEventArgs("Receiving started as user " + _userInfo.Username));
-            while (!mergedToken.IsCancellationRequested)
+            Log("Receiving started as user " + _userInfo.Username);
+            _ = Task.Run(async () =>
             {
-                try
+                while (!mergedToken.IsCancellationRequested)
                 {
-                    if (_ws.State != WebSocketState.Open)
+                    try
                     {
-                        await ConnectAsync(mergedToken);
+                        if (_ws.State != WebSocketState.Open)
+                        {
+                            await ConnectAsync(mergedToken);
+                        }
+                        var response = await _ws.ReceiveAsync(mergedToken);
+                        await HandleResponseAsync(response, mergedToken);
                     }
-                    var response = await _ws.ReceiveAsync(mergedToken);
-                    await HandleResponseAsync(response, mergedToken);
+                    catch (Exception ex)
+                    {
+                        Log("Error in receiving messages", ex);
+                        await Task.Delay(1_000);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    OnLogMessage?.Invoke(this, new LogEventArgs(ex.Message));
-                    await Task.Delay(1_000);
-                }
-            }
+            }, mergedToken);
         }
 
         /// <summary>
@@ -510,18 +513,18 @@ namespace Mattermost
             {
                 try
                 {
-                    OnLogMessage?.Invoke(this, new LogEventArgs("Closing websocket connection from state " + _ws.State));
+                    Log("Closing websocket connection from state " + _ws.State);
                     await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", cancellationToken);
                     _ws.Dispose();
                 }
                 catch (Exception ex)
                 {
-                    OnLogMessage?.Invoke(this, new LogEventArgs("Closing websocket connection with error: " + ex.Message));
+                    Log("Closing websocket connection with error", ex);
                 }
             }
             _ws = new ClientWebSocket();
             await _ws.ConnectAsync(uri, cancellationToken);
-            OnLogMessage?.Invoke(this, new LogEventArgs("Opened new websocket connection with state " + _ws.State));
+            Log("Opened new websocket connection with state " + _ws.State);
             var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token = _apiToken });
             if (result.Status != MattermostStatus.Ok)
             {
@@ -545,6 +548,16 @@ namespace Mattermost
             {
                 throw new ArgumentException("Scheme must be 'http' or 'https'");
             }
+        }
+
+        private void Log(string message)
+        {
+            OnLogMessage?.Invoke(this, new LogEventArgs(message));
+        }
+
+        private void Log(string message, Exception ex)
+        {
+            OnLogMessage?.Invoke(this, new LogEventArgs(message + $" (Exception: {ex.Message}"));
         }
 
         #endregion
