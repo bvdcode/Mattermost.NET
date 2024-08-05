@@ -7,7 +7,7 @@
 
 <a id="readme-top"></a>
 
-# TelegramBot.NET
+# Mattermost.NET
 
 Ready-to-use **.NET Standard** library for convenient development of Mattermost bots.
 
