@@ -79,6 +79,7 @@ namespace Mattermost
         /// <exception cref="ArgumentException"></exception>
         public MattermostClient(Uri serverUri, string apiToken)
         {
+            _receivingTokenSource = new CancellationTokenSource();
             CheckUrl(serverUri);
             _ws = new ClientWebSocket();
             _websocketUri = GetWebsocketUri(serverUri);
@@ -139,11 +140,7 @@ namespace Mattermost
                 await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", CancellationToken.None);
                 _ws.Dispose();
             }
-            catch (Exception)
-            {
-                // ignored
-            }
-
+            catch (Exception) { }
         }
 
         /// <summary>
