@@ -4,3 +4,55 @@
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/bvdcode/Mattermost.NET/.github%2Fworkflows%2Fpublish-release.yml)](https://github.com/bvdcode/Mattermost.NET/actions)
 [![NuGet version (Mattermost.NET)](https://img.shields.io/nuget/vpre/Mattermost.NET.svg?style=flat-square&label=latest&color=yellowgreen)](https://www.nuget.org/packages/Mattermost.NET/)
 [![NuGet version (Mattermost.NET)](https://img.shields.io/nuget/v/Mattermost.NET.svg?style=flat-square&label=stable)](https://www.nuget.org/packages/Mattermost.NET/)
+
+<a id="readme-top"></a>
+
+# TelegramBot.NET
+
+Ready-to-use **.NET Standard** library for convenient development of Mattermost bots.
+
+# Getting Started
+
+## Installation
+
+The library is available as a NuGet package. You can install it using the NuGet Package Manager or the `dotnet` CLI.
+
+```bash
+dotnet add package Mattermost.NET
+```
+
+## Usage
+
+### Create a new bot
+
+```csharp
+using Mattermost.NET;
+const string token = "37VlFKySIZn6gryA85cR1GKBQkjmfRZ6";
+const string server = "https://mm.your-server.com"; // or https://community.mattermost.com by default
+MattermostClient client = new(server, token);
+```
+
+### Subscribe to post updates
+
+```csharp
+client.OnMessageReceived += Client_OnMessageReceived;
+
+private static void Client_OnMessageReceived(object? sender, MessageEventArgs e)
+{
+    if (string.IsNullOrWhiteSpace(e.Message.Post.Text))
+    {
+        return;
+    }
+    e.Client.SendMessageAsync(e.Message.Post.ChannelId, "Hello, World!");
+}
+```
+
+### Start the bot
+
+```csharp
+await client.StartReceivingAsync();
+```
+
+### Stop the bot
+
+```csharp

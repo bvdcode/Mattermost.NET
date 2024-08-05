@@ -22,6 +22,8 @@ namespace Mattermost.ConsoleTest
             }
             LogEventArgs args = new(e.Message.Post.Text);
             Client_OnLogMessage(sender, args);
+
+            e.Client.SendMessageAsync(e.Message.Post.ChannelId, "Hello, World!");
         }
 
         private static void Client_OnLogMessage(object? sender, LogEventArgs e)

@@ -49,6 +49,11 @@ namespace Mattermost
         Task StartReceivingAsync(CancellationToken cancellationToken);
 
         /// <summary>
+        /// Stop receiving messages.
+        /// </summary>
+        Task StopReceivingAsync();
+
+        /// <summary>
         /// Send message to specified channel identifier.
         /// </summary>
         /// <param name="channelId"> Channel identifier. </param>
