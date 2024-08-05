@@ -3,6 +3,8 @@
 [![Static Badge](https://img.shields.io/badge/fuget-f88445?logo=readme&logoColor=white)](https://www.fuget.org/packages/Mattermost.NET)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/bvdcode/Mattermost.NET/.github%2Fworkflows%2Fpublish-release.yml)](https://github.com/bvdcode/Mattermost.NET/actions)
 [![NuGet version (Mattermost.NET)](https://img.shields.io/nuget/v/Mattermost.NET.svg?style=flat-square&label=stable)](https://www.nuget.org/packages/Mattermost.NET/)
+[![CodeFactor](https://www.codefactor.io/repository/github/bvdcode/Mattermost.NET/badge)](https://www.codefactor.io/repository/github/bvdcode/Mattermost.NET)
+![GitHub repo size](https://img.shields.io/github/repo-size/bvdcode/Mattermost.NET)
 
 <a id="readme-top"></a>
 
