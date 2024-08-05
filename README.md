@@ -56,3 +56,33 @@ await client.StartReceivingAsync();
 ### Stop the bot
 
 ```csharp
+await client.StopReceivingAsync();
+```
+
+## Client Methods
+
+### `SendMessageAsync`
+
+```csharp
+await client.SendMessageAsync("channel_id", "Hello, World!");
+```
+
+### `GetChannelMembersAsync`
+
+```csharp
+var members = await client.GetChannelMembersAsync("channel_id");
+```
+
+### `GetChannelPostsAsync`
+
+```csharp
+var posts = await client.GetChannelPostsAsync("channel_id");
+```
+
+# License
+
+Distributed under the MIT License. See LICENSE.md for more information.
+
+# Contact
+
+[E-Mail](mailto:github-mattermost-net@belov.us)
