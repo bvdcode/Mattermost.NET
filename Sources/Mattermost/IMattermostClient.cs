@@ -17,7 +17,7 @@ namespace Mattermost
     public interface IMattermostClient
     {
         /// <summary>
-        /// Bot user information.
+        /// User information.
         /// </summary>
         User CurrentUserInfo { get; }
 
@@ -154,7 +154,7 @@ namespace Mattermost
         Task<Channel?> FindChannelByName(string teamId, string channelName);
 
         /// <summary>
-        /// Set call state for channel identifier.
+        /// Set call state for channel identifier - 'Calls' plugin required.
         /// </summary>
         /// <param name="isCallsEnabled"> New state. </param>
         /// <param name="channelId"> Channel identifier where calls must be in specified state. </param>

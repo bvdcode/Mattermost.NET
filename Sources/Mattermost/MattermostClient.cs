@@ -39,16 +39,16 @@ namespace Mattermost
         public event EventHandler<LogEventArgs>? OnLogMessage;
 
         /// <summary>
-        /// Bot user information.
+        /// User information.
         /// </summary>
-        public User CurrentUserInfo => _botUserInfo;
+        public User CurrentUserInfo => _userInfo;
 
         /// <summary>
         /// Base server address.
         /// </summary>
         public Uri ServerAddress => _serverUri;
 
-        private User _botUserInfo;
+        private User _userInfo;
         private ClientWebSocket _ws;
         private readonly Uri _serverUri;
         private readonly string _apiToken;
@@ -83,7 +83,7 @@ namespace Mattermost
             CheckUrl(serverUri);
             _ws = new ClientWebSocket();
             _websocketUri = GetWebsocketUri(serverUri);
-            _botUserInfo = new User();
+            _userInfo = new User();
             _serverUri = serverUri;
             _apiToken = apiToken;
             _http = new HttpClient() { BaseAddress = _serverUri, Timeout = TimeSpan.FromMinutes(60) };
@@ -108,8 +108,8 @@ namespace Mattermost
             _ws = new ClientWebSocket();
             _receivingTokenSource = new CancellationTokenSource();
             var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken).Token;
-            _botUserInfo = await GetBotUserInfoAsync();
-            OnLogMessage?.Invoke(this, new LogEventArgs("Receiving started as user " + _botUserInfo.Username));
+            _userInfo = await GetBotUserInfoAsync();
+            OnLogMessage?.Invoke(this, new LogEventArgs("Receiving started as user " + _userInfo.Username));
             while (!mergedToken.IsCancellationRequested)
             {
                 try
@@ -462,7 +462,7 @@ namespace Mattermost
                 case MattermostEvent.Posted:
                     {
                         var args = new MessageEventArgs(this, response, cancellationToken);
-                        if (args.Message.Post.UserId != _botUserInfo.Id)
+                        if (args.Message.Post.UserId != _userInfo.Id)
                         {
                             OnMessageReceived?.Invoke(this, args);
                         }
