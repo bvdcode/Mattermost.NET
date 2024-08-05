@@ -79,6 +79,8 @@ var members = await client.GetChannelMembersAsync("channel_id");
 var posts = await client.GetChannelPostsAsync("channel_id");
 ```
 
+`...` and more methods will be documented soon.
+
 # License
 
 Distributed under the MIT License. See LICENSE.md for more information.
