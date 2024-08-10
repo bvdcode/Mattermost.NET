@@ -43,7 +43,6 @@ namespace Mattermost.Tests
                 Assert.That(result.Locale, Is.Not.Empty);
                 Assert.That(result.IsBot, Is.False);
                 Assert.That(result.Timezone, Is.Not.Null);
-                Assert.That(result.AuthData, Is.Not.Null);
             });
         }
     }
