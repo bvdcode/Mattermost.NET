@@ -42,7 +42,7 @@ namespace Mattermost.Models.Users
         /// User authentication data.
         /// </summary>
         [JsonPropertyName("auth_data")]
-        public string AuthData { get; set; } = null!;
+        public string? AuthData { get; set; }
 
         /// <summary>
         /// User authentication service (ex. Gitlab, GMail etc.)
