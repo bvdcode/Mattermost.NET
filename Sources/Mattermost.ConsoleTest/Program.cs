@@ -21,6 +21,7 @@ namespace Mattermost.ConsoleTest
         private static void OnMessageReceived(object? sender, MessageEventArgs e)
         {
             Console.WriteLine($"Received message: {e.Message.Post.Text ?? "empty"}");
+            e.Client.SendMessageAsync(e.Message.Post.ChannelId, "Hello!");
         }
     }
 }
