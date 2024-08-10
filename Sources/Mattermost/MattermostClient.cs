@@ -20,7 +20,6 @@ using Mattermost.Models.Users;
 using System.Collections.Generic;
 using Mattermost.Models.Channels;
 using Mattermost.Models.Responses;
-using static System.Net.WebRequestMethods;
 
 namespace Mattermost
 {
@@ -182,6 +181,34 @@ namespace Mattermost
                 throw new AuthorizationException("Login error, server response: " + result.StatusCode);
             }
             return result.GetResponse<User>();
+        }
+
+        /// <summary>
+        /// Logout from server.
+        /// </summary>
+        /// <returns> Task representing logout operation. </returns>
+        /// <exception cref="MattermostClientException">Throws if server response is not successful.</exception>
+        public async Task LogoutAsync()
+        {
+            var response = await _http.PostAsync(Routes.Users + "/logout", null);
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new MattermostClientException("Logout error, server response: " + response.StatusCode);
+            }
+            _http.DefaultRequestHeaders.Authorization = null;
+            await StopReceivingAsync();
+        }
+
+        /// <summary>
+        /// Get current authorized user information.
+        /// </summary>
+        /// <returns> Authorized user information. </returns>
+        public async Task<User> GetMeAsync()
+        {
+            var response = await _http.GetAsync(Routes.Users + "/me");
+            response.EnsureSuccessStatusCode();
+            string json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<User>(json)!;
         }
 
         /// <summary>

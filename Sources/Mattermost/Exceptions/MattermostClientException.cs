@@ -2,7 +2,7 @@
 
 namespace Mattermost.Exceptions
 {
-    internal class MattermostClientException : Exception
+    public class MattermostClientException : Exception
     {
         public MattermostClientException()
         {

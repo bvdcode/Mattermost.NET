@@ -189,5 +189,17 @@ namespace Mattermost
         /// <param name="password">Password.</param>
         /// <returns>Authorized <see cref="User"/> object.</returns>
         Task<User> LoginAsync(string loginId, string password);
+
+        /// <summary>
+        /// Logout from server.
+        /// </summary>
+        /// <returns> Task representing logout operation. </returns>
+        Task LogoutAsync();
+
+        /// <summary>
+        /// Get current authorized user information.
+        /// </summary>
+        /// <returns> Authorized user information. </returns>
+        Task<User> GetMeAsync();
     }
 }
