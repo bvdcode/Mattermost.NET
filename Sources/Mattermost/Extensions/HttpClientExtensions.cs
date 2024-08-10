@@ -2,6 +2,7 @@
 using System.Text;
 using System.Net.Http;
 using System.Text.Json;
+using Mattermost.Exceptions;
 using System.Threading.Tasks;
 
 namespace Mattermost.Extensions
@@ -17,6 +18,14 @@ namespace Mattermost.Extensions
 
         internal static TResult GetResponse<TResult>(this HttpResponseMessage response)
         {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new AuthorizationException("Unauthorized");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                throw new AuthorizationException("Access denied");
+            }
             response.EnsureSuccessStatusCode();
             var responseContent = response.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<TResult>(responseContent) ?? throw new InvalidOperationException("Response is null");

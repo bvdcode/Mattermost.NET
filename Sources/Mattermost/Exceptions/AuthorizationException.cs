@@ -2,7 +2,7 @@
 
 namespace Mattermost.Exceptions
 {
-    internal class  AuthorizationException : MattermostClientException
+    public class AuthorizationException : MattermostClientException
     {
         public AuthorizationException()
         {

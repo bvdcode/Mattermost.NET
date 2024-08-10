@@ -1,3 +1,4 @@
+using Mattermost.Exceptions;
 using Mattermost.Models.Users;
 using System.Text.Json;
 
@@ -22,6 +23,7 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        [NonParallelizable]
         public async Task LoginTest_ValidCredentials_ReturnsToken()
         {
             Assert.Multiple(() =>
@@ -44,6 +46,33 @@ namespace Mattermost.Tests
                 Assert.That(result.IsBot, Is.False);
                 Assert.That(result.Timezone, Is.Not.Null);
             });
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void LoginTest_InvalidCredentials_ThrowsException()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(username, Is.Not.Empty);
+                Assert.That(password, Is.Not.Empty);
+                Assert.That(token, Is.Not.Empty);
+            });
+            Assert.ThrowsAsync<AuthorizationException>(async () => await client.LoginAsync(username, "invalid"));
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task Logout_Successful()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(username, Is.Not.Empty);
+                Assert.That(password, Is.Not.Empty);
+                Assert.That(token, Is.Not.Empty);
+            });
+            await client.LogoutAsync();
+            Assert.ThrowsAsync<HttpRequestException>(client.GetMeAsync);
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Mattermost.Exceptions
 {
     [Serializable]
-    internal class ApiKeyException : MattermostClientException
+    public class ApiKeyException : MattermostClientException
     {
         public ApiKeyException()
         {
