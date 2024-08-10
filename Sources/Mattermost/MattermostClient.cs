@@ -41,15 +41,21 @@ namespace Mattermost
         /// <summary>
         /// User information.
         /// </summary>
-        public User CurrentUserInfo => _userInfo;
+        public User CurrentUserInfo => _userInfo ?? throw new InvalidOperationException("You must login first");
 
         /// <summary>
         /// Base server address.
         /// </summary>
         public Uri ServerAddress => _serverUri;
 
-        private User _userInfo;
+        /// <summary>
+        /// Extension methods needed for this client, hidden from public.
+        /// </summary>
+        internal HttpClient HttpClient => _http;
+
+        private User? _userInfo;
         private ClientWebSocket _ws;
+        private Task? _receiverTask;
         private readonly Uri _serverUri;
         private readonly HttpClient _http;
         private readonly Uri _websocketUri;
@@ -104,7 +110,7 @@ namespace Mattermost
             var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken).Token;
             _userInfo = await GetBotUserInfoAsync();
             Log("Receiving started as user " + _userInfo.Username);
-            _ = Task.Run(async () =>
+            _receiverTask = Task.Run(async () =>
             {
                 while (!mergedToken.IsCancellationRequested)
                 {
@@ -138,6 +144,7 @@ namespace Mattermost
                 _ws.Dispose();
             }
             catch (Exception) { }
+            _receiverTask?.Dispose();
         }
 
         /// <summary>
@@ -163,7 +170,8 @@ namespace Mattermost
             string token = result.Headers.GetValues("Token").FirstOrDefault()
                 ?? throw new AuthorizationException("Token not found in response headers");
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            return result.GetResponse<User>();
+            _userInfo = result.GetResponse<User>();
+            return _userInfo;
         }
 
         /// <summary>
@@ -180,7 +188,8 @@ namespace Mattermost
             {
                 throw new AuthorizationException("Login error, server response: " + result.StatusCode);
             }
-            return result.GetResponse<User>();
+            _userInfo = result.GetResponse<User>();
+            return _userInfo;
         }
 
         /// <summary>
@@ -200,7 +209,7 @@ namespace Mattermost
         }
 
         /// <summary>
-        /// Get current authorized user information.
+        /// Get current authorized user information - forcing update of <see cref="CurrentUserInfo"/>.
         /// </summary>
         /// <returns> Authorized user information. </returns>
         public async Task<User> GetMeAsync()
@@ -208,7 +217,8 @@ namespace Mattermost
             var response = await _http.GetAsync(Routes.Users + "/me");
             response.EnsureSuccessStatusCode();
             string json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<User>(json)!;
+            _userInfo = JsonSerializer.Deserialize<User>(json)!;
+            return _userInfo;
         }
 
         /// <summary>
