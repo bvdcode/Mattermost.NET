@@ -42,7 +42,7 @@ namespace Mattermost.Models.Users
         /// User authentication data.
         /// </summary>
         [JsonPropertyName("auth_data")]
-        public string? AuthData { get; set; }
+        public string AuthData { get; set; } = null!;
 
         /// <summary>
         /// User authentication service (ex. Gitlab, GMail etc.)
@@ -54,7 +54,7 @@ namespace Mattermost.Models.Users
         /// E-Mail.
         /// </summary>
         [JsonPropertyName("email")]
-        public string? Email { get; set; }
+        public string Email { get; set; } = null!;
 
         /// <summary>
         /// User nickname.
@@ -108,13 +108,13 @@ namespace Mattermost.Models.Users
         /// User locale (ex. en-US, ru-RU etc.)
         /// </summary>
         [JsonPropertyName("locale")]
-        public string? Locale { get; set; }
+        public string Locale { get; set; } = null!;
 
         /// <summary>
         /// User timezone.
         /// </summary>
         [JsonPropertyName("timezone")]
-        public Timezone? Timezone { get; set; }
+        public Timezone Timezone { get; set; } = null!;
 
         /// <summary>
         /// Is bot?
