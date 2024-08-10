@@ -7,10 +7,18 @@ namespace Mattermost.ConsoleTest
         public static async Task Main()
         {
             string token = "your token";
-            MattermostClient client = new(token);
+            MattermostClient client = new();
+
             client.OnMessageReceived += OnMessageReceived;
             client.OnLogMessage += OnLogMessage;
+
+            await client.LoginAsync(token);
             await client.StartReceivingAsync();
+
+            await Task.Delay(10000);
+
+            await client.StopReceivingAsync();
+            await client.LogoutAsync();
         }
 
         private static void OnLogMessage(object? sender, LogEventArgs e)
