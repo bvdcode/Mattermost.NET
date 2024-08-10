@@ -39,6 +39,11 @@ namespace Mattermost.Tests
                 Assert.That(result.Id, Is.Not.Empty);
                 Assert.That(result.CreatedAt, Is.GreaterThan(0));
                 Assert.That(result.UpdatedAt, Is.GreaterThan(0));
+                Assert.That(result.Username, Is.Not.Empty);
+                Assert.That(result.Locale, Is.Not.Empty);
+                Assert.That(result.IsBot, Is.False);
+                Assert.That(result.Timezone, Is.Not.Null);
+                Assert.That(result.AuthData, Is.Not.Null);
             });
         }
     }
