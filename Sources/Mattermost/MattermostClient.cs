@@ -147,6 +147,32 @@ namespace Mattermost
         }
 
         /// <summary>
+        /// Login with specified login identifier and password.
+        /// </summary>
+        /// <param name="loginId">Username or email.</param>
+        /// <param name="password">Password.</param>
+        /// <returns>Authorized <see cref="User"/> object.</returns>
+        /// <exception cref="AuthorizationException">Throws if credentials are invalid or server response is not successful.</exception>
+        public async Task<User> LoginAsync(string loginId, string password)
+        {
+            var body = new
+            {
+                login_id = loginId,
+                password
+            };
+            const string url = Routes.Users + "/login";
+            var result = await _http.PostAsJsonAsync(url, body);
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new AuthorizationException("Login error, server response: " + result.StatusCode);
+            }
+            string token = result.Headers.GetValues("Token").FirstOrDefault()
+                ?? throw new AuthorizationException("Token not found in response headers");
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            return result.GetResponse<User>();
+        }
+
+        /// <summary>
         /// Send message to specified channel identifier.
         /// </summary>
         /// <param name="channelId"> Channel identifier. </param>

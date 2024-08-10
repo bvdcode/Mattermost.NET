@@ -181,5 +181,13 @@ namespace Mattermost
         /// <param name="fileId"> File identifier. </param>
         /// <returns> File bytes. </returns>
         Task<byte[]> GetFileAsync(string fileId);
+
+        /// <summary>
+        /// Login with specified login identifier and password.
+        /// </summary>
+        /// <param name="loginId">Username or email.</param>
+        /// <param name="password">Password.</param>
+        /// <returns>Authorized <see cref="User"/> object.</returns>
+        Task<User> LoginAsync(string loginId, string password);
     }
 }
