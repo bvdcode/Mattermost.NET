@@ -20,6 +20,7 @@ using Mattermost.Models.Users;
 using System.Collections.Generic;
 using Mattermost.Models.Channels;
 using Mattermost.Models.Responses;
+using static System.Net.WebRequestMethods;
 
 namespace Mattermost
 {
@@ -51,33 +52,29 @@ namespace Mattermost
         private User _userInfo;
         private ClientWebSocket _ws;
         private readonly Uri _serverUri;
-        private readonly string _apiToken;
         private readonly HttpClient _http;
         private readonly Uri _websocketUri;
         private CancellationTokenSource _receivingTokenSource;
 
         /// <summary>
-        /// Create <see cref="MattermostClient"/> with specified JWT access token.
+        /// Create <see cref="MattermostClient"/> with default server address.
         /// </summary>
-        /// <param name="apiToken"> JWT API token. </param>
         /// <exception cref="ArgumentException"></exception>
-        public MattermostClient(string apiToken) : this(Routes.DefaultBaseUrl, apiToken) { }
+        public MattermostClient() : this(Routes.DefaultBaseUrl) { }
 
         /// <summary>
         /// Create <see cref="MattermostClient"/> with specified server address JWT access token.
         /// </summary>
         /// <param name="serverUrl"> Server URL with HTTP(S) scheme. </param>
-        /// <param name="apiToken"> JWT API token. </param>
         /// <exception cref="ArgumentException"></exception>
-        public MattermostClient(string serverUrl, string apiToken) : this(new Uri(serverUrl), apiToken) { }
+        public MattermostClient(string serverUrl) : this(new Uri(serverUrl)) { }
 
         /// <summary>
         /// Create <see cref="MattermostClient"/> with specified server address JWT access token.
         /// </summary>
         /// <param name="serverUri"> Server URI with HTTP(S) scheme. </param>
-        /// <param name="apiToken"> JWT API token. </param>
         /// <exception cref="ArgumentException"></exception>
-        public MattermostClient(Uri serverUri, string apiToken)
+        public MattermostClient(Uri serverUri)
         {
             _receivingTokenSource = new CancellationTokenSource();
             CheckUrl(serverUri);
@@ -85,9 +82,7 @@ namespace Mattermost
             _websocketUri = GetWebsocketUri(serverUri);
             _userInfo = new User();
             _serverUri = serverUri;
-            _apiToken = apiToken;
             _http = new HttpClient() { BaseAddress = _serverUri, Timeout = TimeSpan.FromMinutes(60) };
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiToken);
         }
 
         /// <summary>
@@ -169,6 +164,23 @@ namespace Mattermost
             string token = result.Headers.GetValues("Token").FirstOrDefault()
                 ?? throw new AuthorizationException("Token not found in response headers");
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            return result.GetResponse<User>();
+        }
+
+        /// <summary>
+        /// Login with specified API key - personal access token, see <see href="https://developers.mattermost.com/integrate/reference/personal-access-token/"/>
+        /// </summary>
+        /// <param name="apiKey"> API key, ex. bot token or personal access token. </param>
+        /// <returns>Autorized <see cref="User"/> object.</returns>
+        /// <exception cref="AuthorizationException">Throws if API key is invalid or server response is not successful.</exception>
+        public async Task<User> LoginAsync(string apiKey)
+        {
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+            var result = await _http.GetAsync(Routes.Users + "/me");
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new AuthorizationException("Login error, server response: " + result.StatusCode);
+            }
             return result.GetResponse<User>();
         }
 
@@ -534,6 +546,10 @@ namespace Mattermost
 
         private async Task ConnectAsync(CancellationToken cancellationToken)
         {
+            if (_http.DefaultRequestHeaders.Authorization == null)
+            {
+                throw new ApiKeyException("Authorization token is not set - call LoginAsync first");
+            }
             var uri = new Uri(_websocketUri + Routes.WebSocket);
             if (_ws.State != WebSocketState.None)
             {
@@ -551,7 +567,8 @@ namespace Mattermost
             _ws = new ClientWebSocket();
             await _ws.ConnectAsync(uri, cancellationToken);
             Log("Opened new websocket connection with state " + _ws.State);
-            var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token = _apiToken });
+            string token = _http.DefaultRequestHeaders.Authorization!.Parameter.Replace("Bearer ", string.Empty);
+            var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token });
             if (result.Status != MattermostStatus.Ok)
             {
                 throw new ApiKeyException("Authentication error, server response: " + result.Status);
