@@ -27,6 +27,16 @@ namespace Mattermost
         Uri ServerAddress { get; }
 
         /// <summary>
+        /// Occurs when the WebSocket connection is successfully established.
+        /// </summary>
+        event EventHandler<ConnectionEventArgs>? OnConnected;
+
+        /// <summary>
+        /// Occurs when the WebSocket is disconnected, either by the client or the server.
+        /// </summary>
+        event EventHandler<DisconnectionEventArgs>? OnDisconnected;
+
+        /// <summary>
         /// Event called in independent thread when new message received.
         /// </summary>
         event EventHandler<MessageEventArgs>? OnMessageReceived;
