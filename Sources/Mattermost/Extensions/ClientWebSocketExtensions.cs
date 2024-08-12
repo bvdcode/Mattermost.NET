@@ -28,6 +28,11 @@ namespace Mattermost.Extensions
             Array.Resize(ref buffer, response.Count);
             var result = JsonSerializer.Deserialize<WebsocketMessage>(buffer)!;
             result.Raw = Encoding.UTF8.GetString(buffer);
+            result.MessageType = response.MessageType;
+            if (result.MessageType == WebSocketMessageType.Close)
+            {
+                result.UpdateCloseStatusInfo(result.CloseStatus.Value, result.CloseStatusDescription);
+            }
             return result;
         }
 
