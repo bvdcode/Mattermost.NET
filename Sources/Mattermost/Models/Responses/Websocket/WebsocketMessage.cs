@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Text.Json;
 using Mattermost.Enums;
-using System.Text.Json.Serialization;
 using System.Net.WebSockets;
+using System.Text.Json.Serialization;
 
 namespace Mattermost.Models.Responses
 {
     internal class WebsocketMessage
     {
         public WebSocketMessageType MessageType { get; set; }
-
         public WebSocketCloseStatus? CloseStatus { get; private set; }
-        public string CloseStatusDescription { get; private set; }
+        public string? CloseStatusDescription { get; private set; }
 
         public void UpdateCloseStatusInfo(WebSocketCloseStatus status, string description)
         {
