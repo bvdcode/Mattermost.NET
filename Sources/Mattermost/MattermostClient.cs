@@ -28,6 +28,9 @@ namespace Mattermost
     /// </summary>
     public class MattermostClient : IMattermostClient
     {
+        public event EventHandler<ConnectionEventArgs>? OnConnected;
+        public event EventHandler<DisconnectionEventArgs>? OnDisconnected;
+
         /// <summary>
         /// Event called when new message received.
         /// </summary>
@@ -119,9 +122,16 @@ namespace Mattermost
                         if (_ws.State != WebSocketState.Open)
                         {
                             await ConnectAsync(mergedToken);
-                        }
+                        }                        
                         var response = await _ws.ReceiveAsync(mergedToken);
                         await HandleResponseAsync(response, mergedToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        Log("Operation has been cancelled");
+                        // Trigger OnDisconnected event
+                        OnDisconnected?.Invoke(this, new DisconnectionEventArgs(WebSocketCloseStatus.NormalClosure, "Closed by client", DateTime.UtcNow));                        
+                        break;
                     }
                     catch (Exception ex)
                     {
@@ -137,14 +147,35 @@ namespace Mattermost
         /// </summary>
         public async Task StopReceivingAsync()
         {
-            _receivingTokenSource.Cancel();
+            if (_receivingTokenSource != null)
+            {
+                _receivingTokenSource.Cancel();
+            }
+
             try
             {
-                await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", CancellationToken.None);
-                _ws.Dispose();
+                if (_ws != null && _ws.State == WebSocketState.Open)
+                {
+                    await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", CancellationToken.None);
+
+                    // Trigger OnDisconnected event
+                    OnDisconnected?.Invoke(this, new DisconnectionEventArgs(WebSocketCloseStatus.NormalClosure, "Closed by client", DateTime.UtcNow));
+
+                    _ws.Dispose();
+                }
             }
-            catch (Exception) { }
-            _receiverTask?.Dispose();
+            catch (Exception ex)
+            {
+                // Log or handle the exception as appropriate
+                Console.WriteLine($"Error while closing WebSocket: {ex.Message}");
+                throw;
+            }
+
+            if (_receiverTask != null)
+            {
+                await _receiverTask;  // Wait for the receiving task to complete
+                _receiverTask.Dispose();
+            }
         }
 
         /// <summary>
@@ -546,6 +577,15 @@ namespace Mattermost
                         }
                         break;
                     }
+                default:
+                    Log($"The event [{response.Event.ToString()}] is not yet implemented");
+                    break;
+            }
+
+            // Handle the case when the server closes the connection
+            if (response.MessageType == WebSocketMessageType.Close)
+            {
+                OnDisconnected?.Invoke(this, new DisconnectionEventArgs(response.CloseStatus, response.CloseStatusDescription, DateTime.UtcNow));
             }
 
             return Task.CompletedTask;
@@ -602,13 +642,27 @@ namespace Mattermost
                 }
             }
             _ws = new ClientWebSocket();
-            await _ws.ConnectAsync(uri, cancellationToken);
-            Log("Opened new websocket connection with state " + _ws.State);
-            string token = _http.DefaultRequestHeaders.Authorization!.Parameter.Replace("Bearer ", string.Empty);
-            var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token });
-            if (result.Status != MattermostStatus.Ok)
+            try
             {
-                throw new ApiKeyException("Authentication error, server response: " + result.Status);
+                await _ws.ConnectAsync(uri, cancellationToken);
+                Log("Opened new websocket connection with state " + _ws.State);
+                
+                string token = _http.DefaultRequestHeaders.Authorization!.Parameter.Replace("Bearer ", string.Empty);
+                
+                var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token });
+                if (result.Status != MattermostStatus.Ok)
+                {
+                    throw new ApiKeyException("Authentication error, server response: " + result.Status);
+                }
+
+                // Trigger OnConnected event
+                OnConnected?.Invoke(this, new ConnectionEventArgs(uri, DateTime.UtcNow));
+            }
+            catch (Exception ex)
+            {
+                // Handle connection error
+                Log($"WebSocket connection failed: {ex.Message}");
+                OnDisconnected?.Invoke(this, new DisconnectionEventArgs(null, ex.Message, DateTime.UtcNow));
             }
         }
 
