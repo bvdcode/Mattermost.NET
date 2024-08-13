@@ -28,7 +28,14 @@ namespace Mattermost
     /// </summary>
     public class MattermostClient : IMattermostClient
     {
+        /// <summary>
+        /// Called when client is connected to server WebSocket after <see cref="StartReceivingAsync()"/> method.
+        /// </summary>
         public event EventHandler<ConnectionEventArgs>? OnConnected;
+
+        /// <summary>
+        /// Called when client is disconnected from server WebSocket after <see cref="StopReceivingAsync()"/> method or when server closes connection.
+        /// </summary>
         public event EventHandler<DisconnectionEventArgs>? OnDisconnected;
 
         /// <summary>
