@@ -3,6 +3,7 @@ using Mattermost.Models;
 using Mattermost.Exceptions;
 using Mattermost.Models.Users;
 using Mattermost.Models.Responses.Websocket;
+using Mattermost.Extensions;
 
 namespace Mattermost.Tests
 {
@@ -30,7 +31,7 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
-        public async Task LoginTest_ValidCredentials_ReturnsToken()
+        public void LoginTest_ValidCredentials_ReturnsToken()
         {
             Assert.Multiple(() =>
             {
@@ -102,6 +103,14 @@ namespace Mattermost.Tests
             await Task.Delay(1000);
             Assert.That(receivedMessages, Is.Not.Empty);
             Assert.That(receivedMessages[0].Post.Text, Is.EqualTo(":tada: Thanks for helping us make Mattermost better!"));
+        }
+
+        [Test]
+        public void DisposeClient_SendRequest_ThrowsException()
+        {
+            var client = new MattermostClient();
+            client.Dispose();
+            Assert.Throws<ObjectDisposedException>(() => { try { client.LoginAsync(string.Empty).Wait(); } catch (AggregateException ex) { throw ex.InnerException!; } });
         }
 
         /// <summary>

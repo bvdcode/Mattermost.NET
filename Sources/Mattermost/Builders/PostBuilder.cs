@@ -16,14 +16,12 @@ namespace Mattermost.Builders
         private string replyToPostId;
         private readonly List<string> files;
         private MessagePriority messagePriority;
-        private readonly IMattermostClient client;
 
-        internal PostBuilder(IMattermostClient client)
+        internal PostBuilder()
         {
             text = string.Empty;
             replyToPostId = string.Empty;
             files = new List<string>();
-            this.client = client;
             channelId = string.Empty;
             messagePriority = MessagePriority.Empty;
         }
@@ -103,8 +101,7 @@ namespace Mattermost.Builders
             {
                 return this;
             }
-            var fileDetails = client.GetFileDetailsAsync(fileId).Result;
-            files.Add(fileDetails.Id);
+            files.Add(fileId);
             return this;
         }
 
@@ -113,7 +110,7 @@ namespace Mattermost.Builders
         /// </summary>
         /// <returns> Created post. </returns>
         /// <exception cref="ArgumentException"></exception>
-        public Task<Post> SendMessageAsync()
+        public Task<Post> SendMessageAsync(IMattermostClient client)
         {
             if (string.IsNullOrWhiteSpace(channelId))
             {
