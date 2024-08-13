@@ -26,7 +26,7 @@ namespace Mattermost
     /// <summary>
     /// .NET API client for Mattermost servers with websocket polling.
     /// </summary>
-    public class MattermostClient : IMattermostClient
+    public class MattermostClient : IMattermostClient, IDisposable
     {
         /// <summary>
         /// Called when client is connected to server WebSocket after
@@ -77,6 +77,7 @@ namespace Mattermost
         /// </summary>
         internal HttpClient HttpClient => _http;
 
+        private bool _disposed;
         private User? _userInfo;
         private ClientWebSocket _ws;
         private Task? _receiverTask;
@@ -128,12 +129,14 @@ namespace Mattermost
         /// <exception cref="ApiKeyException"></exception>
         public async Task StartReceivingAsync(CancellationToken cancellationToken)
         {
+            CheckAuthorized();
+            CheckDisposed();
             await StopReceivingAsync();
             _ws = new ClientWebSocket();
             _receivingTokenSource = new CancellationTokenSource();
             var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken).Token;
-            _userInfo = await GetBotUserInfoAsync();
-            Log("Starting receiving as user @" + _userInfo.Username);
+            
+            Log("Starting receiving as user @" + _userInfo?.Username ?? "Unknown");
             _receiverTask = Task.Run(async () =>
             {
                 while (!mergedToken.IsCancellationRequested)
@@ -168,6 +171,7 @@ namespace Mattermost
         /// </summary>
         public async Task StopReceivingAsync()
         {
+            CheckDisposed();
             _receivingTokenSource?.Cancel();
 
             if (_ws != null && _ws.State == WebSocketState.Open)
@@ -204,6 +208,7 @@ namespace Mattermost
         /// <exception cref="AuthorizationException">Throws if credentials are invalid or server response is not successful.</exception>
         public async Task<User> LoginAsync(string loginId, string password)
         {
+            CheckDisposed();
             var body = new
             {
                 login_id = loginId,
@@ -230,6 +235,7 @@ namespace Mattermost
         /// <exception cref="AuthorizationException">Throws if API key is invalid or server response is not successful.</exception>
         public async Task<User> LoginAsync(string apiKey)
         {
+            CheckDisposed();
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             var result = await _http.GetAsync(Routes.Users + "/me");
             if (!result.IsSuccessStatusCode)
@@ -247,21 +253,25 @@ namespace Mattermost
         /// <exception cref="MattermostClientException">Throws if server response is not successful.</exception>
         public async Task LogoutAsync()
         {
+            CheckAuthorized();
+            CheckDisposed();
             var response = await _http.PostAsync(Routes.Users + "/logout", null);
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 throw new MattermostClientException("Logout error, server response: " + response.StatusCode);
             }
-            _http.DefaultRequestHeaders.Authorization = null;
             await StopReceivingAsync();
+            _http.DefaultRequestHeaders.Authorization = null;
         }
 
         /// <summary>
-        /// Get current authorized user information - forcing update of <see cref="CurrentUserInfo"/>.
+        /// Get current authorized user information and force update of <see cref="CurrentUserInfo"/>.
         /// </summary>
         /// <returns> Authorized user information. </returns>
         public async Task<User> GetMeAsync()
         {
+            CheckAuthorized();
+            CheckDisposed();
             var response = await _http.GetAsync(Routes.Users + "/me");
             response.EnsureSuccessStatusCode();
             string json = await response.Content.ReadAsStringAsync();
@@ -282,6 +292,8 @@ namespace Mattermost
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
             IEnumerable<string>? files = null)
         {
+            CheckAuthorized();
+            CheckDisposed();
             Dictionary<string, object> metadata = new Dictionary<string, object>();
             if (priority != MessagePriority.Empty)
             {
@@ -316,6 +328,8 @@ namespace Mattermost
         /// <returns> Updated post. </returns>
         public async Task<Post> UpdatePostAsync(string postId, string newText)
         {
+            CheckAuthorized();
+            CheckDisposed();
             var body = new
             {
                 message = newText
@@ -335,6 +349,8 @@ namespace Mattermost
         /// <returns> True if deleted, otherwise false. </returns>
         public async Task<bool> DeletePostAsync(string postId)
         {
+            CheckAuthorized();
+            CheckDisposed();
             var response = await _http.DeleteAsync(Routes.Posts + "/" + postId);
             return response.IsSuccessStatusCode;
         }
@@ -346,6 +362,8 @@ namespace Mattermost
         /// <returns> Created channel info. </returns>
         public async Task<Channel> CreateGroupChannelAsync(params string[] userIds)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string json = JsonSerializer.Serialize(userIds);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _http.PostAsync(Routes.GroupChannels, content);
@@ -374,6 +392,8 @@ namespace Mattermost
         public async Task<Channel> CreateChannelAsync(string teamId, string name, string displayName,
             ChannelType channelType, string purpose = "", string header = "")
         {
+            CheckAuthorized();
+            CheckDisposed();
             const int maxChannelDisplayNameLength = 64;
             if (displayName.Length > maxChannelDisplayNameLength)
             {
@@ -415,6 +435,8 @@ namespace Mattermost
         /// <returns> User information. </returns>
         public async Task<User> GetUserAsync(string userId)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Users + "/" + userId;
             string json = await _http.GetStringAsync(url);
             User userInfo = JsonSerializer.Deserialize<User>(json)!;
@@ -428,6 +450,8 @@ namespace Mattermost
         /// <returns> User information. </returns>
         public async Task<User> GetUserByUsernameAsync(string username)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Users + "/username/" + username.Replace("@", string.Empty).Trim();
             string json = await _http.GetStringAsync(url);
             User userInfo = JsonSerializer.Deserialize<User>(json)!;
@@ -442,6 +466,8 @@ namespace Mattermost
         /// <returns> Channel user information. </returns>
         public async Task<ChannelUserInfo> AddUserToChannelAsync(string channelId, string userId)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Channels + $"/{channelId}/members";
             var body = new
             {
@@ -463,6 +489,8 @@ namespace Mattermost
         /// <returns> True if deleted, otherwise false. </returns>
         public async Task<bool> DeleteUserFromChannelAsync(string channelId, string userId)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Channels + $"/{channelId}/members/{userId}";
             var response = await _http.DeleteAsync(url);
             return response.IsSuccessStatusCode;
@@ -477,6 +505,8 @@ namespace Mattermost
         /// <returns> Created file details. </returns>
         public async Task<FileDetails> UploadFileAsync(string channelId, string filePath, Action<int>? progressChanged = null)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Files + "?channel_id=" + channelId;
             MultipartFormDataContent content = new MultipartFormDataContent();
             FileInfo fileInfo = new FileInfo(filePath);
@@ -502,6 +532,8 @@ namespace Mattermost
         /// <returns> File details. </returns>
         public async Task<FileDetails> GetFileDetailsAsync(string fileId)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Files + "/" + fileId + "/info";
             string json = await _http.GetStringAsync(url);
             return JsonSerializer.Deserialize<FileDetails>(json)!;
@@ -515,6 +547,8 @@ namespace Mattermost
         /// <returns> Channel info. </returns>
         public async Task<Channel?> FindChannelByName(string teamId, string channelName)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Teams + $"/{teamId}/channels/name/{channelName}";
             var response = await _http.GetAsync(url);
             if (!response.IsSuccessStatusCode)
@@ -532,6 +566,8 @@ namespace Mattermost
         /// <param name="isCallsEnabled"> New state. </param>
         public async Task<bool> SetChannelCallStateAsync(string channelId, bool isCallsEnabled)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Plugins + "/com.mattermost.calls/" + channelId;
             var body = new
             {
@@ -549,6 +585,8 @@ namespace Mattermost
         /// <param name="channelId"> Channel identifier. </param>
         public async Task<bool> ArchiveChannelAsync(string channelId)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Channels + "/" + channelId;
             var response = await _http.DeleteAsync(url);
             return response.IsSuccessStatusCode;
@@ -561,6 +599,8 @@ namespace Mattermost
         /// <returns> Post information. </returns>
         public async Task<Post> GetPostAsync(string postId)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Posts + "/" + postId;
             string json = await _http.GetStringAsync(url);
             return JsonSerializer.Deserialize<Post>(json)!;
@@ -573,10 +613,27 @@ namespace Mattermost
         /// <returns> File bytes. </returns>
         public async Task<byte[]> GetFileAsync(string fileId)
         {
+            CheckAuthorized();
+            CheckDisposed();
             string url = Routes.Files + "/" + fileId;
             var response = await _http.GetAsync(url);
             response = response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsByteArrayAsync();
+        }
+
+        /// <summary>
+        /// Dispose client resources.
+        /// </summary>
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                _ws.Dispose();
+                _http.Dispose();
+                _disposed = true;
+                _receiverTask?.Dispose();
+                _receivingTokenSource.Dispose();
+            }
         }
 
         #region Private methods
@@ -639,11 +696,6 @@ namespace Mattermost
                     }
                 }
             }, token);
-        }
-
-        private async Task<User> GetBotUserInfoAsync()
-        {
-            return await GetUserAsync("me");
         }
 
         private async Task ConnectAsync(CancellationToken cancellationToken)
@@ -722,6 +774,24 @@ namespace Mattermost
         private void Log(string message, Exception ex)
         {
             OnLogMessage?.Invoke(this, new LogEventArgs(message + $" (Exception: {ex.Message}"));
+        }
+
+        private void CheckAuthorized()
+        {
+            if (_http.DefaultRequestHeaders.Authorization == null
+                || _http.DefaultRequestHeaders.Authorization.Scheme != "Bearer"
+                || string.IsNullOrWhiteSpace(_http.DefaultRequestHeaders.Authorization.Parameter))
+            {
+                throw new ApiKeyException("Authorization token is not set - call LoginAsync first");
+            }
+        }
+
+        private void CheckDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
         }
 
         #endregion
