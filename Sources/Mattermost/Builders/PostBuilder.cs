@@ -17,7 +17,10 @@ namespace Mattermost.Builders
         private readonly List<string> files;
         private MessagePriority messagePriority;
 
-        internal PostBuilder()
+        /// <summary>
+        /// Create new post builder.
+        /// </summary>
+        public PostBuilder()
         {
             text = string.Empty;
             replyToPostId = string.Empty;

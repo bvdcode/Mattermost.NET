@@ -1,4 +1,6 @@
 ﻿using System.Text.Json;
+using Mattermost.Builders;
+using Mattermost.Enums;
 using Mattermost.Models;
 
 namespace Mattermost.ConsoleTest
@@ -28,7 +30,6 @@ namespace Mattermost.ConsoleTest
 
             await client.LoginAsync(secrets.Username, secrets.Password);
             await client.StartReceivingAsync();
-
             await Task.Delay(10000);
 
             await client.StopReceivingAsync();
@@ -39,7 +40,7 @@ namespace Mattermost.ConsoleTest
         {
             var myInfo = client.CurrentUserInfo;
             Console.WriteLine($"User Infomation:  {myInfo.FirstName} {myInfo.LastName}");
-            Console.WriteLine($"   Username: {myInfo.Username} ({myInfo.Nickname})");
+            Console.WriteLine($"   Username: {myInfo.Username} ({myInfo.Nickname ?? myInfo.Email})");
             Console.WriteLine($"   Created at: {myInfo.CreatedAt:MM/dd/yyyy}");
             Console.WriteLine($"   Id: {myInfo.Id}");
         }
