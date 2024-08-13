@@ -16,7 +16,7 @@ namespace Mattermost.Events
         /// <summary>
         /// Gets or sets a description of the reason for the WebSocket closure.
         /// </summary>
-        public string CloseStatusDescription { get; set; }
+        public string? CloseStatusDescription { get; set; }
 
         /// <summary>
         /// Gets or sets the timestamp when the disconnection occurred.
@@ -29,7 +29,7 @@ namespace Mattermost.Events
         /// <param name="closeStatus">The status code indicating why the WebSocket was closed.</param>
         /// <param name="closeStatusDescription">A description of the reason for the WebSocket closure.</param>
         /// <param name="disconnectedAt">The timestamp when the disconnection occurred.</param>
-        public DisconnectionEventArgs(WebSocketCloseStatus? closeStatus, string closeStatusDescription, DateTime disconnectedAt)
+        public DisconnectionEventArgs(WebSocketCloseStatus? closeStatus, string? closeStatusDescription, DateTime disconnectedAt)
         {
             CloseStatus = closeStatus;
             CloseStatusDescription = closeStatusDescription;
