@@ -37,7 +37,7 @@ namespace Mattermost.Models.Responses.Websocket.Users
                 "offline" => UserStatus.Offline,
                 "away" => UserStatus.Away,
                 "dnd" => UserStatus.DoNotDisturb,
-                _ => UserStatus.Custom
+                _ => UserStatus.Unknown,
             };
         }
     }
