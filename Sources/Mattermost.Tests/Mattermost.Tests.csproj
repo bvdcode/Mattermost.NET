@@ -31,4 +31,6 @@
     </None>
   </ItemGroup>
 
+  <Import Project="..\Mattermost.Models\Mattermost.Models.projitems" Label="Shared" />
+
 </Project>
