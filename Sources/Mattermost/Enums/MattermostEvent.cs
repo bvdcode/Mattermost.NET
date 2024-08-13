@@ -13,5 +13,6 @@ namespace Mattermost.Enums
         SidebarCategoryUpdated = 6,
         UserAdded = 7,
         EphemeralMessage = 8,
+        UserUpdated = 9,
     }
 }
