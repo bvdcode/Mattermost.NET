@@ -42,8 +42,17 @@ namespace Mattermost.Models.Responses.Websocket
         /// <summary>
         /// Post data.
         /// </summary>
-        public Post Post => JsonSerializer.Deserialize<Post>(RawPostData)
-            ?? throw new JsonException("Failed to deserialize post data.");
+        public Post Post
+        {
+            get
+            {
+                parsedPost ??= JsonSerializer.Deserialize<Post>(RawPostData)
+                        ?? throw new JsonException("Failed to deserialize post data.");
+                return parsedPost;
+            }
+        }
+
+        private Post? parsedPost = null!;
 
         /// <summary>
         /// Post sender name.
