@@ -2,9 +2,11 @@ using System.Text.Json;
 using Mattermost.Models;
 using Mattermost.Exceptions;
 using Mattermost.Models.Users;
+using Mattermost.Models.Responses.Websocket;
 
 namespace Mattermost.Tests
 {
+    [SingleThreaded]
     public partial class MattermostClientTests
     {
         private string username = string.Empty;
@@ -13,7 +15,8 @@ namespace Mattermost.Tests
         IMattermostClient client;
 
         [SetUp]
-        public void Setup()
+        [OneTimeSetUp]
+        public async Task Setup()
         {
             string json = File.ReadAllText("secrets.json");
             var secrets = JsonSerializer.Deserialize<Secrets>(json)!;
@@ -22,6 +25,7 @@ namespace Mattermost.Tests
             token = secrets.Token;
             var mmClient = (IMattermostClient)new MattermostClient();
             client = mmClient;
+            await client.LoginAsync(username, password);
         }
 
         [Test]
@@ -34,7 +38,7 @@ namespace Mattermost.Tests
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });
-            User result = await client.LoginAsync(username, password);
+            User result = client.CurrentUserInfo;
             Assert.That(result, Is.Not.Null);
             Assert.Multiple(() =>
             {
@@ -73,7 +77,6 @@ namespace Mattermost.Tests
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });
-            await client.LoginAsync(username, password);
             await client.StartReceivingAsync();
             await Task.Delay(1000);
             Assert.That(client.IsConnected, Is.True);
@@ -84,7 +87,30 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
-        public async Task Logout_Successful()
+        public async Task SendMessageToBot_ReceivedFromEvent()
+        {
+            const string message = "/ping";
+            const string botId = "w5e788utqbfgickdfgsabp8wya";
+            await client.StartReceivingAsync();
+            await Task.Delay(1000);
+            List<PostInfo> receivedMessages = [];
+            client.OnMessageReceived += (sender, e) =>
+            {
+                receivedMessages.Add(e.Message);
+            };
+            await client.SendMessageAsync(botId, message);
+            await Task.Delay(1000);
+            Assert.That(receivedMessages, Is.Not.Empty);
+            Assert.That(receivedMessages[0].Post.Text, Is.EqualTo(":tada: Thanks for helping us make Mattermost better!"));
+        }
+
+        /// <summary>
+        /// Don't rename this test, it should be started with 'Z' to be the last one.
+        /// </summary>
+        /// <returns></returns>
+        [Test]
+        [NonParallelizable]
+        public async Task Z_Logout_Successful()
         {
             Assert.Multiple(() =>
             {
@@ -93,7 +119,7 @@ namespace Mattermost.Tests
                 Assert.That(token, Is.Not.Empty);
             });
             await client.LogoutAsync();
-            Assert.ThrowsAsync<HttpRequestException>(client.GetMeAsync);
+            Assert.ThrowsAsync<ApiKeyException>(client.GetMeAsync);
         }
     }
 }
