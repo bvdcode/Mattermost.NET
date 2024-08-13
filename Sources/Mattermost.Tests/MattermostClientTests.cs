@@ -41,8 +41,8 @@ namespace Mattermost.Tests
                 Assert.That(result.Username, Is.Not.Null);
                 Assert.That(result.Email, Is.EqualTo(username));
                 Assert.That(result.Id, Is.Not.Empty);
-                Assert.That(result.CreatedAt, Is.GreaterThan(0));
-                Assert.That(result.UpdatedAt, Is.GreaterThan(0));
+                Assert.That(result.CreatedAt, Is.Not.Empty);
+                Assert.That(result.UpdatedAt, Is.Not.Empty);
                 Assert.That(result.Username, Is.Not.Empty);
                 Assert.That(result.Locale, Is.Not.Empty);
                 Assert.That(result.IsBot, Is.False);
