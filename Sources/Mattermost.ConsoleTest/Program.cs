@@ -18,7 +18,7 @@ namespace Mattermost.ConsoleTest
             };
 
             client.OnLogMessage += (s, e) => Console.WriteLine(e.Message);
-            client.OnDisconnected += (sender, e) => Console.WriteLine($"Disconnected:  {e.CloseStatusDescription}");
+            client.OnDisconnected += (sender, e) => Console.WriteLine($"Disconnected: {e.CloseStatusDescription}");
             client.OnMessageReceived += (sender, e) =>
             {
                 Console.WriteLine($"Received message: {e.Message.Post.Text ?? "(empty)"}");
@@ -39,25 +39,8 @@ namespace Mattermost.ConsoleTest
             var myInfo = client.CurrentUserInfo;
             Console.WriteLine($"User Infomation:  {myInfo.FirstName} {myInfo.LastName}");
             Console.WriteLine($"   Username: {myInfo.Username} ({myInfo.Nickname})");
-            Console.WriteLine($"   Created at: {ConvertUnixTimeMillisecondsToDateTime(myInfo.CreatedAt):MM/dd/yyyy}");
+            Console.WriteLine($"   Created at: {myInfo.CreatedAt:MM/dd/yyyy}");
             Console.WriteLine($"   Id: {myInfo.Id}");
-        }
-
-        /// <summary>
-        /// Converts a Unix timestamp in milliseconds to a <see cref="DateTime"/>.
-        /// </summary>
-        /// <param name="unixTimeMilliseconds">The Unix timestamp in milliseconds.</param>
-        /// <returns>A <see cref="DateTime"/> representing the specified timestamp.</returns>
-        public static DateTime ConvertUnixTimeMillisecondsToDateTime(long unixTimeMilliseconds)
-        {
-            // Convert milliseconds to seconds for the base conversion
-            long unixTimeSeconds = unixTimeMilliseconds / 1000;
-
-            // Convert the seconds-based timestamp to DateTimeOffset
-            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTimeSeconds);
-
-            // Add the remaining milliseconds to get the precise DateTime
-            return dateTimeOffset.DateTime.AddMilliseconds(unixTimeMilliseconds % 1000);
         }
     }
 }
