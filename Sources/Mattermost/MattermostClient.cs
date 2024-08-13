@@ -580,6 +580,21 @@ namespace Mattermost
                         }
                         break;
                     }
+                case MattermostEvent.Typing:
+                    // Log($"User [{response.Data}] is typing");
+                    // Note: events like StatusChange or Typing are very frequent
+                    // If we'll log them, the log will be filled with these messages
+                    break;
+
+                case MattermostEvent.StatusChange:
+                    // Log($"User [{response.Data}] status changed");
+                    // Note: events like StatusChange or Typing are very frequent
+                    // If we'll log them, the log will be filled with these messages
+                    break;
+
+                case MattermostEvent.Unknown:
+                    Log($"Unknown event received: {response.Raw}");
+                    break;
                 default:
                     Log($"The event [{response.Event}] is not yet implemented");
                     break;

@@ -38,9 +38,9 @@ namespace Mattermost.ConsoleTest
         {
             var myInfo = client.CurrentUserInfo;
             Console.WriteLine($"User Infomation:  {myInfo.FirstName} {myInfo.LastName}");
-            Console.WriteLine($"   {myInfo.Username} ({myInfo.Nickname})");
-            Console.WriteLine($"   {ConvertUnixTimeMillisecondsToDateTime(myInfo.CreatedAt):MM/dd/yyyy}");
-            Console.WriteLine($"   {myInfo.Id}");
+            Console.WriteLine($"   Username: {myInfo.Username} ({myInfo.Nickname})");
+            Console.WriteLine($"   Created at: {ConvertUnixTimeMillisecondsToDateTime(myInfo.CreatedAt):MM/dd/yyyy}");
+            Console.WriteLine($"   Id: {myInfo.Id}");
         }
 
         /// <summary>
