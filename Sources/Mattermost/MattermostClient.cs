@@ -631,8 +631,11 @@ namespace Mattermost
                 _ws.Dispose();
                 _http.Dispose();
                 _disposed = true;
-                _receiverTask?.Dispose();
                 _receivingTokenSource.Dispose();
+                if (_receiverTask != null && _receiverTask.IsCompleted)
+                {
+                    _receiverTask.Dispose();
+                }
             }
         }
 
