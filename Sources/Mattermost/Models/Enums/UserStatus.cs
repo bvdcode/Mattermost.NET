@@ -28,11 +28,6 @@
         /// <summary>
         /// Do not disturb status.
         /// </summary>
-        DoNotDisturb = 4,
-
-        /// <summary>
-        /// Custom status: "In a meeting"
-        /// </summary>
-        InMeeting = 5,
+        DoNotDisturb = 4
     }
 }
