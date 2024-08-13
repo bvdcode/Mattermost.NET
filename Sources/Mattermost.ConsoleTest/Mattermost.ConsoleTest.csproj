@@ -11,6 +11,12 @@
 	  <ProjectReference Include="..\Mattermost\Mattermost.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="secrets.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 	<Import Project="..\Mattermost.Models\Mattermost.Models.projitems" Label="Shared" />
 
 </Project>
