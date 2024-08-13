@@ -6,9 +6,9 @@
     public enum UserStatus
     {
         /// <summary>
-        /// Custom status, ex. "Playing with Mattermost API".
+        /// Unknown status, when status is not recognized.
         /// </summary>
-        Custom = 0,
+        Unknown = 0,
 
         /// <summary>
         /// Away status - user is not active.
