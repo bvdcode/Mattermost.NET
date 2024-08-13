@@ -1,10 +1,14 @@
-﻿namespace Mattermost.ConsoleTest
+﻿using System.Text.Json;
+using Mattermost.Models;
+
+namespace Mattermost.ConsoleTest
 {
     public class Program
     {
         public static async Task Main()
         {
-            string token = "your token";
+            string json = File.ReadAllText("secrets.json");
+            var secrets = JsonSerializer.Deserialize<Secrets>(json)!;
             MattermostClient client = new();
 
             client.OnConnected += (sender, e) =>
@@ -13,17 +17,15 @@
                 ShowUserInfo(client);
             };
 
+            client.OnLogMessage += (s, e) => Console.WriteLine($"[LOG]: {e.Message}");
             client.OnDisconnected += (sender, e) => Console.WriteLine($"Disconnected:  {e.CloseStatusDescription}");
-
             client.OnMessageReceived += (sender, e) =>
             {
                 Console.WriteLine($"Received message: {e.Message.Post.Text ?? "(empty)"}");
                 e.Client.SendMessageAsync(e.Message.Post.ChannelId, "Hello!");
             };
 
-            client.OnLogMessage += (s, e) => Console.WriteLine($"[LOG]: {e.Message}");
-
-            await client.LoginAsync(token);
+            await client.LoginAsync(secrets.Username, secrets.Password);
             await client.StartReceivingAsync();
 
             await Task.Delay(10000);

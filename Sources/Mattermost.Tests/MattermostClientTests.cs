@@ -1,6 +1,7 @@
+using System.Text.Json;
+using Mattermost.Models;
 using Mattermost.Exceptions;
 using Mattermost.Models.Users;
-using System.Text.Json;
 
 namespace Mattermost.Tests
 {
@@ -19,7 +20,8 @@ namespace Mattermost.Tests
             username = secrets.Username;
             password = secrets.Password;
             token = secrets.Token;
-            client = new MattermostClient();
+            var mmClient = (IMattermostClient)new MattermostClient();
+            client = mmClient;
         }
 
         [Test]
