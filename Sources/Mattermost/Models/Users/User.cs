@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using Mattermost.Models;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace Mattermost.Models.Users
 {
@@ -21,16 +21,34 @@ namespace Mattermost.Models.Users
         public long CreatedAt { get; set; }
 
         /// <summary>
+        /// The <see cref="DateTime"/> a user was created in UTC format.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime CreatedAtDateTime => DateTimeOffset.FromUnixTimeMilliseconds(CreatedAt).UtcDateTime;
+
+        /// <summary>
         /// The time in milliseconds a user was last updated.
         /// </summary>
         [JsonPropertyName("update_at")]
         public long UpdatedAt { get; set; }
 
         /// <summary>
+        /// The <see cref="DateTime"/> a user was last updated in UTC format.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime UpdatedAtDateTime => DateTimeOffset.FromUnixTimeMilliseconds(UpdatedAt).UtcDateTime;
+
+        /// <summary>
         /// The time in milliseconds a user was deleted.
         /// </summary>
         [JsonPropertyName("delete_at")]
         public int DeletedAt { get; set; }
+
+        /// <summary>
+        /// The <see cref="DateTime"/> a user was deleted in UTC format.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime DeletedAtDateTime => DateTimeOffset.FromUnixTimeMilliseconds(DeletedAt).UtcDateTime;
 
         /// <summary>
         /// Username.
@@ -99,10 +117,22 @@ namespace Mattermost.Models.Users
         public long LastPasswordUpdate { get; set; }
 
         /// <summary>
+        /// The <see cref="DateTime"/> a user password was last updated in UTC format.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime LastPasswordUpdateDateTime => DateTimeOffset.FromUnixTimeMilliseconds(LastPasswordUpdate).UtcDateTime;
+
+        /// <summary>
         /// The time in milliseconds a user picture was last updated.
         /// </summary>
         [JsonPropertyName("last_picture_update")]
         public long LastPictureUpdate { get; set; }
+
+        /// <summary>
+        /// The <see cref="DateTime"/> a user picture was last updated in UTC format.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime LastPictureUpdateDateTime => DateTimeOffset.FromUnixTimeMilliseconds(LastPictureUpdate).UtcDateTime;
 
         /// <summary>
         /// User locale (ex. en-US, ru-RU etc.)
