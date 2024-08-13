@@ -2,18 +2,15 @@
 
 namespace Mattermost.Exceptions
 {
+    /// <summary>
+    /// Base class for all exceptions thrown by the Mattermost client.
+    /// </summary>
     public class MattermostClientException : Exception
     {
-        public MattermostClientException()
-        {
-        }
+        internal MattermostClientException() { }
 
-        public MattermostClientException(string message) : base(message)
-        {
-        }
+        internal MattermostClientException(string message) : base(message) { }
 
-        public MattermostClientException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
+        internal MattermostClientException(string message, Exception innerException) : base(message, innerException) { }
     }
 }

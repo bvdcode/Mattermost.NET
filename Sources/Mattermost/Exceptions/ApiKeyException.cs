@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace Mattermost.Exceptions
 {
+    /// <summary>
+    /// Thrown when the API key is invalid.
+    /// </summary>
     [Serializable]
     public class ApiKeyException : MattermostClientException
     {
-        public ApiKeyException()
-        {
-        }
+        internal ApiKeyException() { }
 
-        public ApiKeyException(string message) : base(message)
-        {
-        }
+        internal ApiKeyException(string message) : base(message) { }
 
-        public ApiKeyException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
+        internal ApiKeyException(string message, Exception innerException) : base(message, innerException) { }
     }
 }
