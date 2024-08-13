@@ -11,4 +11,6 @@
 	  <ProjectReference Include="..\Mattermost\Mattermost.csproj" />
 	</ItemGroup>
 
+	<Import Project="..\Mattermost.Models\Mattermost.Models.projitems" Label="Shared" />
+
 </Project>
