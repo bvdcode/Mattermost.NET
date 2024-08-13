@@ -17,6 +17,11 @@ namespace Mattermost
     public interface IMattermostClient
     {
         /// <summary>
+        /// Specifies whether the client is connected to the server with WebSocket.
+        /// </summary>
+        bool IsConnected { get; }
+
+        /// <summary>
         /// User information.
         /// </summary>
         User CurrentUserInfo { get; }
