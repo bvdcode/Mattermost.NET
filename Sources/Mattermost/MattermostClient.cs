@@ -29,12 +29,14 @@ namespace Mattermost
     public class MattermostClient : IMattermostClient
     {
         /// <summary>
-        /// Called when client is connected to server WebSocket after <see cref="StartReceivingAsync()"/> method.
+        /// Called when client is connected to server WebSocket after
+        /// <see cref="StartReceivingAsync()"/> method.
         /// </summary>
         public event EventHandler<ConnectionEventArgs>? OnConnected;
 
         /// <summary>
-        /// Called when client is disconnected from server WebSocket after <see cref="StopReceivingAsync()"/> method or when server closes connection.
+        /// Called when client is disconnected from server WebSocket after 
+        /// <see cref="StopReceivingAsync()"/> method or when server closes connection.
         /// </summary>
         public event EventHandler<DisconnectionEventArgs>? OnDisconnected;
 
@@ -119,7 +121,7 @@ namespace Mattermost
             _receivingTokenSource = new CancellationTokenSource();
             var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken).Token;
             _userInfo = await GetBotUserInfoAsync();
-            Log("Receiving started as user " + _userInfo.Username);
+            Log("Starting receiving as user @" + _userInfo.Username);
             _receiverTask = Task.Run(async () =>
             {
                 while (!mergedToken.IsCancellationRequested)
@@ -662,9 +664,8 @@ namespace Mattermost
             _ws = new ClientWebSocket();
             try
             {
+                Log("Opening new websocket connection...");
                 await _ws.ConnectAsync(uri, cancellationToken);
-                Log("Opening new websocket connection from state " + _ws.State);
-
                 if (_http.DefaultRequestHeaders.Authorization == null
                     || _http.DefaultRequestHeaders.Authorization.Scheme != "Bearer"
                     || string.IsNullOrWhiteSpace(_http.DefaultRequestHeaders.Authorization.Parameter))
