@@ -41,12 +41,12 @@ namespace Mattermost.Tests
                 Assert.That(result.Username, Is.Not.Null);
                 Assert.That(result.Email, Is.EqualTo(username));
                 Assert.That(result.Id, Is.Not.Empty);
-                Assert.That(result.CreatedAt, Is.Not.Empty);
-                Assert.That(result.UpdatedAt, Is.Not.Empty);
                 Assert.That(result.Username, Is.Not.Empty);
                 Assert.That(result.Locale, Is.Not.Empty);
                 Assert.That(result.IsBot, Is.False);
                 Assert.That(result.Timezone, Is.Not.Null);
+                Assert.That(result.CreatedAt, Is.Not.EqualTo(default(DateTime)));
+                Assert.That(result.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
             });
         }
 
@@ -75,8 +75,10 @@ namespace Mattermost.Tests
             });
             await client.LoginAsync(username, password);
             await client.StartReceivingAsync();
+            await Task.Delay(1000);
             Assert.That(client.IsConnected, Is.True);
             await client.StopReceivingAsync();
+            await Task.Delay(1000);
             Assert.That(client.IsConnected, Is.False);
         }
 
