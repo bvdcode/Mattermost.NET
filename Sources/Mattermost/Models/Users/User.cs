@@ -18,37 +18,43 @@ namespace Mattermost.Models.Users
         /// The time in milliseconds a user was created.
         /// </summary>
         [JsonPropertyName("create_at")]
-        public long CreatedAt { get; set; }
+        public long CreatedAtUnixTimestamp { get; set; }
 
         /// <summary>
         /// The <see cref="DateTime"/> a user was created in UTC format.
         /// </summary>
         [JsonIgnore]
-        public DateTime CreatedAtDateTime => DateTimeOffset.FromUnixTimeMilliseconds(CreatedAt).UtcDateTime;
+        public DateTime CreatedAt => DateTimeOffset
+            .FromUnixTimeMilliseconds(CreatedAtUnixTimestamp)
+            .UtcDateTime;
 
         /// <summary>
         /// The time in milliseconds a user was last updated.
         /// </summary>
         [JsonPropertyName("update_at")]
-        public long UpdatedAt { get; set; }
+        public long UpdatedAtUnixTimestamp { get; set; }
 
         /// <summary>
         /// The <see cref="DateTime"/> a user was last updated in UTC format.
         /// </summary>
         [JsonIgnore]
-        public DateTime UpdatedAtDateTime => DateTimeOffset.FromUnixTimeMilliseconds(UpdatedAt).UtcDateTime;
+        public DateTime UpdatedAt => DateTimeOffset
+            .FromUnixTimeMilliseconds(UpdatedAtUnixTimestamp)
+            .UtcDateTime;
 
         /// <summary>
         /// The time in milliseconds a user was deleted.
         /// </summary>
         [JsonPropertyName("delete_at")]
-        public int DeletedAt { get; set; }
+        public int DeletedAtUnixTimestamp { get; set; }
 
         /// <summary>
         /// The <see cref="DateTime"/> a user was deleted in UTC format.
         /// </summary>
         [JsonIgnore]
-        public DateTime DeletedAtDateTime => DateTimeOffset.FromUnixTimeMilliseconds(DeletedAt).UtcDateTime;
+        public DateTime DeletedAt => DateTimeOffset
+            .FromUnixTimeMilliseconds(DeletedAtUnixTimestamp)
+            .UtcDateTime;
 
         /// <summary>
         /// Username.
@@ -114,25 +120,29 @@ namespace Mattermost.Models.Users
         /// The time in milliseconds a user password was last updated.
         /// </summary>
         [JsonPropertyName("last_password_update")]
-        public long LastPasswordUpdate { get; set; }
+        public long LastPasswordUpdateUnixTimestamp { get; set; }
 
         /// <summary>
         /// The <see cref="DateTime"/> a user password was last updated in UTC format.
         /// </summary>
         [JsonIgnore]
-        public DateTime LastPasswordUpdateDateTime => DateTimeOffset.FromUnixTimeMilliseconds(LastPasswordUpdate).UtcDateTime;
+        public DateTime LastPasswordUpdate => DateTimeOffset
+            .FromUnixTimeMilliseconds(LastPasswordUpdateUnixTimestamp)
+            .UtcDateTime;
 
         /// <summary>
         /// The time in milliseconds a user picture was last updated.
         /// </summary>
         [JsonPropertyName("last_picture_update")]
-        public long LastPictureUpdate { get; set; }
+        public long LastPictureUpdateUnixTimestamp { get; set; }
 
         /// <summary>
         /// The <see cref="DateTime"/> a user picture was last updated in UTC format.
         /// </summary>
         [JsonIgnore]
-        public DateTime LastPictureUpdateDateTime => DateTimeOffset.FromUnixTimeMilliseconds(LastPictureUpdate).UtcDateTime;
+        public DateTime LastPictureUpdate => DateTimeOffset
+            .FromUnixTimeMilliseconds(LastPictureUpdateUnixTimestamp)
+            .UtcDateTime;
 
         /// <summary>
         /// User locale (ex. en-US, ru-RU etc.)
