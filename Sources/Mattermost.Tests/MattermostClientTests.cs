@@ -65,6 +65,23 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
+        public async Task ConnectWebSocket_ServerConnected()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(username, Is.Not.Empty);
+                Assert.That(password, Is.Not.Empty);
+                Assert.That(token, Is.Not.Empty);
+            });
+            await client.LoginAsync(username, password);
+            await client.StartReceivingAsync();
+            Assert.That(client.IsConnected, Is.True);
+            await client.StopReceivingAsync();
+            Assert.That(client.IsConnected, Is.False);
+        }
+
+        [Test]
+        [NonParallelizable]
         public async Task Logout_Successful()
         {
             Assert.Multiple(() =>

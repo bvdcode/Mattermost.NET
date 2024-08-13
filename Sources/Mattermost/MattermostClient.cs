@@ -58,6 +58,11 @@ namespace Mattermost
         public event EventHandler<UserStatusChangeEventArgs>? OnStatusUpdated;
 
         /// <summary>
+        /// Specifies whether the client is connected to the server with WebSocket.
+        /// </summary>
+        public bool IsConnected => _ws.State == WebSocketState.Open;
+
+        /// <summary>
         /// User information.
         /// </summary>
         public User CurrentUserInfo => _userInfo ?? throw new InvalidOperationException("You must login first");
