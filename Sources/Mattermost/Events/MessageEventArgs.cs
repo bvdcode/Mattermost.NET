@@ -23,13 +23,13 @@ namespace Mattermost.Events
         /// <summary>
         /// Received message.
         /// </summary>
-        public PostUpdateInfo Message { get; } = null!;
+        public PostInfo Message { get; } = null!;
 
         internal MessageEventArgs(IMattermostClient mattermostBot, WebsocketMessage response, CancellationToken cancellationToken)
         {
             Client = mattermostBot;
             CancellationToken = cancellationToken;
-            Message = response.GetData<PostInfo>().ToPostUpdateInfo();
+            Message = response.GetData<PostInfo>();
         }
     }
 }

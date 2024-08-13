@@ -34,10 +34,16 @@ namespace Mattermost.Models.Responses.Websocket
         public string Mentions { get; set; } = string.Empty;
 
         /// <summary>
-        /// Post raw JSON data.
+        /// Raw post JSON data.
         /// </summary>
         [JsonPropertyName("post")]
-        public string Post { get; set; } = string.Empty;
+        public string RawPostData { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Post data.
+        /// </summary>
+        public Post Post => JsonSerializer.Deserialize<Post>(RawPostData)
+            ?? throw new JsonException("Failed to deserialize post data.");
 
         /// <summary>
         /// Post sender name.
@@ -56,20 +62,5 @@ namespace Mattermost.Models.Responses.Websocket
         /// </summary>
         [JsonPropertyName("set_online")]
         public bool SetOnline { get; set; }
-
-        internal PostUpdateInfo ToPostUpdateInfo()
-        {
-            return new PostUpdateInfo()
-            {
-                ChannelDisplayName = ChannelDisplayName,
-                ChannelName = ChannelName,
-                ChannelType = ChannelType,
-                Mentions = Mentions,
-                Post = JsonSerializer.Deserialize<Post>(Post)!,
-                SenderName = SenderName,
-                SetOnline = SetOnline,
-                TeamId = TeamId
-            };
-        }
     }
 }
