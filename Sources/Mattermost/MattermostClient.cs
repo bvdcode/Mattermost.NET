@@ -581,7 +581,7 @@ namespace Mattermost
                         break;
                     }
                 default:
-                    Log($"The event [{response.Event.ToString()}] is not yet implemented");
+                    Log($"The event [{response.Event}] is not yet implemented");
                     break;
             }
 
