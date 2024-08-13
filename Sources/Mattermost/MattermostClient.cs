@@ -545,7 +545,7 @@ namespace Mattermost
         /// <param name="teamId"> Team identifier where channel is exists. </param>
         /// <param name="channelName"> Channel name. </param>
         /// <returns> Channel info. </returns>
-        public async Task<Channel?> FindChannelByName(string teamId, string channelName)
+        public async Task<Channel?> FindChannelByNameAsync(string teamId, string channelName)
         {
             CheckAuthorized();
             CheckDisposed();

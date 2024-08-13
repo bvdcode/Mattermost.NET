@@ -166,7 +166,7 @@ namespace Mattermost
         /// <param name="teamId"> Team identifier where channel is exists. </param>
         /// <param name="channelName"> Channel name. </param>
         /// <returns> Channel info. </returns>
-        Task<Channel?> FindChannelByName(string teamId, string channelName);
+        Task<Channel?> FindChannelByNameAsync(string teamId, string channelName);
 
         /// <summary>
         /// Set call state for channel identifier - 'Calls' plugin required.
