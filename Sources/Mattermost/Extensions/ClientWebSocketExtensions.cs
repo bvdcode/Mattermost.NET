@@ -31,7 +31,7 @@ namespace Mattermost.Extensions
             result.MessageType = response.MessageType;
             if (result.MessageType == WebSocketMessageType.Close)
             {
-                result.UpdateCloseStatusInfo(result.CloseStatus.Value, result.CloseStatusDescription);
+                result.UpdateCloseStatusInfo(result.CloseStatus, result.CloseStatusDescription);
             }
             return result;
         }

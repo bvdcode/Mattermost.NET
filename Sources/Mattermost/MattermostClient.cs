@@ -42,13 +42,20 @@ namespace Mattermost
 
         /// <summary>
         /// Event called when new message received.
+        /// You have to call <see cref="StartReceivingAsync()"/> method to start receiving messages.
         /// </summary>
         public event EventHandler<MessageEventArgs>? OnMessageReceived;
 
         /// <summary>
-        /// Event callen when log message created.
+        /// Event called when log message created.
         /// </summary>
         public event EventHandler<LogEventArgs>? OnLogMessage;
+
+        /// <summary>
+        /// Event called when user status updated.
+        /// You have to call <see cref="StartReceivingAsync()"/> method to start receiving status updates.
+        /// </summary>
+        public event EventHandler<UserStatusChangeEventArgs>? OnStatusUpdated;
 
         /// <summary>
         /// User information.
@@ -574,31 +581,24 @@ namespace Mattermost
             switch (response.Event)
             {
                 case MattermostEvent.Posted:
+                    var messageArgs = new MessageEventArgs(this, response, cancellationToken);
+                    if (_userInfo != null && messageArgs.Message.Post.UserId != _userInfo.Id)
                     {
-                        var args = new MessageEventArgs(this, response, cancellationToken);
-                        if (_userInfo != null && args.Message.Post.UserId != _userInfo.Id)
-                        {
-                            OnMessageReceived?.Invoke(this, args);
-                        }
-                        break;
+                        OnMessageReceived?.Invoke(this, messageArgs);
                     }
-                case MattermostEvent.Typing:
-                    // Log($"User [{response.Data}] is typing");
-                    // Note: events like StatusChange or Typing are very frequent
-                    // If we'll log them, the log will be filled with these messages
                     break;
 
                 case MattermostEvent.StatusChange:
-                    // Log($"User [{response.Data}] status changed");
-                    // Note: events like StatusChange or Typing are very frequent
-                    // If we'll log them, the log will be filled with these messages
+                    var statusArgs = new UserStatusChangeEventArgs(this, response, cancellationToken);
+                    OnStatusUpdated?.Invoke(this, statusArgs);
                     break;
 
                 case MattermostEvent.Unknown:
-                    Log($"Unknown event received: {response.Raw}");
+                    Log($"Unknown event received: {response.EventText}");
                     break;
+
                 default:
-                    Log($"The event [{response.Event}] is not yet implemented");
+                    Log($"Received event: {response.Event}");
                     break;
             }
 

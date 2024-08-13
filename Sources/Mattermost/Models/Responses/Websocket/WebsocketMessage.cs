@@ -12,7 +12,7 @@ namespace Mattermost.Models.Responses
         public WebSocketCloseStatus? CloseStatus { get; private set; }
         public string? CloseStatusDescription { get; private set; }
 
-        public void UpdateCloseStatusInfo(WebSocketCloseStatus status, string description)
+        public void UpdateCloseStatusInfo(WebSocketCloseStatus? status, string? description)
         {
             CloseStatus = status;
             CloseStatusDescription = description;

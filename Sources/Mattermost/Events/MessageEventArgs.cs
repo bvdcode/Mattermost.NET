@@ -13,7 +13,7 @@ namespace Mattermost.Events
         /// <summary>
         /// Mattermost client instance.
         /// </summary>
-        public IMattermostClient Client { get; set; } = null!;
+        public IMattermostClient Client { get; } = null!;
 
         /// <summary>
         /// Cancellation token from <see cref="IMattermostClient.StartReceivingAsync(CancellationToken)"/>
