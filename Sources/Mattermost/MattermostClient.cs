@@ -137,7 +137,7 @@ namespace Mattermost
                     }
                     catch (OperationCanceledException)
                     {
-                        Log("Operation has been cancelled");
+                        Log("WebSocket receiving canceled");
                         // Trigger OnDisconnected event
                         OnDisconnected?.Invoke(this, new DisconnectionEventArgs(WebSocketCloseStatus.NormalClosure, "Closed by client", DateTime.UtcNow));
                         break;
