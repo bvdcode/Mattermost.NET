@@ -1,6 +1,4 @@
-﻿using Mattermost.Events;
-
-namespace Mattermost.ConsoleTest
+﻿namespace Mattermost.ConsoleTest
 {
     public class Program
     {
@@ -9,10 +7,10 @@ namespace Mattermost.ConsoleTest
             string token = "your token";
             MattermostClient client = new();
 
-            client.OnConnected += async (sender, e) =>
+            client.OnConnected += (sender, e) =>
             {
                 Console.WriteLine($"Connected to {e.Uri}");
-                await ShowUserInfoAsync(client);
+                ShowUserInfo(client);
             };
 
             client.OnDisconnected += (sender, e) => Console.WriteLine($"Disconnected:  {e.CloseStatusDescription}");
@@ -34,12 +32,12 @@ namespace Mattermost.ConsoleTest
             await client.LogoutAsync();
         }
 
-        private static async Task ShowUserInfoAsync(MattermostClient client)
+        private static void ShowUserInfo(MattermostClient client)
         {
-            var myInfo = await client.GetMeAsync();
+            var myInfo = client.CurrentUserInfo;
             Console.WriteLine($"User Infomation:  {myInfo.FirstName} {myInfo.LastName}");
             Console.WriteLine($"   {myInfo.Username} ({myInfo.Nickname})");
-            Console.WriteLine($"   {ConvertUnixTimeMillisecondsToDateTime(myInfo.CreatedAt).ToString("MM/dd/yyyy")}");
+            Console.WriteLine($"   {ConvertUnixTimeMillisecondsToDateTime(myInfo.CreatedAt):MM/dd/yyyy}");
             Console.WriteLine($"   {myInfo.Id}");
         }
 
