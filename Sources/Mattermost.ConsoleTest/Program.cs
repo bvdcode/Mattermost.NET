@@ -17,7 +17,7 @@ namespace Mattermost.ConsoleTest
                 ShowUserInfo(client);
             };
 
-            client.OnLogMessage += (s, e) => Console.WriteLine($"[LOG]: {e.Message}");
+            client.OnLogMessage += (s, e) => Console.WriteLine(e.Message);
             client.OnDisconnected += (sender, e) => Console.WriteLine($"Disconnected:  {e.CloseStatusDescription}");
             client.OnMessageReceived += (sender, e) =>
             {
