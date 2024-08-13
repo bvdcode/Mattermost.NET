@@ -55,12 +55,14 @@ namespace Mattermost.Models.Responses
 
         internal TObj GetData<TObj>()
         {
-            return JsonSerializer.Deserialize<TObj>(Json)!;
+            return JsonSerializer.Deserialize<TObj>(Json) ?? default!;
         }
 
         private MattermostEvent GetEvent()
         {
-            bool parsed = Enum.TryParse<MattermostEvent>(EventText, true, out var result);
+            string eventText = (EventText ?? string.Empty)
+                .Replace("_", string.Empty);
+            bool parsed = Enum.TryParse<MattermostEvent>(eventText, true, out var result);
             return parsed ? result : MattermostEvent.Unknown;
         }
 

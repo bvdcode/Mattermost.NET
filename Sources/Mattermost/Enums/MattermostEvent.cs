@@ -4,9 +4,9 @@ namespace Mattermost.Enums
 {
     public enum MattermostEvent
     {
-        Unknown,
-        Posted,
-        Status_Change,
-        Typing
+        Unknown = 0,
+        Posted = 1,
+        StatusChange = 2,
+        Typing = 3
     }
 }
