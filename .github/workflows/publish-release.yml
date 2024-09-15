@@ -64,8 +64,8 @@ jobs:
     - name: Push package to GitHub packages 
       if: needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change  
       run: |
-        dotnet nuget push nupkg/*.nupkg --skip-duplicate --api-key ${{ secrets.DEPLOY_GITHUB_TOKEN }} --source "github"
-        dotnet nuget push nupkg/*.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push *.nupkg --skip-duplicate --api-key ${{ secrets.DEPLOY_GITHUB_TOKEN }} --source "github"
+        dotnet nuget push *.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json
     
     #Create release
     - name: Create Release
