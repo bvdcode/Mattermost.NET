@@ -30,7 +30,9 @@ dotnet add package Mattermost.NET
 using Mattermost.NET;
 const string token = "37VlFKySIZn6gryA85cR1GKBQkjmfRZ6";
 const string server = "https://mm.your-server.com"; // or https://community.mattermost.com by default
-MattermostClient client = new(server, token);
+MattermostClient client = new(server);
+
+var botUser = await client.LoginAsync(token);
 ```
 
 ### Subscribe to post updates

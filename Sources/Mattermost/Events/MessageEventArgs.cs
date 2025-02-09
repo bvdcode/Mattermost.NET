@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
-using Mattermost.Models.Responses;
 using Mattermost.Models.Responses.Websocket;
+using Mattermost.Models.Responses.Websocket.Posts;
 
 namespace Mattermost.Events
 {

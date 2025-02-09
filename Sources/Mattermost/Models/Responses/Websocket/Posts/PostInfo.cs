@@ -2,7 +2,7 @@
 using Mattermost.Models.Posts;
 using System.Text.Json.Serialization;
 
-namespace Mattermost.Models.Responses.Websocket
+namespace Mattermost.Models.Responses.Websocket.Posts
 {
     /// <summary>
     /// Base post information class.

@@ -1,7 +1,7 @@
-﻿using Mattermost.Models.Responses;
-using Mattermost.Models.Responses.Websocket.Users;
-using System;
+﻿using System;
 using System.Threading;
+using Mattermost.Models.Responses.Websocket;
+using Mattermost.Models.Responses.Websocket.Users;
 
 namespace Mattermost.Events
 {
