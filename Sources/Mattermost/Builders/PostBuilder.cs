@@ -123,7 +123,7 @@ namespace Mattermost.Builders
             {
                 throw new ArgumentException("Post cannot be empty - no text and no files there.");
             }
-            return client.SendMessageAsync(channelId, text, replyToPostId, messagePriority, files.Count > 0 ? files : null);
+            return client.CreatePostAsync(channelId, text, replyToPostId, messagePriority, files.Count > 0 ? files : null);
         }
     }
 }
