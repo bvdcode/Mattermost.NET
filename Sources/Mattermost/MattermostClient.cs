@@ -58,6 +58,11 @@ namespace Mattermost
         public event EventHandler<UserStatusChangeEventArgs>? OnStatusUpdated;
 
         /// <summary>
+        /// Event called when any event received.
+        /// </summary>
+        public event EventHandler<WebSocketEventArgs>? OnEventReceived;
+
+        /// <summary>
         /// Specifies whether the client is connected to the server with WebSocket.
         /// </summary>
         public bool IsConnected => _ws.State == WebSocketState.Open;
@@ -643,6 +648,14 @@ namespace Mattermost
 
         private Task HandleResponseAsync(WebsocketMessage response, CancellationToken cancellationToken)
         {
+            try
+            {
+                OnEventReceived?.Invoke(this, new WebSocketEventArgs(this, response, cancellationToken));
+            }
+            catch (Exception ex)
+            {
+                Log("Error when calling OnEventReceived", ex);
+            }
             switch (response.Event)
             {
                 case MattermostEvent.Posted:

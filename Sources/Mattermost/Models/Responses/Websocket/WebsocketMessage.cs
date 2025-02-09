@@ -42,12 +42,12 @@ namespace Mattermost.Models.Responses.Websocket
             {
                 if (Data == null)
                 {
-                    return string.Empty;
+                    return "{}";
                 }
                 string json = JsonSerializer.Serialize(Data);
                 if (string.IsNullOrWhiteSpace(json))
                 {
-                    return string.Empty;
+                    return "{}";
                 }
                 return json;
             }
