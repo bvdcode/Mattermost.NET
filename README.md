@@ -14,6 +14,43 @@ Ready-to-use **.NET Standard** library for convenient development of Mattermost 
 
 ---
 
+# Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Create a new bot](#create-a-new-bot)
+  - [Authenticate the bot](#authenticate-the-bot)
+  - [Subscribe to post updates](#subscribe-to-post-updates)
+  - [Start the bot updates](#start-the-bot-updates)
+  - [Stop the bot](#stop-the-bot)
+- [Client Methods](#client-methods)
+  - [Posts](#posts)
+    - [`CreatePostAsync`](#createpostasync---send-message-to-specified-channel-using-channel-identifier)
+    - [`GetPostAsync`](#getpostasync---get-post-by-identifier)
+    - [`UpdatePostAsync`](#updatepostasync---update-message-text-for-specified-post-identifier)
+    - [`DeletePostAsync`](#deletepostasync---delete-post-with-specified-post-identifier)
+  - [Channels](#channels)
+    - [`CreateChannelAsync`](#createchannelasync---create-simple-channel-with-specified-users)
+    - [`CreateGroupChannelAsync`](#creategroupchannelasync---create-group-channel-with-specified-users)
+    - [`AddUserToChannelAsync`](#addusertochannelasync---add-user-to-specified-channel)
+    - [`DeleteUserFromChannelAsync`](#deleteuserfromchannelasync---remove-user-from-specified-channel)
+    - [`FindChannelByNameAsync`](#findchannelbynamesync---find-channel-by-name-and-team-id)
+    - [`ArchiveChannelAsync`](#archivechannelasync---archive-specified-channel)
+  - [Files](#files)
+    - [`GetFileAsync`](#getfileasync---get-file-bytes-by-identifier)
+    - [`GetFileDetailsAsync`](#getfiledetailsasync---get-file-details-by-identifier)
+    - [`UploadFileAsync`](#uploadfileasync---upload-file-to-specified-channel)
+  - [Users](#users)
+    - [`GetMeAsync`](#getmeasync---get-current-authenticated-user-information)
+    - [`GetUserAsync`](#getuserasync---get-user-by-identifier)
+    - [`GetUserByUsernameAsync`](#getuserbyusernameasync---get-user-by-username)
+  - [Other](#other)
+    - [`SetChannelCallStateAsync`](#setchannelcallstateasync---set-call-state-for-specified-channel-calls-plugin-required)
+- [License](#license)
+- [Contact](#contact)
+
+---
+
 # Installation
 
 The library is available as a NuGet package. You can install it using the NuGet Package Manager or the `dotnet` CLI.
