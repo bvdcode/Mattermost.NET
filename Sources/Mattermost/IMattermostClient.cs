@@ -67,9 +67,11 @@ namespace Mattermost
         /// Stop receiving messages.
         /// </summary>
         Task StopReceivingAsync();
-        
+
+        #region Posts
+
         /// <summary>
-        /// Send message to specified channel identifier.
+        /// Send message to specified channel using channel identifier.
         /// </summary>
         /// <param name="channelId"> Channel identifier. </param>
         /// <param name="message"> Message text (Markdown supported). </param>
@@ -81,7 +83,14 @@ namespace Mattermost
         Task<Post> CreatePostAsync(string channelId, string message = "", string replyToPostId = "", MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null);
 
         /// <summary>
-        /// Send message to specified channel identifier.
+        /// Get post by identifier.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        /// <returns> Post information. </returns>
+        Task<Post> GetPostAsync(string postId);
+
+        /// <summary>
+        /// Send message to specified channel using channel identifier.
         /// </summary>
         /// <param name="channelId"> Channel identifier. </param>
         /// <param name="message"> Message text (Markdown supported). </param>
@@ -107,12 +116,9 @@ namespace Mattermost
         /// <returns> True if deleted, otherwise false. </returns>
         Task<bool> DeletePostAsync(string postId);
 
-        /// <summary>
-        /// Create group channel with specified users.
-        /// </summary>
-        /// <param name="userIds"> Participant users. </param>
-        /// <returns> Created channel info. </returns>
-        Task<Channel> CreateGroupChannelAsync(params string[] userIds);
+        #endregion
+
+        #region Channels
 
         /// <summary>
         /// Create simple channel with specified users.
@@ -128,11 +134,11 @@ namespace Mattermost
             ChannelType channelType, string purpose = "", string header = "");
 
         /// <summary>
-        /// Get user by identifier.
+        /// Create group channel with specified users.
         /// </summary>
-        /// <param name="userId"> User identifier. </param>
-        /// <returns> User information. </returns>
-        Task<User> GetUserAsync(string userId);
+        /// <param name="userIds"> Participant users. </param>
+        /// <returns> Created channel info. </returns>
+        Task<Channel> CreateGroupChannelAsync(params string[] userIds);
 
         /// <summary>
         /// Add user to channel.
@@ -151,11 +157,37 @@ namespace Mattermost
         Task<bool> DeleteUserFromChannelAsync(string channelId, string userId);
 
         /// <summary>
-        /// Get user by username.
+        /// Find channel by channel name and team identifier.
         /// </summary>
-        /// <param name="username"> Username. </param>
-        /// <returns> User information. </returns>
-        Task<User> GetUserByUsernameAsync(string username);
+        /// <param name="teamId"> Team identifier where channel is exists. </param>
+        /// <param name="channelName"> Channel name. </param>
+        /// <returns> Channel info. </returns>
+        Task<Channel?> FindChannelByNameAsync(string teamId, string channelName);
+
+        /// <summary>
+        /// Archive channel by specified channel identifier.
+        /// </summary>
+        /// <param name="channelId"> Channel identifier. </param>
+        /// <returns> True if archieved, otherwise false. </returns>
+        Task<bool> ArchiveChannelAsync(string channelId);
+
+        #endregion
+
+        #region Files
+
+        /// <summary>
+        /// Get file by identifier.
+        /// </summary>
+        /// <param name="fileId"> File identifier. </param>
+        /// <returns> File bytes. </returns>
+        Task<byte[]> GetFileAsync(string fileId);
+
+        /// <summary>
+        /// Get file details by specified identifier.
+        /// </summary>
+        /// <param name="fileId"> File identifier. </param>
+        /// <returns> File details. </returns>
+        Task<FileDetails> GetFileDetailsAsync(string fileId);
 
         /// <summary>
         /// Upload new file.
@@ -166,20 +198,31 @@ namespace Mattermost
         /// <returns> Created file details. </returns>
         Task<FileDetails> UploadFileAsync(string channelId, string filePath, Action<int>? progressChanged = null);
 
-        /// <summary>
-        /// Get file details by specified identifier.
-        /// </summary>
-        /// <param name="fileId"> File identifier. </param>
-        /// <returns> File details. </returns>
-        Task<FileDetails> GetFileDetailsAsync(string fileId);
+        #endregion
+
+        #region Users
 
         /// <summary>
-        /// Find channel by channel name and team identifier.
+        /// Get current authorized user information.
         /// </summary>
-        /// <param name="teamId"> Team identifier where channel is exists. </param>
-        /// <param name="channelName"> Channel name. </param>
-        /// <returns> Channel info. </returns>
-        Task<Channel?> FindChannelByNameAsync(string teamId, string channelName);
+        /// <returns> Authorized user information. </returns>
+        Task<User> GetMeAsync();
+
+        /// <summary>
+        /// Get user by identifier.
+        /// </summary>
+        /// <param name="userId"> User identifier. </param>
+        /// <returns> User information. </returns>
+        Task<User> GetUserAsync(string userId);
+
+        /// <summary>
+        /// Get user by username.
+        /// </summary>
+        /// <param name="username"> Username. </param>
+        /// <returns> User information. </returns>
+        Task<User> GetUserByUsernameAsync(string username);
+
+        #endregion
 
         /// <summary>
         /// Set call state for channel identifier - 'Calls' plugin required.
@@ -188,28 +231,7 @@ namespace Mattermost
         /// <param name="channelId"> Channel identifier where calls must be in specified state. </param>
         /// <returns> True if calls state setted, otherwise false. </returns>
         Task<bool> SetChannelCallStateAsync(string channelId, bool isCallsEnabled);
-
-        /// <summary>
-        /// Archive channel by specified channel identifier.
-        /// </summary>
-        /// <param name="channelId"> Channel identifier. </param>
-        /// <returns> True if archieved, otherwise false. </returns>
-        Task<bool> ArchiveChannelAsync(string channelId);
-
-        /// <summary>
-        /// Get post by identifier.
-        /// </summary>
-        /// <param name="postId"> Post identifier. </param>
-        /// <returns> Post information. </returns>
-        Task<Post> GetPostAsync(string postId);
-
-        /// <summary>
-        /// Get file by identifier.
-        /// </summary>
-        /// <param name="fileId"> File identifier. </param>
-        /// <returns> File bytes. </returns>
-        Task<byte[]> GetFileAsync(string fileId);
-
+        
         /// <summary>
         /// Login with specified login identifier and password.
         /// </summary>
@@ -223,11 +245,5 @@ namespace Mattermost
         /// </summary>
         /// <returns> Task representing logout operation. </returns>
         Task LogoutAsync();
-
-        /// <summary>
-        /// Get current authorized user information.
-        /// </summary>
-        /// <returns> Authorized user information. </returns>
-        Task<User> GetMeAsync();
     }
 }
