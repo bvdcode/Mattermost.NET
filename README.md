@@ -76,7 +76,7 @@ await client.StopReceivingAsync();
 
 ## Posts
 
-### `SendMessageAsync:`
+### `CreatePostAsync` - Send message to specified channel using channel identifier.
 
 `string channelId` - The ID of the channel to send the message to.
 `string message` - The message to send.
@@ -87,12 +87,24 @@ await client.StopReceivingAsync();
 Example:
 
 ```csharp
-await client.SendMessageAsync("channel_id", "Hello, World!");
+await client.CreatePostAsync("channel_id", "Hello, World!");
 ```
 
 ---
 
-### `UpdatePostAsync:`
+### `GetPostAsync` - Get post by identifier.
+
+`string postId` - The ID of the post to get.
+
+Example:
+
+```csharp
+var post = await client.GetPostAsync("post_id");
+```
+
+---
+
+### `UpdatePostAsync` - Update message text for specified post identifier.
 
 `string postId` - The ID of the post to update.
 `string message` - The new message text.
@@ -105,7 +117,7 @@ await client.UpdatePostAsync("post_id", "I changed my mind");
 
 ---
 
-### `DeletePostAsync:`
+### `DeletePostAsync` - Delete post with specified post identifier.
 
 `string postId` - The ID of the post to delete.
 
@@ -117,19 +129,174 @@ await client.DeletePostAsync("post_id");
 
 ---
 
-### `GetChannelMembersAsync`
+## Channels
+
+### `CreateChannelAsync` - Create simple channel with specified users.
+
+`string teamId` - The ID of the team to create the channel in.
+`string name` - The name of the channel to create.
+`string displayName` - The display name of the channel to create.
+`ChannelType channelType` - The type of the channel to create.
+`string purpose` - The purpose of the channel to create (optional).
+`string header` - The header of the channel to create (optional).
 
 Example:
 
 ```csharp
-var members = await client.GetChannelMembersAsync("channel_id");
+await client.CreateChannelAsync("team_id", "channel_name", "Channel display name", ChannelType.Public, "Channel purpose", "Channel header");
 ```
 
-### `GetChannelPostsAsync`
+---
+
+### `CreateGroupChannelAsync` - Create group channel with specified users.
+
+`string[] userIds` - The IDs of the users to create the group channel with.
+
+Example:
 
 ```csharp
-var posts = await client.GetChannelPostsAsync("channel_id");
+await client.CreateGroupChannelAsync([ "user_id_1", "user_id_2" ]);
 ```
+
+---
+
+### `AddUserToChannelAsync` - Add user to specified channel.
+
+`string channelId` - The ID of the channel to add the user to.
+`string userId` - The ID of the user to add to the channel.
+
+Example:
+
+```csharp
+await client.AddUserToChannelAsync("channel_id", "user_id");
+```
+
+---
+
+### `DeleteUserFromChannelAsync` - Remove user from specified channel.
+
+`string channelId` - The ID of the channel to remove the user from.
+`string userId` - The ID of the user to remove from the channel.
+
+Example:
+
+```csharp
+await client.DeleteUserFromChannelAsync("channel_id", "user_id");
+```
+
+---
+
+### `FindChannelByNameAsync` - Find channel by name and team ID.
+
+`string teamId` - The ID of the team to search in.
+`string channelName` - The name of the channel to search for.
+
+Example:
+
+```csharp
+Channel? channel = await client.FindChannelByNameAsync("team_id", "channel_name");
+```
+
+---
+
+### `ArchiveChannelAsync` - Archive specified channel.
+
+`string channelId` - The ID of the channel to archive.
+
+Example:
+
+```csharp
+bool archived = await client.ArchiveChannelAsync("channel_id");
+```
+
+---
+
+## Files
+
+### `GetFileAsync` - Get file bytes by identifier.
+
+`string fileId` - The ID of the file to get.
+
+Example:
+
+```csharp
+byte[] file = await client.GetFileAsync("file_id");
+```
+
+---
+
+### `GetFileDetailsAsync` - Get file details by identifier.
+
+`string fileId` - The ID of the file to get.
+
+Example:
+
+```csharp
+FileDetails fileDetails = await client.GetFileDetailsAsync("file_id");
+```
+
+---
+
+### `UploadFileAsync` - Upload file to specified channel.
+
+`string channelId` - The ID of the channel to upload the file to.
+`string filePath` - The path to the file to upload.
+`Action<int>? progressChanged` - The action to call with the upload progress.
+
+Example:
+
+```csharp
+var callback = new Action<int>(progress => Console.WriteLine($"Upload progress: {progress}%"));
+await client.UploadFileAsync("channel_id", "file_path", callback);
+```
+
+---
+
+## Users
+
+### `GetMeAsync` - Get current authenticated user information.
+
+Example:
+
+```csharp
+User me = await client.GetMeAsync();
+```
+
+---
+
+### `GetUserAsync` - Get user by identifier.
+
+`string userId` - The ID of the user to get.
+
+Example:
+
+```csharp
+User user = await client.GetUserAsync("user_id");
+```
+
+---
+
+### `GetUserByUsernameAsync` - Get user by username.
+
+`string username` - The username of the user to get.
+
+Example:
+
+```csharp
+User user = await client.GetUserByUsernameAsync("username");
+```
+
+---
+
+## Other
+
+`SetChannelCallStateAsync` - Set call state for specified channel ('Calls' plugin required).
+
+---
+
+> If you are looking for another methods, please visit the [Mattermost API documentation](https://api.mattermost.com/) and create an issue in the [GitHub repository](https://github.com/bvdcode/Mattermost.NET/issues/new?template=Blank+issue) with what exact methods you need - I will add them as soon as possible.
+
+---
 
 # License
 
