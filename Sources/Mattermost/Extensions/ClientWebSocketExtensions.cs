@@ -5,8 +5,8 @@ using System.Threading;
 using System.Text.Json;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
-using Mattermost.Models.Responses;
 using Mattermost.Models.Requests.Websocket;
+using Mattermost.Models.Responses.Websocket;
 
 namespace Mattermost.Extensions
 {

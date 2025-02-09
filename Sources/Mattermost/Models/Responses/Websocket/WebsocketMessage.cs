@@ -4,7 +4,7 @@ using Mattermost.Enums;
 using System.Net.WebSockets;
 using System.Text.Json.Serialization;
 
-namespace Mattermost.Models.Responses
+namespace Mattermost.Models.Responses.Websocket
 {
     internal class WebsocketMessage
     {

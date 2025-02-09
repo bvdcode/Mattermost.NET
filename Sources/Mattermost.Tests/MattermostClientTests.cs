@@ -2,8 +2,7 @@ using System.Text.Json;
 using Mattermost.Models;
 using Mattermost.Exceptions;
 using Mattermost.Models.Users;
-using Mattermost.Models.Responses.Websocket;
-using Mattermost.Extensions;
+using Mattermost.Models.Responses.Websocket.Posts;
 
 namespace Mattermost.Tests
 {

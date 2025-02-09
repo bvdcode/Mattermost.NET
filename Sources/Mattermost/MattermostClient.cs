@@ -19,7 +19,7 @@ using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
 using System.Collections.Generic;
 using Mattermost.Models.Channels;
-using Mattermost.Models.Responses;
+using Mattermost.Models.Responses.Websocket;
 
 namespace Mattermost
 {
@@ -656,10 +656,6 @@ namespace Mattermost
                 case MattermostEvent.StatusChange:
                     var statusArgs = new UserStatusChangeEventArgs(this, response, cancellationToken);
                     OnStatusUpdated?.Invoke(this, statusArgs);
-                    break;
-
-                case MattermostEvent.Unknown:
-                    Log($"Unknown event received: {response.EventText}");
                     break;
 
                 default:
