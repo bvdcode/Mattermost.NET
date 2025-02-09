@@ -284,6 +284,7 @@ namespace Mattermost
             return _userInfo;
         }
 
+
         /// <summary>
         /// Send message to specified channel identifier.
         /// </summary>
@@ -293,7 +294,21 @@ namespace Mattermost
         /// <param name="priority"> Set message priority </param>
         /// <param name="files"> Attach files to post. </param>
         /// <returns> Created post. </returns>
-        public async Task<Post> SendMessageAsync(string channelId, string message = "",
+        [Obsolete("Use CreatePostAsync instead.")]
+        public Task<Post> SendMessageAsync(string channelId, string message = "",
+            string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
+            IEnumerable<string>? files = null) => CreatePostAsync(channelId, message, replyToPostId, priority, files);
+
+        /// <summary>
+        /// Send message to specified channel identifier.
+        /// </summary>
+        /// <param name="channelId"> Channel identifier. </param>
+        /// <param name="message"> Message text (Markdown supported). </param>
+        /// <param name="replyToPostId"> Reply to post (optional) </param>
+        /// <param name="priority"> Set message priority </param>
+        /// <param name="files"> Attach files to post. </param>
+        /// <returns> Created post. </returns>
+        public async Task<Post> CreatePostAsync(string channelId, string message = "",
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
             IEnumerable<string>? files = null)
         {
