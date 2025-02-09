@@ -12,9 +12,9 @@
 
 Ready-to-use **.NET Standard** library for convenient development of Mattermost bots.
 
-# Getting Started
+---
 
-## Installation
+# Installation
 
 The library is available as a NuGet package. You can install it using the NuGet Package Manager or the `dotnet` CLI.
 
@@ -22,25 +22,31 @@ The library is available as a NuGet package. You can install it using the NuGet 
 dotnet add package Mattermost.NET
 ```
 
-## Usage
+---
 
-### Create a new bot
+# Usage
+
+## Create a new bot
 
 ```csharp
 using Mattermost.NET;
 const string token = "37VlFKySIZn6gryA85cR1GKBQkjmfRZ6";
 const string server = "https://mm.your-server.com"; // or https://community.mattermost.com by default
 MattermostClient client = new(server);
+```
 
+## Authenticate the bot
+
+```csharp
 var botUser = await client.LoginAsync(token);
 ```
 
-### Subscribe to post updates
+## Subscribe to post updates
 
 ```csharp
-client.OnMessageReceived += Client_OnMessageReceived;
+client.OnMessageReceived += ClientOnMessageReceived;
 
-private static void Client_OnMessageReceived(object? sender, MessageEventArgs e)
+private static void ClientOnMessageReceived(object? sender, MessageEventArgs e)
 {
     if (string.IsNullOrWhiteSpace(e.Message.Post.Text))
     {
@@ -50,27 +56,70 @@ private static void Client_OnMessageReceived(object? sender, MessageEventArgs e)
 }
 ```
 
-### Start the bot
+## Start the bot updates
 
 ```csharp
 await client.StartReceivingAsync();
 ```
 
-### Stop the bot
+> **Note:** The bot will automatically reconnect if the connection is lost. It's not required to call `StartReceivingAsync` if you don't want to receive updates through the WebSocket connection.
+
+## Stop the bot
 
 ```csharp
 await client.StopReceivingAsync();
 ```
 
-## Client Methods
+---
 
-### `SendMessageAsync`
+# Client Methods
+
+## Posts
+
+### `SendMessageAsync:`
+
+`string channelId` - The ID of the channel to send the message to.
+`string message` - The message to send.
+`string replyToPostId` - The ID of the post to reply to (optional).
+`MessagePriority priority` - The priority of the message, default is `MessagePriority.Empty`.
+`IEnumerable<string> files` - The files to upload, you have to upload files before sending the message.
+
+Example:
 
 ```csharp
 await client.SendMessageAsync("channel_id", "Hello, World!");
 ```
 
+---
+
+### `UpdatePostAsync:`
+
+`string postId` - The ID of the post to update.
+`string message` - The new message text.
+
+Example:
+
+```csharp
+await client.UpdatePostAsync("post_id", "I changed my mind");
+```
+
+---
+
+### `DeletePostAsync:`
+
+`string postId` - The ID of the post to delete.
+
+Example:
+
+```csharp
+await client.DeletePostAsync("post_id");
+```
+
+---
+
 ### `GetChannelMembersAsync`
+
+Example:
 
 ```csharp
 var members = await client.GetChannelMembersAsync("channel_id");
@@ -81,8 +130,6 @@ var members = await client.GetChannelMembersAsync("channel_id");
 ```csharp
 var posts = await client.GetChannelPostsAsync("channel_id");
 ```
-
-`...` and more methods will be documented soon.
 
 # License
 
