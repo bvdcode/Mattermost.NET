@@ -98,7 +98,7 @@ namespace Mattermost.Tests
             {
                 receivedMessages.Add(e.Message);
             };
-            await client.SendMessageAsync(botId, message);
+            await client.CreatePostAsync(botId, message);
             await Task.Delay(1000);
             Assert.That(receivedMessages, Is.Not.Empty);
             Assert.That(receivedMessages[0].Post.Text, Is.EqualTo(":tada: Thanks for helping us make Mattermost better!"));

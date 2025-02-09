@@ -25,7 +25,7 @@ namespace Mattermost.ConsoleTest
             client.OnMessageReceived += (sender, e) =>
             {
                 Console.WriteLine($"Received message: {e.Message.Post.Text ?? "(empty)"}");
-                e.Client.SendMessageAsync(e.Message.Post.ChannelId, "Hello!");
+                e.Client.CreatePostAsync(e.Message.Post.ChannelId, "Hello!");
             };
 
             await client.LoginAsync(secrets.Username, secrets.Password);
