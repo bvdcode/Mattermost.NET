@@ -8,6 +8,7 @@ using Mattermost.Models.Users;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Channels;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Mattermost
 {
@@ -219,6 +220,16 @@ namespace Mattermost
         /// <param name="progressChanged"> Uploading progress callback in percents - from 0 to 100. </param>
         /// <returns> Created file details. </returns>
         Task<FileDetails> UploadFileAsync(string channelId, string filePath, Action<int>? progressChanged = null);
+
+        /// <summary>
+        /// Upload new file.
+        /// </summary>
+        /// <param name="channelId"> Channel where file will be posted. </param>
+        /// <param name="fileName"> Name of the uploaded file. </param>
+        /// <param name="stream"> File content. </param>
+        /// <param name="progressChanged"> Uploading progress callback in percents - from 0 to 100. </param>
+        /// <returns> Created file details. </returns>
+        Task<FileDetails> UploadFileAsync(string channelId, string fileName, Stream stream, Action<int>? progressChanged = null);
 
         #endregion
 

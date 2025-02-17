@@ -589,18 +589,30 @@ namespace Mattermost
         /// <returns> Created file details. </returns>
         public async Task<FileDetails> UploadFileAsync(string channelId, string filePath, Action<int>? progressChanged = null)
         {
+            FileInfo fileInfo = new FileInfo(filePath);
+            using var fs = fileInfo.OpenRead();
+            return await UploadFileAsync(channelId, fileInfo.Name, fs, progressChanged);
+        }
+
+        /// <summary>
+        /// Upload new file.
+        /// </summary>
+        /// <param name="channelId"> Channel where file will be posted. </param>
+        /// <param name="fileName"> Name of the uploaded file. </param>
+        /// <param name="stream"> File content. </param>
+        /// <param name="progressChanged"> Uploading progress callback in percents - from 0 to 100. </param>
+        /// <returns> Created file details. </returns>
+        public async Task<FileDetails> UploadFileAsync(string channelId, string fileName, Stream stream, Action<int>? progressChanged = null) 
+        {
             CheckAuthorized();
             CheckDisposed();
             string url = Routes.Files + "?channel_id=" + channelId;
             MultipartFormDataContent content = new MultipartFormDataContent();
-            FileInfo fileInfo = new FileInfo(filePath);
-            using var fs = fileInfo.OpenRead();
-            StreamContent file = new StreamContent(fs);
-            content.Add(file, "files", fileInfo.Name);
+            StreamContent file = new StreamContent(stream);
+            content.Add(file, "files", fileName);
             CancellationTokenSource cts = new CancellationTokenSource();
-            if (progressChanged != null)
-            {
-                StartProgressTracker(fs, fileInfo, cts.Token, progressChanged);
+            if (progressChanged != null) {
+                StartProgressTracker(stream, cts.Token, progressChanged);
             }
             var result = await _http.PostAsync(url, content);
             result = result.EnsureSuccessStatusCode();
@@ -764,7 +776,7 @@ namespace Mattermost
             return Task.CompletedTask;
         }
 
-        private void StartProgressTracker(FileStream fs, FileInfo fileInfo, CancellationToken token, Action<int> progressChanged)
+        private void StartProgressTracker(Stream fs, CancellationToken token, Action<int> progressChanged)
         {
             _ = Task.Run(async () =>
             {
@@ -773,7 +785,7 @@ namespace Mattermost
                 while (true)
                 {
                     long current = fs.Position;
-                    long total = fileInfo.Length;
+                    long total = fs.Length;
                     int result = (int)((double)current * 100 / total);
                     if (result != progress)
                     {
