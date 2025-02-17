@@ -117,6 +117,27 @@ namespace Mattermost
         /// <returns> True if deleted, otherwise false. </returns>
         Task<bool> DeletePostAsync(string postId);
 
+        /// <summary>
+        /// Get a page of posts in a channel.
+        /// </summary>
+        /// <param name="channelId"> Channel identifier. </param>
+        /// <param name="page"> The page to select. </param>
+        /// <param name="perPage"> The number of posts per page. </param>
+        /// <param name="beforePostId"> A post id to select the posts that came before this one. </param>
+        /// <param name="afterPostId"> A post id to select the posts that came after this one. </param>
+        /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
+        /// <returns> ChannelPosts object with posts. </returns>
+        Task<ChannelPosts> GetPostsForChannelAsync(string channelId, int page = 0, int perPage = 60, string? beforePostId = null, string? afterPostId = null, bool includeDeleted = false);
+
+        /// <summary>
+        /// Get a page of posts in a channel.
+        /// </summary>
+        /// <param name="channelId"> Channel identifier. </param>
+        /// <param name="since"> Time to select modified posts after. </param>
+        /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
+        /// <returns> ChannelPosts object with posts. </returns>
+        Task<ChannelPosts> GetPostsForChannelAsync(string channelId, DateTime since, bool includeDeleted = false);
+
         #endregion
 
         #region Channels
