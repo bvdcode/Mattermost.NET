@@ -78,8 +78,9 @@ namespace Mattermost
         /// <param name="replyToPostId"> Reply to post (optional) </param>
         /// <param name="priority"> Set message priority </param>
         /// <param name="files"> Attach files to post. </param>
+        /// <param name="props"> A general JSON property bag to attach to the post. </param>
         /// <returns> Created post. </returns>
-        Task<Post> CreatePostAsync(string channelId, string message = "", string replyToPostId = "", MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null);
+        Task<Post> CreatePostAsync(string channelId, string message = "", string replyToPostId = "", MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null, IDictionary<string, object>? props = null);
 
         /// <summary>
         /// Get post by identifier.
@@ -105,8 +106,9 @@ namespace Mattermost
         /// </summary>
         /// <param name="postId"> Post identifier. </param>
         /// <param name="newText"> New message text (Markdown supported). </param>
+        /// <param name="props"> A general JSON property bag to attach to the post. </param>
         /// <returns> Updated post. </returns>
-        Task<Post> UpdatePostAsync(string postId, string newText);
+        Task<Post> UpdatePostAsync(string postId, string newText, IDictionary<string, object>? props = null);
 
         /// <summary>
         /// Delete post with specified post identifier.
