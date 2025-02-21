@@ -120,6 +120,7 @@ await client.StopReceivingAsync();
 `string replyToPostId` - The ID of the post to reply to (optional).
 `MessagePriority priority` - The priority of the message, default is `MessagePriority.Empty`.
 `IEnumerable<string> files` - The files to upload, you have to upload files before sending the message.
+`IDictionary<string, object>? props` - The properties of the post (optional).
 
 Example:
 
@@ -141,10 +142,30 @@ var post = await client.GetPostAsync("post_id");
 
 ---
 
+### `GetChannelPostsAsync` - Get posts from specified channel.
+
+`string channelId` - The ID of the channel to get posts from.
+`int page` - The page number to get (default is 0).
+`int perPage` - The number of posts per page (default is 60).
+`string? beforePostId` - The ID of the post to get posts before (optional).
+`string? afterPostId` - The ID of the post to get posts after (optional).
+`bool includeDeleted` - Whether to include deleted posts (default is false).
+`DateTime? since` - The date to get posts since (optional).
+
+Example:
+```csharp
+var posts = await client.GetChannelPostsAsync("channel_id", 0, 60);
+// or
+var posts = await client.GetChannelPostsAsync("channel_id", since: DateTime.UtcNow);
+```
+
+---
+
 ### `UpdatePostAsync` - Update message text for specified post identifier.
 
 `string postId` - The ID of the post to update.
 `string message` - The new message text.
+`IDictionary<string, object>? props` - The properties of the post (optional).
 
 Example:
 

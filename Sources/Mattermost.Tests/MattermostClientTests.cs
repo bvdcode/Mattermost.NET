@@ -7,7 +7,7 @@ using Mattermost.Models.Responses.Websocket.Posts;
 namespace Mattermost.Tests
 {
     [SingleThreaded]
-    public partial class MattermostClientTests
+    public class MattermostClientTests
     {
         private string username = string.Empty;
         private string password = string.Empty;
@@ -102,6 +102,28 @@ namespace Mattermost.Tests
             await Task.Delay(1000);
             Assert.That(receivedMessages, Is.Not.Empty);
             Assert.That(receivedMessages[0].Post.Text, Is.EqualTo(":tada: Thanks for helping us make Mattermost better!"));
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task GetChannelPosts_ReceivedPosts()
+        {
+            const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
+            var result = await client.GetChannelPostsAsync(channelId);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Posts, Is.Not.Empty);
+            Assert.That(result.Posts, Is.Not.Null);
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task GetChannelPosts_UseDateTime_ReceivedPosts()
+        {
+            const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
+            var result = await client.GetChannelPostsAsync(channelId, since: DateTime.UtcNow.AddDays(-15));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Posts, Is.Not.Empty);
+            Assert.That(result.Posts, Is.Not.Null);
         }
 
         [Test]

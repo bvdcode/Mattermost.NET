@@ -8,6 +8,7 @@ using System.Text.Json;
 using Mattermost.Enums;
 using Mattermost.Events;
 using Mattermost.Models;
+using Mattermost.Helpers;
 using Mattermost.Constants;
 using Mattermost.Extensions;
 using Mattermost.Exceptions;
@@ -19,6 +20,7 @@ using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
 using System.Collections.Generic;
 using Mattermost.Models.Channels;
+using Mattermost.Models.Responses;
 using Mattermost.Models.Responses.Websocket;
 
 namespace Mattermost
@@ -307,10 +309,11 @@ namespace Mattermost
         /// <param name="replyToPostId"> Reply to post (optional) </param>
         /// <param name="priority"> Set message priority </param>
         /// <param name="files"> Attach files to post. </param>
+        /// <param name="props"> A general JSON property bag to attach to the post. </param>
         /// <returns> Created post. </returns>
         public async Task<Post> CreatePostAsync(string channelId, string message = "",
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
-            IEnumerable<string>? files = null)
+            IEnumerable<string>? files = null, IDictionary<string, object>? props = null)
         {
             CheckAuthorized();
             CheckDisposed();
@@ -330,7 +333,8 @@ namespace Mattermost
                 channel_id = channelId,
                 root_id = replyToPostId,
                 metadata,
-                file_ids = files
+                file_ids = files,
+                props
             };
             string json = JsonSerializer.Serialize(body);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -345,14 +349,16 @@ namespace Mattermost
         /// </summary>
         /// <param name="postId"> Post identifier. </param>
         /// <param name="newText"> New message text (Markdown supported). </param>
+        /// <param name="props"> A general JSON property bag to attach to the post. </param>
         /// <returns> Updated post. </returns>
-        public async Task<Post> UpdatePostAsync(string postId, string newText)
+        public async Task<Post> UpdatePostAsync(string postId, string newText, IDictionary<string, object>? props = null)
         {
             CheckAuthorized();
             CheckDisposed();
             var body = new
             {
-                message = newText
+                message = newText,
+                props
             };
             string json = JsonSerializer.Serialize(body);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -373,6 +379,32 @@ namespace Mattermost
             CheckDisposed();
             var response = await _http.DeleteAsync(Routes.Posts + "/" + postId);
             return response.IsSuccessStatusCode;
+        }
+
+        /// <summary>
+        /// Get a page of posts in a channel.
+        /// </summary>
+        /// <param name="channelId"> Channel identifier. </param>
+        /// <param name="page"> The page to select. </param>
+        /// <param name="perPage"> The number of posts per page. </param>
+        /// <param name="beforePostId"> A post id to select the posts that came before this one. </param>
+        /// <param name="afterPostId"> A post id to select the posts that came after this one. </param>
+        /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
+        /// <param name="since"> Time to select modified posts after. </param>
+        /// <returns> ChannelPosts object with posts. </returns>
+        public async Task<ChannelPostsResponse> GetChannelPostsAsync(string channelId, int page = 0, 
+            int perPage = 60, string? beforePostId = null, string? afterPostId = null,
+            bool includeDeleted = false, DateTime? since = null)
+        {
+            CheckAuthorized();
+            CheckDisposed();
+
+            string query = QueryHelpers.BuildChannelPostsQuery(page, perPage, beforePostId, afterPostId, includeDeleted, since);
+            string url = $"{Routes.Channels}/{channelId}/posts?{query}";
+            var response = await _http.GetAsync(url);
+            response = response.EnsureSuccessStatusCode();
+            string json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ChannelPostsResponse>(json)!;
         }
 
         /// <summary>
@@ -525,18 +557,31 @@ namespace Mattermost
         /// <returns> Created file details. </returns>
         public async Task<FileDetails> UploadFileAsync(string channelId, string filePath, Action<int>? progressChanged = null)
         {
-            CheckAuthorized();
-            CheckDisposed();
-            string url = Routes.Files + "?channel_id=" + channelId;
-            MultipartFormDataContent content = new MultipartFormDataContent();
             FileInfo fileInfo = new FileInfo(filePath);
             using var fs = fileInfo.OpenRead();
-            StreamContent file = new StreamContent(fs);
-            content.Add(file, "files", fileInfo.Name);
+            return await UploadFileAsync(channelId, fileInfo.Name, fs, progressChanged);
+        }
+
+        /// <summary>
+        /// Upload new file.
+        /// </summary>
+        /// <param name="channelId"> Channel where file will be posted. </param>
+        /// <param name="fileName"> Name of the uploaded file. </param>
+        /// <param name="stream"> File content. </param>
+        /// <param name="progressChanged"> Uploading progress callback in percents - from 0 to 100. </param>
+        /// <returns> Created file details. </returns>
+        public async Task<FileDetails> UploadFileAsync(string channelId, string fileName, Stream stream, Action<int>? progressChanged = null) 
+        {
+            CheckAuthorized();
+            CheckDisposed();
+            string url = $"{Routes.Files}?channel_id={channelId}";
+            MultipartFormDataContent content = new MultipartFormDataContent();
+            StreamContent file = new StreamContent(stream);
+            content.Add(file, "files", fileName);
             CancellationTokenSource cts = new CancellationTokenSource();
             if (progressChanged != null)
             {
-                StartProgressTracker(fs, fileInfo, cts.Token, progressChanged);
+                StartProgressTracker(stream, cts.Token, progressChanged);
             }
             var result = await _http.PostAsync(url, content);
             result = result.EnsureSuccessStatusCode();
@@ -700,16 +745,16 @@ namespace Mattermost
             return Task.CompletedTask;
         }
 
-        private void StartProgressTracker(FileStream fs, FileInfo fileInfo, CancellationToken token, Action<int> progressChanged)
+        private void StartProgressTracker(Stream fs, CancellationToken token, Action<int> progressChanged)
         {
             _ = Task.Run(async () =>
             {
                 int progress = 0;
 
-                while (true)
+                while (!token.IsCancellationRequested)
                 {
                     long current = fs.Position;
-                    long total = fileInfo.Length;
+                    long total = fs.Length;
                     int result = (int)((double)current * 100 / total);
                     if (result != progress)
                     {
