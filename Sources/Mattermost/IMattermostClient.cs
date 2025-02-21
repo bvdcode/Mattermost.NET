@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using Mattermost.Enums;
 using Mattermost.Events;
@@ -8,7 +9,6 @@ using Mattermost.Models.Users;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Channels;
 using System.Collections.Generic;
-using System.IO;
 using Mattermost.Models.Responses;
 
 namespace Mattermost
@@ -82,7 +82,9 @@ namespace Mattermost
         /// <param name="files"> Attach files to post. </param>
         /// <param name="props"> A general JSON property bag to attach to the post. </param>
         /// <returns> Created post. </returns>
-        Task<Post> CreatePostAsync(string channelId, string message = "", string replyToPostId = "", MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null, IDictionary<string, object>? props = null);
+        Task<Post> CreatePostAsync(string channelId, string message = "", string replyToPostId = "", 
+            MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null, 
+            IDictionary<string, object>? props = null);
 
         /// <summary>
         /// Get post by identifier.
@@ -101,7 +103,8 @@ namespace Mattermost
         /// <param name="files"> Attach files to post. </param>
         /// <returns> Created post. </returns>
         [Obsolete("Use CreatePostAsync instead.")]
-        Task<Post> SendMessageAsync(string channelId, string message = "", string replyToPostId = "", MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null);
+        Task<Post> SendMessageAsync(string channelId, string message = "", string replyToPostId = "", 
+            MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null);
 
         /// <summary>
         /// Update message text for specified post identifier.
