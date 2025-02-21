@@ -105,6 +105,28 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        [NonParallelizable]
+        public async Task GetChannelPosts_ReceivedPosts()
+        {
+            const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
+            var result = await client.GetChannelPostsAsync(channelId);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Posts, Is.Not.Empty);
+            Assert.That(result.Posts, Is.Not.Null);
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task GetChannelPosts_UseDateTime_ReceivedPosts()
+        {
+            const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
+            var result = await client.GetChannelPostsAsync(channelId, since: DateTime.UtcNow.AddDays(-15));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Posts, Is.Not.Empty);
+            Assert.That(result.Posts, Is.Not.Null);
+        }
+
+        [Test]
         public void DisposeClient_SendRequest_ThrowsException()
         {
             var client = new MattermostClient();

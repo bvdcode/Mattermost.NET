@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Web;
+using System.Linq;
 using System.Collections.Specialized;
 
 namespace Mattermost.Helpers
 {
     internal class QueryHelpers
     {
-        internal static NameValueCollection BuildChannelPostsQuery(int page, int perPage, string? beforePostId, string? afterPostId, bool includeDeleted, DateTime? since)
+        internal static string BuildChannelPostsQuery(int page, int perPage, string? beforePostId, string? afterPostId, bool includeDeleted, DateTime? since)
         {
             NameValueCollection query = new NameValueCollection();
             if (page < 0)
@@ -32,7 +32,7 @@ namespace Mattermost.Helpers
             {
                 query.Add("after", afterPostId);
             }
-            return HttpUtility.ParseQueryString(query.ToString());
+            return string.Join("&", query.AllKeys.Select(key => $"{key}={query[key]}"));
         }
     }
 }

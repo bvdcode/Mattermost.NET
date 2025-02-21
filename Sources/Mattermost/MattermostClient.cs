@@ -400,7 +400,7 @@ namespace Mattermost
             CheckAuthorized();
             CheckDisposed();
 
-            NameValueCollection query = QueryHelpers.BuildChannelPostsQuery(page, perPage, beforePostId, afterPostId, includeDeleted, since);
+            string query = QueryHelpers.BuildChannelPostsQuery(page, perPage, beforePostId, afterPostId, includeDeleted, since);
             string url = $"{Routes.Channels}/{channelId}/posts?{query}";
             var response = await _http.GetAsync(url);
             response = response.EnsureSuccessStatusCode();
@@ -575,12 +575,13 @@ namespace Mattermost
         {
             CheckAuthorized();
             CheckDisposed();
-            string url = Routes.Files + "?channel_id=" + channelId;
+            string url = $"{Routes.Files}?channel_id={channelId}";
             MultipartFormDataContent content = new MultipartFormDataContent();
             StreamContent file = new StreamContent(stream);
             content.Add(file, "files", fileName);
             CancellationTokenSource cts = new CancellationTokenSource();
-            if (progressChanged != null) {
+            if (progressChanged != null)
+            {
                 StartProgressTracker(stream, cts.Token, progressChanged);
             }
             var result = await _http.PostAsync(url, content);
@@ -751,7 +752,7 @@ namespace Mattermost
             {
                 int progress = 0;
 
-                while (true)
+                while (!token.IsCancellationRequested)
                 {
                     long current = fs.Position;
                     long total = fs.Length;
