@@ -8,6 +8,7 @@ using System.Text.Json;
 using Mattermost.Enums;
 using Mattermost.Events;
 using Mattermost.Models;
+using Mattermost.Helpers;
 using Mattermost.Constants;
 using Mattermost.Extensions;
 using Mattermost.Exceptions;
@@ -19,9 +20,9 @@ using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
 using System.Collections.Generic;
 using Mattermost.Models.Channels;
-using Mattermost.Models.Responses.Websocket;
+using Mattermost.Models.Responses;
 using System.Collections.Specialized;
-using System.Web;
+using Mattermost.Models.Responses.Websocket;
 
 namespace Mattermost
 {
@@ -390,52 +391,21 @@ namespace Mattermost
         /// <param name="beforePostId"> A post id to select the posts that came before this one. </param>
         /// <param name="afterPostId"> A post id to select the posts that came after this one. </param>
         /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
-        /// <returns> ChannelPosts object with posts. </returns>
-        public async Task<ChannelPosts> GetChannelPostsAsync(string channelId, int page = 0, 
-            int perPage = 60, string? beforePostId = null, string? afterPostId = null, bool includeDeleted = false)
-        {
-            CheckAuthorized();
-            CheckDisposed();
-
-            var query = new NameValueCollection {
-                { nameof(page), page.ToString() },
-                { "per_page", perPage.ToString() },
-                { "include_deleted", includeDeleted.ToString() }
-            };
-            if (beforePostId != null) {
-                query.Add("before", beforePostId);
-            }
-            if (afterPostId != null) {
-                query.Add("after", afterPostId);
-            }
-            var url = Routes.Channels + "/" + channelId + "/posts?" + HttpUtility.ParseQueryString(query.ToString());
-            var response = await _http.GetAsync(url);
-            response = response.EnsureSuccessStatusCode();
-            string json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<ChannelPosts>(json)!;
-        }
-
-        /// <summary>
-        /// Get a page of posts in a channel.
-        /// </summary>
-        /// <param name="channelId"> Channel identifier. </param>
         /// <param name="since"> Time to select modified posts after. </param>
-        /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
         /// <returns> ChannelPosts object with posts. </returns>
-        public async Task<ChannelPosts> GetChannelPostsAsync(string channelId, DateTime since, bool includeDeleted = false) 
+        public async Task<ChannelPostsResponse> GetChannelPostsAsync(string channelId, int page = 0, 
+            int perPage = 60, string? beforePostId = null, string? afterPostId = null,
+            bool includeDeleted = false, DateTime? since = null)
         {
             CheckAuthorized();
             CheckDisposed();
 
-            var query = new NameValueCollection {
-                { "include_deleted", includeDeleted.ToString() },
-                { nameof(since), ((DateTimeOffset)since).ToUnixTimeSeconds().ToString() }
-            };
-            var url = Routes.Channels + "/" + channelId + "/posts?" + HttpUtility.ParseQueryString(query.ToString());
+            NameValueCollection query = QueryHelpers.BuildChannelPostsQuery(page, perPage, beforePostId, afterPostId, includeDeleted, since);
+            string url = $"{Routes.Channels}/{channelId}/posts?{query}";
             var response = await _http.GetAsync(url);
             response = response.EnsureSuccessStatusCode();
             string json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<ChannelPosts>(json)!;
+            return JsonSerializer.Deserialize<ChannelPostsResponse>(json)!;
         }
 
         /// <summary>

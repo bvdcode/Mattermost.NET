@@ -2,15 +2,15 @@ using Mattermost.Models.Posts;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Mattermost.Models.Channels
+namespace Mattermost.Models.Responses
 {
     /// <summary>
     /// Result of GetPostsForChannel query.
     /// </summary>
-    public class ChannelPosts
+    public class ChannelPostsResponse
     {
         /// <summary>
-        /// Array of strings.
+        /// List of post IDs in the order they were created.
         /// </summary>
         [JsonPropertyName("order")]
         public IEnumerable<string> Order { get; set; } = new List<string>();
