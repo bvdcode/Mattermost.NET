@@ -11,5 +11,13 @@ namespace Mattermost.Tests
             var actual = QueryHelpers.BuildChannelPostsQuery(1, 10, beforePostId: "postId1", afterPostId: "postId2", includeDeleted: true, since: new DateTime(2023, 7, 24, 0, 0, 0));
             Assert.That(actual, Is.EqualTo(expected));
         }
+
+        [Test]
+        public void ExceptionHelpers_ThrowIfEmpty_ValidResult()
+        {
+            Assert.Throws<ArgumentException>(() => ExceptionHelpers.ThrowIfEmpty("", "paramName"));
+            Assert.Throws<ArgumentNullException>(() => ExceptionHelpers.ThrowIfEmpty("text", ""));
+            Assert.DoesNotThrow(() => ExceptionHelpers.ThrowIfEmpty("text", "paramName"));
+        }
     }
 }
