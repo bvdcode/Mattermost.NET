@@ -391,10 +391,9 @@ namespace Mattermost
         /// <param name="afterPostId"> A post id to select the posts that came after this one. </param>
         /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
         /// <returns> ChannelPosts object with posts. </returns>
-        public async Task<ChannelPosts> GetPostsForChannelAsync(string channelId, int page = 0, 
-            int perPage = 60, string? beforePostId = null, 
-            string? afterPostId = null, bool includeDeleted = false
-            ) {
+        public async Task<ChannelPosts> GetChannelPostsAsync(string channelId, int page = 0, 
+            int perPage = 60, string? beforePostId = null, string? afterPostId = null, bool includeDeleted = false)
+        {
             CheckAuthorized();
             CheckDisposed();
 
@@ -423,7 +422,7 @@ namespace Mattermost
         /// <param name="since"> Time to select modified posts after. </param>
         /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
         /// <returns> ChannelPosts object with posts. </returns>
-        public async Task<ChannelPosts> GetPostsForChannelAsync(string channelId, DateTime since, bool includeDeleted = false) 
+        public async Task<ChannelPosts> GetChannelPostsAsync(string channelId, DateTime since, bool includeDeleted = false) 
         {
             CheckAuthorized();
             CheckDisposed();
