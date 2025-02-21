@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Mattermost.Models.Enums;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Mattermost.Helpers
 {
