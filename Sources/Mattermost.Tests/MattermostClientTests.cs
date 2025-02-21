@@ -7,7 +7,7 @@ using Mattermost.Models.Responses.Websocket.Posts;
 namespace Mattermost.Tests
 {
     [SingleThreaded]
-    public partial class MattermostClientTests
+    public class MattermostClientTests
     {
         private string username = string.Empty;
         private string password = string.Empty;
