@@ -21,7 +21,6 @@ using Mattermost.Models.Users;
 using System.Collections.Generic;
 using Mattermost.Models.Channels;
 using Mattermost.Models.Responses;
-using System.Collections.Specialized;
 using Mattermost.Models.Responses.Websocket;
 
 namespace Mattermost
