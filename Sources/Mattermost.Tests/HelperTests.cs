@@ -16,8 +16,16 @@ namespace Mattermost.Tests
         public void ExceptionHelpers_ThrowIfEmpty_ValidResult()
         {
             Assert.Throws<ArgumentException>(() => ExceptionHelpers.ThrowIfEmpty("", "paramName"));
-            Assert.Throws<ArgumentNullException>(() => ExceptionHelpers.ThrowIfEmpty("text", ""));
+            Assert.Throws<ArgumentException>(() => ExceptionHelpers.ThrowIfEmpty("text", ""));
             Assert.DoesNotThrow(() => ExceptionHelpers.ThrowIfEmpty("text", "paramName"));
+        }
+
+        [Test]
+        public void MarkdownHelpers_ConvertToMarkdown_ValidResult()
+        {
+            const string expected = "This is a **bold** text and this is an _italic_ text.";
+            var actual = $"This is a {MarkdownHelpers.Bold("bold")} text and this is an {MarkdownHelpers.Italic("italic")} text.";
+            Assert.That(actual, Is.EqualTo(expected));
         }
     }
 }
