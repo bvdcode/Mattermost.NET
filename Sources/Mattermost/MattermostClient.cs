@@ -30,8 +30,6 @@ namespace Mattermost
     /// </summary>
     public class MattermostClient : IMattermostClient, IDisposable
     {
-        public const int MaxMessageLength = 4000;
-
         /// <summary>
         /// Called when client is connected to server WebSocket after
         /// <see cref="StartReceivingAsync()"/> method.
@@ -298,6 +296,7 @@ namespace Mattermost
         /// <param name="priority"> Set message priority </param>
         /// <param name="files"> Attach files to post. </param>
         /// <returns> Created post. </returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         [Obsolete("Use CreatePostAsync instead.")]
         public Task<Post> SendMessageAsync(string channelId, string message = "",
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
@@ -313,15 +312,15 @@ namespace Mattermost
         /// <param name="files"> Attach files to post. </param>
         /// <param name="props"> A general JSON property bag to attach to the post. </param>
         /// <returns> Created post. </returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         public async Task<Post> CreatePostAsync(string channelId, string message = "",
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
             IEnumerable<string>? files = null, IDictionary<string, object>? props = null)
         {
-            if (message?.Length > MaxMessageLength) {
-                throw new ArgumentOutOfRangeException(
-                    nameof(message), 
-                    $"Message length exceed maximum limit of characters {message.Length} > {MaxMessageLength}"
-                );
+            if (message.Length > MattermostApiLimits.MaxPostMessageLength)
+            {
+                throw new ArgumentOutOfRangeException(nameof(message), 
+                    $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
 
             CheckAuthorized();
@@ -360,13 +359,13 @@ namespace Mattermost
         /// <param name="newText"> New message text (Markdown supported). </param>
         /// <param name="props"> A general JSON property bag to attach to the post. </param>
         /// <returns> Updated post. </returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         public async Task<Post> UpdatePostAsync(string postId, string newText, IDictionary<string, object>? props = null)
         {
-            if (newText?.Length > MaxMessageLength) {
-                throw new ArgumentOutOfRangeException(
-                    nameof(newText),
-                    $"Message length exceed maximum limit of characters {newText.Length} > {MaxMessageLength}"
-                );
+            if (newText.Length > MattermostApiLimits.MaxPostMessageLength)
+            {
+                throw new ArgumentOutOfRangeException(nameof(newText),
+                    $"The message length exceeds the maximum number of characters allowed ({newText.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
 
             CheckAuthorized();
