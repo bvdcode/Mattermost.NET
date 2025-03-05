@@ -150,7 +150,7 @@ namespace Mattermost.Tests
         {
             var client = new MattermostClient();
             client.Dispose();
-            Assert.Throws<ObjectDisposedException>(() => { try { client.LoginAsync(string.Empty).Wait(); } catch (AggregateException ex) { throw ex.InnerException!; } });
+            Assert.Throws<ObjectDisposedException>(() => { try { client.GetMeAsync().Wait(); } catch (AggregateException ex) { throw ex.InnerException!; } });
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Mattermost.Tests
                 Assert.That(token, Is.Not.Empty);
             });
             await client.LogoutAsync();
-            Assert.ThrowsAsync<ApiKeyException>(client.GetMeAsync);
+            Assert.ThrowsAsync<AuthorizationException>(client.GetMeAsync);
         }
     }
 }
