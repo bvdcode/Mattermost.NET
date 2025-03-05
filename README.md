@@ -35,10 +35,13 @@ const string server = "https://mm.your-server.com"; // or https://community.matt
 MattermostClient client = new(server);
 ```
 
-## Authenticate the bot
+## Authenticate the bot with credentials
 
 ```csharp
 var botUser = await client.LoginAsync(token);
+// Or you can use constructor if you have API key, ex. personal or bot token
+// It will automatically authenticate the bot
+MattermostClient client = new(server, apiKey);
 ```
 
 ## Subscribe to post updates

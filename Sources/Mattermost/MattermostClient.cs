@@ -89,6 +89,7 @@ namespace Mattermost
         private ClientWebSocket _ws;
         private Task? _receiverTask;
         private readonly Uri _serverUri;
+        private readonly string? _apiKey;
         private readonly HttpClient _http;
         private readonly Uri _websocketUri;
         private CancellationTokenSource _receivingTokenSource;
@@ -98,6 +99,27 @@ namespace Mattermost
         /// </summary>
         /// <exception cref="ArgumentException"></exception>
         public MattermostClient() : this(Routes.DefaultBaseUrl) { }
+
+        /// <summary>
+        /// Create <see cref="MattermostClient"/> with specified server address and API key.
+        /// </summary>
+        /// <param name="serverUrl"> Server URL with HTTP(S) scheme. </param>
+        /// <param name="apiKey"> API key, ex. bot token or personal access token. </param>
+        public MattermostClient(string serverUrl, string apiKey) : this(new Uri(serverUrl), apiKey) { }
+
+        /// <summary>
+        /// Create <see cref="MattermostClient"/> with specified server address and API key.
+        /// </summary>
+        /// <param name="serverUri"> Server URI with HTTP(S) scheme. </param>
+        /// <param name="apiKey"> API key, ex. bot token or personal access token. </param>
+        public MattermostClient(Uri serverUri, string apiKey) : this(serverUri)
+        {
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new ApiKeyException("API key is empty");
+            }
+            _apiKey = apiKey;
+        }
 
         /// <summary>
         /// Create <see cref="MattermostClient"/> with specified server address JWT access token.
@@ -136,13 +158,13 @@ namespace Mattermost
         /// <exception cref="ApiKeyException"></exception>
         public async Task StartReceivingAsync(CancellationToken cancellationToken)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             await StopReceivingAsync();
             _ws = new ClientWebSocket();
             _receivingTokenSource = new CancellationTokenSource();
             var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken).Token;
-            
+
             Log("Starting receiving as user @" + _userInfo?.Username ?? "Unknown");
             _receiverTask = Task.Run(async () =>
             {
@@ -209,16 +231,21 @@ namespace Mattermost
         /// <summary>
         /// Login with specified login identifier and password.
         /// </summary>
-        /// <param name="loginId">Username or email.</param>
+        /// <param name="username">Username or email.</param>
         /// <param name="password">Password.</param>
         /// <returns>Authorized <see cref="User"/> object.</returns>
         /// <exception cref="AuthorizationException">Throws if credentials are invalid or server response is not successful.</exception>
-        public async Task<User> LoginAsync(string loginId, string password)
+        /// <exception cref="ArgumentException">Throws if username or password is empty.</exception>
+        public async Task<User> LoginAsync(string username, string password)
         {
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentException("Username or password is empty");
+            }
             CheckDisposed();
             var body = new
             {
-                login_id = loginId,
+                login_id = username,
                 password
             };
             const string url = Routes.Users + "/login";
@@ -240,17 +267,10 @@ namespace Mattermost
         /// <param name="apiKey"> API key, ex. bot token or personal access token. </param>
         /// <returns>Autorized <see cref="User"/> object.</returns>
         /// <exception cref="AuthorizationException">Throws if API key is invalid or server response is not successful.</exception>
-        public async Task<User> LoginAsync(string apiKey)
+        [Obsolete("Use constructor with API key instead, ex. new MattermostClient(serverUrl, apiKey)")]
+        public Task<User> LoginAsync(string apiKey)
         {
-            CheckDisposed();
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-            var result = await _http.GetAsync(Routes.Users + "/me");
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new AuthorizationException("Login error, server response: " + result.StatusCode);
-            }
-            _userInfo = result.GetResponse<User>();
-            return _userInfo;
+            return LoginWithApiKeyAsync(apiKey);
         }
 
         /// <summary>
@@ -260,8 +280,8 @@ namespace Mattermost
         /// <exception cref="MattermostClientException">Throws if server response is not successful.</exception>
         public async Task LogoutAsync()
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             var response = await _http.PostAsync(Routes.Users + "/logout", null);
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -277,8 +297,8 @@ namespace Mattermost
         /// <returns> Authorized user information. </returns>
         public async Task<User> GetMeAsync()
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             var response = await _http.GetAsync(Routes.Users + "/me");
             response.EnsureSuccessStatusCode();
             string json = await response.Content.ReadAsStringAsync();
@@ -319,12 +339,12 @@ namespace Mattermost
         {
             if (message.Length > MattermostApiLimits.MaxPostMessageLength)
             {
-                throw new ArgumentOutOfRangeException(nameof(message), 
+                throw new ArgumentOutOfRangeException(nameof(message),
                     $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
 
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             Dictionary<string, object> metadata = new Dictionary<string, object>();
             if (priority != MessagePriority.Empty)
             {
@@ -368,8 +388,8 @@ namespace Mattermost
                     $"The message length exceeds the maximum number of characters allowed ({newText.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
 
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             var body = new
             {
                 message = newText,
@@ -390,8 +410,8 @@ namespace Mattermost
         /// <returns> True if deleted, otherwise false. </returns>
         public async Task<bool> DeletePostAsync(string postId)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             var response = await _http.DeleteAsync(Routes.Posts + "/" + postId);
             return response.IsSuccessStatusCode;
         }
@@ -407,12 +427,12 @@ namespace Mattermost
         /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
         /// <param name="since"> Time to select modified posts after. </param>
         /// <returns> ChannelPosts object with posts. </returns>
-        public async Task<ChannelPostsResponse> GetChannelPostsAsync(string channelId, int page = 0, 
+        public async Task<ChannelPostsResponse> GetChannelPostsAsync(string channelId, int page = 0,
             int perPage = 60, string? beforePostId = null, string? afterPostId = null,
             bool includeDeleted = false, DateTime? since = null)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
 
             string query = QueryHelpers.BuildChannelPostsQuery(page, perPage, beforePostId, afterPostId, includeDeleted, since);
             string url = $"{Routes.Channels}/{channelId}/posts?{query}";
@@ -429,8 +449,8 @@ namespace Mattermost
         /// <returns> Created channel info. </returns>
         public async Task<Channel> CreateGroupChannelAsync(params string[] userIds)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string json = JsonSerializer.Serialize(userIds);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _http.PostAsync(Routes.GroupChannels, content);
@@ -459,8 +479,8 @@ namespace Mattermost
         public async Task<Channel> CreateChannelAsync(string teamId, string name, string displayName,
             ChannelType channelType, string purpose = "", string header = "")
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             const int maxChannelDisplayNameLength = 64;
             if (displayName.Length > maxChannelDisplayNameLength)
             {
@@ -502,8 +522,8 @@ namespace Mattermost
         /// <returns> User information. </returns>
         public async Task<User> GetUserAsync(string userId)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Users + "/" + userId;
             string json = await _http.GetStringAsync(url);
             User userInfo = JsonSerializer.Deserialize<User>(json)!;
@@ -517,8 +537,8 @@ namespace Mattermost
         /// <returns> User information. </returns>
         public async Task<User> GetUserByUsernameAsync(string username)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Users + "/username/" + username.Replace("@", string.Empty).Trim();
             string json = await _http.GetStringAsync(url);
             User userInfo = JsonSerializer.Deserialize<User>(json)!;
@@ -533,8 +553,8 @@ namespace Mattermost
         /// <returns> Channel user information. </returns>
         public async Task<ChannelUserInfo> AddUserToChannelAsync(string channelId, string userId)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Channels + $"/{channelId}/members";
             var body = new
             {
@@ -556,8 +576,8 @@ namespace Mattermost
         /// <returns> True if deleted, otherwise false. </returns>
         public async Task<bool> DeleteUserFromChannelAsync(string channelId, string userId)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Channels + $"/{channelId}/members/{userId}";
             var response = await _http.DeleteAsync(url);
             return response.IsSuccessStatusCode;
@@ -585,10 +605,10 @@ namespace Mattermost
         /// <param name="stream"> File content. </param>
         /// <param name="progressChanged"> Uploading progress callback in percents - from 0 to 100. </param>
         /// <returns> Created file details. </returns>
-        public async Task<FileDetails> UploadFileAsync(string channelId, string fileName, Stream stream, Action<int>? progressChanged = null) 
+        public async Task<FileDetails> UploadFileAsync(string channelId, string fileName, Stream stream, Action<int>? progressChanged = null)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = $"{Routes.Files}?channel_id={channelId}";
             MultipartFormDataContent content = new MultipartFormDataContent();
             StreamContent file = new StreamContent(stream);
@@ -612,8 +632,8 @@ namespace Mattermost
         /// <returns> File details. </returns>
         public async Task<FileDetails> GetFileDetailsAsync(string fileId)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Files + "/" + fileId + "/info";
             string json = await _http.GetStringAsync(url);
             return JsonSerializer.Deserialize<FileDetails>(json)!;
@@ -627,8 +647,8 @@ namespace Mattermost
         /// <returns> Channel info. </returns>
         public async Task<Channel?> FindChannelByNameAsync(string teamId, string channelName)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Teams + $"/{teamId}/channels/name/{channelName}";
             var response = await _http.GetAsync(url);
             if (!response.IsSuccessStatusCode)
@@ -646,8 +666,8 @@ namespace Mattermost
         /// <param name="isCallsEnabled"> New state. </param>
         public async Task<bool> SetChannelCallStateAsync(string channelId, bool isCallsEnabled)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Plugins + "/com.mattermost.calls/" + channelId;
             var body = new
             {
@@ -665,8 +685,8 @@ namespace Mattermost
         /// <param name="channelId"> Channel identifier. </param>
         public async Task<bool> ArchiveChannelAsync(string channelId)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Channels + "/" + channelId;
             var response = await _http.DeleteAsync(url);
             return response.IsSuccessStatusCode;
@@ -679,8 +699,8 @@ namespace Mattermost
         /// <returns> Post information. </returns>
         public async Task<Post> GetPostAsync(string postId)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Posts + "/" + postId;
             string json = await _http.GetStringAsync(url);
             return JsonSerializer.Deserialize<Post>(json)!;
@@ -693,8 +713,8 @@ namespace Mattermost
         /// <returns> File bytes. </returns>
         public async Task<byte[]> GetFileAsync(string fileId)
         {
-            CheckAuthorized();
             CheckDisposed();
+            CheckAuthorized();
             string url = Routes.Files + "/" + fileId;
             var response = await _http.GetAsync(url);
             response = response.EnsureSuccessStatusCode();
@@ -789,7 +809,7 @@ namespace Mattermost
         {
             if (_http.DefaultRequestHeaders.Authorization == null)
             {
-                throw new ApiKeyException("Authorization token is not set - call LoginAsync first");
+                throw new AuthorizationException("Authorization token is not set - call LoginAsync first");
             }
             var uri = new Uri(_websocketUri + Routes.WebSocket);
             if (_ws.State != WebSocketState.None)
@@ -814,13 +834,13 @@ namespace Mattermost
                     || _http.DefaultRequestHeaders.Authorization.Scheme != "Bearer"
                     || string.IsNullOrWhiteSpace(_http.DefaultRequestHeaders.Authorization.Parameter))
                 {
-                    throw new ApiKeyException("Authorization token is not set - call LoginAsync first");
+                    throw new AuthorizationException("Authorization token is not set - call LoginAsync first");
                 }
                 string token = _http.DefaultRequestHeaders.Authorization.Parameter.Replace("Bearer ", string.Empty);
                 var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token });
                 if (result.Status != MattermostStatus.Ok)
                 {
-                    throw new ApiKeyException("Authentication error, server response: " + result.Status);
+                    throw new AuthorizationException("Authentication error, server response: " + result.Status);
                 }
                 Log("WebSocket connection established with state " + _ws.State);
 
@@ -869,7 +889,14 @@ namespace Mattermost
                 || _http.DefaultRequestHeaders.Authorization.Scheme != "Bearer"
                 || string.IsNullOrWhiteSpace(_http.DefaultRequestHeaders.Authorization.Parameter))
             {
-                throw new ApiKeyException("Authorization token is not set - call LoginAsync first");
+                if (!string.IsNullOrWhiteSpace(_apiKey))
+                {
+                    LoginWithApiKeyAsync(_apiKey).Wait();
+                }
+                else
+                {
+                    throw new AuthorizationException("Authorization token is not set - call LoginAsync first or use constructor with API key");
+                }
             }
         }
 
@@ -879,6 +906,23 @@ namespace Mattermost
             {
                 throw new ObjectDisposedException(GetType().FullName);
             }
+        }
+
+        private async Task<User> LoginWithApiKeyAsync(string apiKey)
+        {
+            CheckDisposed();
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new ApiKeyException("API key is empty");
+            }
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+            var result = await _http.GetAsync(Routes.Users + "/me");
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new ApiKeyException("Login with API key error, server response: " + result.StatusCode);
+            }
+            _userInfo = result.GetResponse<User>();
+            return _userInfo;
         }
 
         #endregion

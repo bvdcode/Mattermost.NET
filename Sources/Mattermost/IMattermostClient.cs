@@ -11,6 +11,7 @@ using Mattermost.Models.Posts;
 using Mattermost.Models.Channels;
 using System.Collections.Generic;
 using Mattermost.Models.Responses;
+using Mattermost.Exceptions;
 
 namespace Mattermost
 {
@@ -270,15 +271,24 @@ namespace Mattermost
         /// <summary>
         /// Login with specified login identifier and password.
         /// </summary>
-        /// <param name="loginId">Username or email.</param>
+        /// <param name="username">Username or email.</param>
         /// <param name="password">Password.</param>
         /// <returns>Authorized <see cref="User"/> object.</returns>
-        Task<User> LoginAsync(string loginId, string password);
+        Task<User> LoginAsync(string username, string password);
 
         /// <summary>
         /// Logout from server.
         /// </summary>
         /// <returns> Task representing logout operation. </returns>
         Task LogoutAsync();
+
+        /// <summary>
+        /// Login with specified API key - personal access token, see <see href="https://developers.mattermost.com/integrate/reference/personal-access-token/"/>
+        /// </summary>
+        /// <param name="apiKey"> API key, ex. bot token or personal access token. </param>
+        /// <returns>Autorized <see cref="User"/> object.</returns>
+        /// <exception cref="AuthorizationException">Throws if API key is invalid or server response is not successful.</exception>
+        [Obsolete("Use constructor with API key instead, ex. new MattermostClient(serverUrl, apiKey)")]
+        Task<User> LoginAsync(string apiKey);
     }
 }
