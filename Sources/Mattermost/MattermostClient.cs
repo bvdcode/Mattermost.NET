@@ -30,6 +30,8 @@ namespace Mattermost
     /// </summary>
     public class MattermostClient : IMattermostClient, IDisposable
     {
+        public const int MaxMessageLength = 4000;
+
         /// <summary>
         /// Called when client is connected to server WebSocket after
         /// <see cref="StartReceivingAsync()"/> method.
@@ -315,6 +317,13 @@ namespace Mattermost
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
             IEnumerable<string>? files = null, IDictionary<string, object>? props = null)
         {
+            if (message?.Length > MaxMessageLength) {
+                throw new ArgumentOutOfRangeException(
+                    nameof(message), 
+                    $"Message length exceed maximum limit of characters {message.Length} > {MaxMessageLength}"
+                );
+            }
+
             CheckAuthorized();
             CheckDisposed();
             Dictionary<string, object> metadata = new Dictionary<string, object>();
@@ -353,6 +362,13 @@ namespace Mattermost
         /// <returns> Updated post. </returns>
         public async Task<Post> UpdatePostAsync(string postId, string newText, IDictionary<string, object>? props = null)
         {
+            if (newText?.Length > MaxMessageLength) {
+                throw new ArgumentOutOfRangeException(
+                    nameof(newText),
+                    $"Message length exceed maximum limit of characters {newText.Length} > {MaxMessageLength}"
+                );
+            }
+
             CheckAuthorized();
             CheckDisposed();
             var body = new
