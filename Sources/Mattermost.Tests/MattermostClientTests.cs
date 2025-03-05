@@ -3,6 +3,7 @@ using Mattermost.Models;
 using Mattermost.Exceptions;
 using Mattermost.Models.Users;
 using Mattermost.Models.Responses.Websocket.Posts;
+using Mattermost.Constants;
 
 namespace Mattermost.Tests
 {
@@ -102,6 +103,24 @@ namespace Mattermost.Tests
             await Task.Delay(1000);
             Assert.That(receivedMessages, Is.Not.Empty);
             Assert.That(receivedMessages[0].Post.Text, Is.EqualTo(":tada: Thanks for helping us make Mattermost better!"));
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void SendMessage_BigText_ThrowsException()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya"; // https://community.mattermost.com/core/channels/off-topic-pub
+            string message = "A".PadRight(MattermostApiLimits.MaxPostMessageLength + 1, 'A');
+            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await client.CreatePostAsync(channelId, message));
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void EditMessage_BigText_ThrowsException()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya"; // https://community.mattermost.com/core/channels/off-topic-pub
+            string message = "A".PadRight(MattermostApiLimits.MaxPostMessageLength + 1, 'A');
+            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await client.UpdatePostAsync(channelId, message));
         }
 
         [Test]
