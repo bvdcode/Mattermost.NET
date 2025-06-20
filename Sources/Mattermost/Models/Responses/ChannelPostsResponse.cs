@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace Mattermost.Models.Responses
 {
     /// <summary>
-    /// Result of GetPostsForChannel query.
+    /// Contains a collection of posts in a channel.
     /// </summary>
     public class ChannelPostsResponse
     {

@@ -138,7 +138,7 @@ namespace Mattermost
         /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
         /// <param name="since"> Time to select modified posts after. </param>
         /// <returns> ChannelPosts object with posts. </returns>
-        public Task<ChannelPostsResponse> GetChannelPostsAsync(string channelId, int page = 0,
+        public Task<IEnumerable<Post>> GetPostsAsync(string channelId, int page = 0,
             int perPage = 60, string? beforePostId = null, string? afterPostId = null,
             bool includeDeleted = false, DateTime? since = null);
 
