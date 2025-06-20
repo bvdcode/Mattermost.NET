@@ -7,8 +7,8 @@ namespace Mattermost.Tests
         [Test]
         public void QueryHelpers_BuildQuery_ValidResult()
         {
-            const string expected = "page=1&per_page=10&include_deleted=True&since=1690182000&before=postId1&after=postId2";
-            var actual = QueryHelpers.BuildChannelPostsQuery(1, 10, beforePostId: "postId1", afterPostId: "postId2", includeDeleted: true, since: new DateTime(2023, 7, 24, 0, 0, 0));
+            const string expected = "page=1&per_page=10&include_deleted=True&since=1690156800&before=postId1&after=postId2";
+            var actual = QueryHelpers.BuildChannelPostsQuery(1, 10, beforePostId: "postId1", afterPostId: "postId2", includeDeleted: true, since: new DateTime(2023, 7, 24, 0, 0, 0, DateTimeKind.Utc));
             Assert.That(actual, Is.EqualTo(expected));
         }
 

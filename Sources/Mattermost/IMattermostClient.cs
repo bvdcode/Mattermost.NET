@@ -138,9 +138,17 @@ namespace Mattermost
         /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
         /// <param name="since"> Time to select modified posts after. </param>
         /// <returns> ChannelPosts object with posts. </returns>
-        public Task<IEnumerable<Post>> GetPostsAsync(string channelId, int page = 0,
+        public Task<IEnumerable<Post>> GetChannelPostsAsync(string channelId, int page = 0,
             int perPage = 60, string? beforePostId = null, string? afterPostId = null,
             bool includeDeleted = false, DateTime? since = null);
+
+        /// <summary>
+        /// Get posts related to specified post identifier in thread format.
+        /// </summary>
+        /// <param name="postId"> Post identifier to get thread posts. </param>
+        /// <param name="fromPostId"> Post identifier to start from. </param>
+        /// <returns> Collection of posts in thread format. </returns>
+        public Task<IEnumerable<Post>> GetThreadPostsAsync(string postId, string? fromPostId = null);
 
         #endregion
 
