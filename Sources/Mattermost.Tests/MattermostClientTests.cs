@@ -130,8 +130,17 @@ namespace Mattermost.Tests
             const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
             var result = await client.GetChannelPostsAsync(channelId);
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Posts, Is.Not.Empty);
-            Assert.That(result.Posts, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task GetThreadPosts_ReceivedPosts()
+        {
+            const string postId = "z6adks4emffu7cspkh6asjorkw"; // https://community.mattermost.com/core/messages/@feedbackbot
+            var result = await client.GetThreadPostsAsync(postId);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
         }
 
         [Test]
@@ -141,8 +150,7 @@ namespace Mattermost.Tests
             const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
             var result = await client.GetChannelPostsAsync(channelId, since: DateTime.UtcNow.AddDays(-15));
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Posts, Is.Not.Empty);
-            Assert.That(result.Posts, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
         }
 
         [Test]
