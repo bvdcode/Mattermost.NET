@@ -12,6 +12,8 @@
 
 Ready-to-use **.NET Standard** library for convenient development of Mattermost bots.
 
+> Mattermost.NET is a production-ready .NET Standard library for building bots and integrations for the Mattermost platform. It provides a clean, strongly-typed C# interface over the Mattermost API, with support for messaging, channel management, file uploads, and real-time WebSocket updates. The client handles authentication, reconnection, and offers async methods for most operations. Published on NuGet under the MIT license.
+
 ---
 
 # Installation
