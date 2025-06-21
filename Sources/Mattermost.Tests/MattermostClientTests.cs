@@ -141,6 +141,7 @@ namespace Mattermost.Tests
             var result = await client.GetThreadPostsAsync(postId);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
+            Assert.That(result.Count, Is.GreaterThan(1));
         }
 
         [Test]
