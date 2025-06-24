@@ -665,16 +665,22 @@ namespace Mattermost
         }
 
         /// <summary>
-        /// Find channel by channel name and team identifier.
+        /// Find channel by channel name and team name or identifier.
         /// </summary>
-        /// <param name="teamId"> Team identifier where channel is exists. </param>
+        /// <param name="teamIdOrName"> Team name or identifier where channel exists. </param>
         /// <param name="channelName"> Channel name. </param>
-        /// <returns> Channel info. </returns>
-        public async Task<Channel?> FindChannelByNameAsync(string teamId, string channelName)
+        /// <param name="isTeamId"> True if teamIdOrName is team identifier, otherwise false (team name). Default is false. </param>
+        /// <param name="includeDeleted"> Include deleted channels in search, default is true. </param>
+        /// <returns> Channel info, or null if team or channel not found. </returns>
+        public async Task<Channel?> FindChannelByNameAsync(string teamIdOrName, string channelName, bool isTeamId = false, bool includeDeleted = true)
         {
             CheckDisposed();
             CheckAuthorized();
-            string url = Routes.Teams + $"/{teamId}/channels/name/{channelName}";
+            string escapedTeamIdOrName = Uri.EscapeDataString(teamIdOrName);
+            string escapedChannelName = Uri.EscapeDataString(channelName);
+            string url = isTeamId
+                ? Routes.Teams + $"/{escapedTeamIdOrName}/channels/name/{escapedChannelName}?include_deleted={includeDeleted}"
+                : Routes.Teams + $"/name/{escapedTeamIdOrName}/channels/name/{escapedChannelName}?include_deleted={includeDeleted}";
             var response = await _http.GetAsync(url);
             if (!response.IsSuccessStatusCode)
             {

@@ -5,13 +5,12 @@ using Mattermost.Enums;
 using Mattermost.Events;
 using Mattermost.Models;
 using Mattermost.Constants;
+using Mattermost.Exceptions;
 using System.Threading.Tasks;
 using Mattermost.Models.Users;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Channels;
 using System.Collections.Generic;
-using Mattermost.Models.Responses;
-using Mattermost.Exceptions;
 
 namespace Mattermost
 {
@@ -191,12 +190,14 @@ namespace Mattermost
         Task<bool> DeleteUserFromChannelAsync(string channelId, string userId);
 
         /// <summary>
-        /// Find channel by channel name and team identifier.
+        /// Find channel by channel name and team name or identifier.
         /// </summary>
-        /// <param name="teamId"> Team identifier where channel is exists. </param>
+        /// <param name="teamIdOrName"> Team name or identifier where channel exists. </param>
         /// <param name="channelName"> Channel name. </param>
+        /// <param name="isTeamId"> True if teamIdOrName is team identifier, otherwise false (team name). Default is false. </param>
+        /// <param name="includeDeleted"> Include deleted channels in search, default is true. </param>
         /// <returns> Channel info. </returns>
-        Task<Channel?> FindChannelByNameAsync(string teamId, string channelName);
+        Task<Channel?> FindChannelByNameAsync(string teamIdOrName, string channelName, bool isTeamId = false, bool includeDeleted = true);
 
         /// <summary>
         /// Archive channel by specified channel identifier.
