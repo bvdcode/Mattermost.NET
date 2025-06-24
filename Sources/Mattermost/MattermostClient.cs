@@ -669,10 +669,10 @@ namespace Mattermost
         /// </summary>
         /// <param name="teamIdOrName"> Team name or identifier where channel exists. </param>
         /// <param name="channelName"> Channel name. </param>
-        /// <param name="isTeamId"> True if teamIdOrName is team identifier, otherwise false (team name). Default is false. </param>
+        /// <param name="isTeamId"> True if teamIdOrName is team identifier, otherwise false (team name). Default is true. </param>
         /// <param name="includeDeleted"> Include deleted channels in search, default is true. </param>
         /// <returns> Channel info, or null if team or channel not found. </returns>
-        public async Task<Channel?> FindChannelByNameAsync(string teamIdOrName, string channelName, bool isTeamId = false, bool includeDeleted = true)
+        public async Task<Channel?> FindChannelByNameAsync(string teamIdOrName, string channelName, bool isTeamId = true, bool includeDeleted = true)
         {
             CheckDisposed();
             CheckAuthorized();
