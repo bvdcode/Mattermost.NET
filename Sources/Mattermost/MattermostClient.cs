@@ -427,7 +427,7 @@ namespace Mattermost
         /// <param name="includeDeleted"> Whether to include deleted posts or not. Must have system admin permissions. </param>
         /// <param name="since"> Time to select modified posts after. </param>
         /// <returns> ChannelPosts object with posts. </returns>
-        public async Task<IEnumerable<Post>> GetChannelPostsAsync(string channelId, int page = 0,
+        public async Task<ChannelPostsResponse> GetChannelPostsAsync(string channelId, int page = 0,
             int perPage = 60, string? beforePostId = null, string? afterPostId = null,
             bool includeDeleted = false, DateTime? since = null)
         {
@@ -439,9 +439,8 @@ namespace Mattermost
             var response = await _http.GetAsync(url);
             response = response.EnsureSuccessStatusCode();
             string json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<ChannelPostsResponse>(json)
+            return JsonSerializer.Deserialize<ChannelPostsResponse>(json)
                 ?? throw new MattermostClientException("Failed to deserialize channel posts response");
-            return result.Posts.Values.OrderBy(p => p.CreatedAt);
         }
 
         /// <summary>
