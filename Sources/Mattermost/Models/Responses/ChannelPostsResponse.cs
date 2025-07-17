@@ -1,4 +1,5 @@
 using Mattermost.Models.Posts;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -38,5 +39,10 @@ namespace Mattermost.Models.Responses
         /// </summary>
         [JsonPropertyName("has_next")]
         public bool HasNext { get; set; }
+
+        internal bool Any()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
