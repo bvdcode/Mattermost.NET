@@ -40,6 +40,10 @@ namespace Mattermost.Helpers
                 {
                     throw new ArgumentOutOfRangeException(nameof(since), "Value must be in UTC.");
                 }
+                if (since < DateTime.UnixEpoch)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(since), "Value must be greater than or equal to Unix epoch (1970-01-01T00:00:00Z).");
+                }
                 query.Add(nameof(since), ((DateTimeOffset)since).ToUnixTimeSeconds().ToString());
             }
             if (!string.IsNullOrWhiteSpace(beforePostId))
