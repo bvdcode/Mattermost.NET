@@ -219,6 +219,13 @@ namespace Mattermost
         Task<byte[]> GetFileAsync(string fileId);
 
         /// <summary>
+        /// Get file stream by identifier.
+        /// </summary>
+        /// <param name="fileId"> File identifier. </param>
+        /// <returns> File stream. </returns>
+        Task<Stream> GetFileStreamAsync(string fileId);
+
+        /// <summary>
         /// Get file details by specified identifier.
         /// </summary>
         /// <param name="fileId"> File identifier. </param>
