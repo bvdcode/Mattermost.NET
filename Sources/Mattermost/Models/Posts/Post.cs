@@ -116,5 +116,11 @@ namespace Mattermost.Models.Posts
         /// </summary>
         [JsonPropertyName("props")]
         public Dictionary<string, object> Props { get; set; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Indicates whether the post is a root post in a thread or not.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsRoot => string.IsNullOrWhiteSpace(RootId);
     }
 }
