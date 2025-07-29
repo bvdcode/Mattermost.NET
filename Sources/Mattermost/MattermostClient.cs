@@ -752,6 +752,21 @@ namespace Mattermost
         }
 
         /// <summary>
+        /// Get file stream by identifier.
+        /// </summary>
+        /// <param name="fileId"> File identifier. </param>
+        /// <returns> File stream. </returns>
+        public async Task<Stream> GetFileStreamAsync(string fileId)
+        {
+            CheckDisposed();
+            CheckAuthorized();
+            string url = Routes.Files + "/" + fileId;
+            var response = await _http.GetAsync(url);
+            response = response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStreamAsync();
+        }
+
+        /// <summary>
         /// Dispose client resources.
         /// </summary>
         public void Dispose()
