@@ -130,7 +130,7 @@ namespace Mattermost.Tests
             const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
             var result = await client.GetChannelPostsAsync(channelId);
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
+            Assert.That(result.Posts, Is.Not.Empty);
         }
 
         [Test]
@@ -151,7 +151,21 @@ namespace Mattermost.Tests
             const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
             var result = await client.GetChannelPostsAsync(channelId, since: DateTime.UtcNow.AddDays(-15));
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
+            Assert.That(result.Posts, Is.Not.Empty);
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task GetChannelInfo_ReceivedChannelInfo()
+        {
+            const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
+            var result = await client.GetChannelAsync(channelId);
+            Assert.That(result, Is.Not.Null);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result.Id, Is.EqualTo(channelId));
+                Assert.That(result.Name, Is.EqualTo("off-topic-pub"));
+            }
         }
 
         [Test]

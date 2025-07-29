@@ -1,17 +1,17 @@
-﻿using Mattermost.Constants;
-using Mattermost.Enums;
-using Mattermost.Events;
-using Mattermost.Exceptions;
-using Mattermost.Models;
-using Mattermost.Models.Channels;
-using Mattermost.Models.Posts;
-using Mattermost.Models.Responses;
-using Mattermost.Models.Users;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
+using Mattermost.Enums;
 using System.Threading;
+using Mattermost.Models;
+using Mattermost.Events;
+using Mattermost.Constants;
+using Mattermost.Exceptions;
 using System.Threading.Tasks;
+using Mattermost.Models.Posts;
+using Mattermost.Models.Users;
+using System.Collections.Generic;
+using Mattermost.Models.Channels;
+using Mattermost.Models.Responses;
 
 namespace Mattermost
 {
@@ -97,20 +97,6 @@ namespace Mattermost
         Task<Post> GetPostAsync(string postId);
 
         /// <summary>
-        /// Send message to specified channel using channel identifier.
-        /// </summary>
-        /// <param name="channelId"> Channel identifier. </param>
-        /// <param name="message"> Message text (Markdown supported). </param>
-        /// <param name="replyToPostId"> Reply to post (optional) </param>
-        /// <param name="priority"> Set message priority </param>
-        /// <param name="files"> Attach files to post. </param>
-        /// <returns> Created post. </returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
-        [Obsolete("Use CreatePostAsync instead.")]
-        Task<Post> SendMessageAsync(string channelId, string message = "", string replyToPostId = "", 
-            MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null);
-
-        /// <summary>
         /// Update message text for specified post identifier.
         /// </summary>
         /// <param name="postId"> Post identifier. </param>
@@ -153,6 +139,13 @@ namespace Mattermost
         #endregion
 
         #region Channels
+
+        /// <summary>
+        /// Get channel from the provided channel id string.
+        /// </summary>
+        /// <param name="channelId"> Channel identifier. </param>
+        /// <returns> Channel information. </returns>
+        Task<Channel> GetChannelAsync(string channelId);
 
         /// <summary>
         /// Create simple channel with specified users.
@@ -298,14 +291,5 @@ namespace Mattermost
         /// </summary>
         /// <returns> Task representing logout operation. </returns>
         Task LogoutAsync();
-
-        /// <summary>
-        /// Login with specified API key - personal access token, see <see href="https://developers.mattermost.com/integrate/reference/personal-access-token/"/>
-        /// </summary>
-        /// <param name="apiKey"> API key, ex. bot token or personal access token. </param>
-        /// <returns>Autorized <see cref="User"/> object.</returns>
-        /// <exception cref="AuthorizationException">Throws if API key is invalid or server response is not successful.</exception>
-        [Obsolete("Use constructor with API key instead, ex. new MattermostClient(serverUrl, apiKey)")]
-        Task<User> LoginAsync(string apiKey);
     }
 }
