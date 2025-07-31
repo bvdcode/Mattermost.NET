@@ -32,7 +32,6 @@ dotnet add package Mattermost.NET
 
 ```csharp
 using Mattermost.NET;
-const string token = "37VlFKySIZn6gryA85cR1GKBQkjmfRZ6";
 const string server = "https://mm.your-server.com"; // or https://community.mattermost.com by default
 MattermostClient client = new(server);
 ```
@@ -40,10 +39,11 @@ MattermostClient client = new(server);
 ## Authenticate the bot with credentials
 
 ```csharp
-var botUser = await client.LoginAsync(token);
+var botUser = await client.LoginAsync(username, password);
 // Or you can use constructor if you have API key, ex. personal or bot token
 // It will automatically authenticate the bot
-MattermostClient client = new(server, apiKey);
+const string token = "37VlFKySIZn6gryA85cR1GKBQkjmfRZ6";
+MattermostClient client = new(server, token);
 ```
 
 ## Subscribe to post updates
