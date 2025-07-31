@@ -268,6 +268,13 @@ namespace Mattermost
         /// <returns> User information. </returns>
         Task<User> GetUserByUsernameAsync(string username);
 
+        /// <summary>
+        /// Get user by email address.
+        /// </summary>
+        /// <param name="email"> Email address. </param>
+        /// <returns> User information. </returns>
+        Task<User> GetUserByEmailAsync(string email);
+
         #endregion
 
         /// <summary>

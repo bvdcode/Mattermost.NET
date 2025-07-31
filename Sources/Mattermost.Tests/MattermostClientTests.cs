@@ -169,6 +169,20 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        public async Task GetUserByEmail_ValidEmail_ReceivedUserInfo()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(username, Is.Not.Empty);
+                Assert.That(password, Is.Not.Empty);
+                Assert.That(token, Is.Not.Empty);
+            });
+            var user = await client.GetUserByEmailAsync(username);
+            Assert.That(user, Is.Not.Null);
+            Assert.That(user.Email, Is.EqualTo(username));
+        }
+
+        [Test]
         public void DisposeClient_SendRequest_ThrowsException()
         {
             var client = new MattermostClient();
