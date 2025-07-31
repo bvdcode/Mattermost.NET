@@ -200,6 +200,25 @@ namespace Mattermost
         /// <returns> True if archieved, otherwise false. </returns>
         Task<bool> ArchiveChannelAsync(string channelId);
 
+        /// <summary>
+        /// Create a new direct message channel between current user and specified user. <br/>
+        /// Must have create_direct_channel permission. <br/>
+        /// Having the manage_system permission voids the previous requirements.
+        /// </summary>
+        /// <param name="userId"> User identifier to create direct channel with. </param>
+        /// <returns>Created direct channel.</returns>
+        Task<Channel> CreateDirectChannelAsync(string userId);
+
+        /// <summary>
+        /// Create a new direct message channel between two users. <br/>
+        /// Must be one of the two users and have create_direct_channel permission. <br/>
+        /// Having the manage_system permission voids the previous requirements.
+        /// </summary>
+        /// <param name="userId1"> First user identifier to create direct channel with. </param>
+        /// <param name="userId2"> Second user identifier to create direct channel with. </param>
+        /// <returns>Created direct channel.</returns>
+        Task<Channel> CreateDirectChannelAsync(string userId1, string userId2);
+
         #endregion
 
         #region Files

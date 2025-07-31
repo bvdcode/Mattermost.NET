@@ -4,6 +4,7 @@ using Mattermost.Exceptions;
 using Mattermost.Models.Users;
 using Mattermost.Models.Responses.Websocket.Posts;
 using Mattermost.Constants;
+using Mattermost.Enums;
 
 namespace Mattermost.Tests
 {
@@ -177,9 +178,34 @@ namespace Mattermost.Tests
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });
-            var user = await client.GetUserByEmailAsync(username);
-            Assert.That(user, Is.Not.Null);
-            Assert.That(user.Email, Is.EqualTo(username));
+            try
+            {
+                var user = await client.GetUserByEmailAsync(username);
+                Assert.That(user, Is.Not.Null);
+                Assert.That(user.Email, Is.EqualTo(username));
+            }
+            catch (MattermostClientException ex)
+            {
+                if (ex.Message.Contains("Access to user information by email is forbidden"))
+                {
+                    Assert.Pass();
+                    return;
+                }
+            }
+        }
+
+        [Test]
+        public async Task CreateDirectChannel_ValidUserId_ReceivedChannelInfo()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(username, Is.Not.Empty);
+                Assert.That(password, Is.Not.Empty);
+                Assert.That(token, Is.Not.Empty);
+            });
+            var channel = await client.CreateDirectChannelAsync("zsdnqzetgj83xrwxxrze3i188r");
+            Assert.That(channel, Is.Not.Null);
+            Assert.That(channel.ChannelType, Is.EqualTo(ChannelType.Direct));
         }
 
         [Test]

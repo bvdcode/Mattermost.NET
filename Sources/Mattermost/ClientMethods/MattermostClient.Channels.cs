@@ -6,6 +6,7 @@ using Mattermost.Enums;
 using Mattermost.Constants;
 using System.Threading.Tasks;
 using Mattermost.Models.Channels;
+using Mattermost.Exceptions;
 
 namespace Mattermost
 {
@@ -167,6 +168,44 @@ namespace Mattermost
             var team = await GetTeamAsync(teamId);
             result.Link = ServerAddress + team.Name + "/channels/" + result.Id;
             return result;
+        }
+
+        /// <summary>
+        /// Create a new direct message channel between two users. <br/>
+        /// Must be one of the two users and have create_direct_channel permission. <br/>
+        /// Having the manage_system permission voids the previous requirements.
+        /// </summary>
+        /// <param name="userId"> User identifier to create direct channel with. </param>
+        /// <returns>Created direct channel.</returns>
+        public Task<Channel> CreateDirectChannelAsync(string userId)
+        {
+            return CreateDirectChannelAsync(CurrentUserInfo.Id, userId);
+        }
+
+        /// <summary>
+        /// Create a new direct message channel between two users. <br/>
+        /// Must be one of the two users and have create_direct_channel permission. <br/>
+        /// Having the manage_system permission voids the previous requirements.
+        /// </summary>
+        /// <param name="userId1"> First user identifier to create direct channel with. </param>
+        /// <param name="userId2"> Second user identifier to create direct channel with. </param>
+        /// <returns>Created direct channel.</returns>
+        public async Task<Channel> CreateDirectChannelAsync(string userId1, string userId2)
+        {
+            CheckDisposed();
+            CheckAuthorized();
+            var body = new[] { userId1, userId2 };
+            string json = JsonSerializer.Serialize(body);
+            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _http.PostAsync(Routes.Channels + "/direct", content);
+            json = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new MattermostClientException($"Failed to create direct channel: {json}");
+            }
+            response.EnsureSuccessStatusCode();
+            return JsonSerializer.Deserialize<Channel>(json)
+                ?? throw new JsonException("Failed to deserialize channel information.");
         }
     }
 }

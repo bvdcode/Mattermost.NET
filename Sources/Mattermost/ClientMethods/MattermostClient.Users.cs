@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 using Mattermost.Constants;
+using Mattermost.Exceptions;
 using System.Threading.Tasks;
 using Mattermost.Models.Users;
-using Mattermost.Exceptions;
 
 namespace Mattermost
 {
@@ -20,7 +20,7 @@ namespace Mattermost
             response.EnsureSuccessStatusCode();
             string json = await response.Content.ReadAsStringAsync();
             _userInfo = JsonSerializer.Deserialize<User>(json)
-                ?? throw new MattermostClientException("Failed to deserialize user information.");
+                ?? throw new JsonException("Failed to deserialize user information: " + json);
             return _userInfo;
         }
 
@@ -36,7 +36,7 @@ namespace Mattermost
             string url = Routes.Users + "/" + userId;
             string json = await _http.GetStringAsync(url);
             User userInfo = JsonSerializer.Deserialize<User>(json)
-                ?? throw new MattermostClientException("Failed to deserialize user information for ID: " + userId);
+                ?? throw new JsonException($"Failed to deserialize user information for ID#{userId}: {json}");
             return userInfo;
         }
 
@@ -52,7 +52,7 @@ namespace Mattermost
             string url = Routes.Users + "/username/" + username.Replace("@", string.Empty).Trim();
             string json = await _http.GetStringAsync(url);
             User userInfo = JsonSerializer.Deserialize<User>(json)
-                ?? throw new MattermostClientException("Failed to deserialize user information for username: " + username);
+                ?? throw new JsonException($"Failed to deserialize user information for username '{username}': {json}");
             return userInfo;
         }
 
@@ -73,7 +73,7 @@ namespace Mattermost
             }
             string json = await response.Content.ReadAsStringAsync();
             User userInfo = JsonSerializer.Deserialize<User>(json)
-                ?? throw new MattermostClientException("Failed to deserialize user information for email: " + email);
+                ?? throw new JsonException($"Failed to deserialize user information for email '{email}': {json}");
             return userInfo;
         }
     }
