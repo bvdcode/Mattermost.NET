@@ -13,7 +13,12 @@
         /// <summary>
         /// Private channel - join only by invitation.
         /// </summary>
-        Private
+        Private,
+
+        /// <summary>
+        /// Direct channel - private channel with only two participants.
+        /// </summary>
+        Direct
     }
 
     internal static class ChannelTypeExtensions
@@ -24,6 +29,7 @@
             {
                 ChannelType.Public => "O",
                 ChannelType.Private => "P",
+                ChannelType.Direct => "D",
                 _ => null,
             };
         }

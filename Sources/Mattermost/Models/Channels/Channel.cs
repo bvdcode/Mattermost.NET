@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using Mattermost.Enums;
+using System;
+using System.Text.Json.Serialization;
 
 namespace Mattermost.Models.Channels
 {
@@ -42,6 +44,23 @@ namespace Mattermost.Models.Channels
         /// </summary>
         [JsonPropertyName("type")]
         public string Type { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Channel type as <see cref="ChannelType"/> enum.
+        /// </summary>
+        [JsonIgnore]
+        public ChannelType ChannelType
+        {
+            get => Type switch
+            {
+                "O" => ChannelType.Public,
+                "P" => ChannelType.Private,
+                "D" => ChannelType.Direct,
+                _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, null)
+            };
+            set => Type = value.ToChannelChar() 
+                ?? throw new ArgumentOutOfRangeException(nameof(value), value, null);
+        }
 
         /// <summary>
         /// Channel diplay name.
