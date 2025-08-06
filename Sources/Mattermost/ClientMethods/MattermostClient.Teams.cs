@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http;
 using Mattermost.Constants;
 using System.Threading.Tasks;
 using Mattermost.Models.Teams;
@@ -12,14 +12,9 @@ namespace Mattermost
         /// </summary>
         /// <param name="teamId"> Team identifier. </param>
         /// <returns> Team information. </returns>
-        public async Task<Team> GetTeamAsync(string teamId)
+        public Task<Team> GetTeamAsync(string teamId)
         {
-            string url = Routes.Teams + "/" + teamId;
-            var response = await _http.GetAsync(url);
-            response = response.EnsureSuccessStatusCode();
-            string json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Team>(json)
-                ?? throw new JsonException("Failed to deserialize team information.");
+            return SendRequestAsync<Team>(HttpMethod.Get, Routes.Teams + "/" + teamId);
         }
     }
 }

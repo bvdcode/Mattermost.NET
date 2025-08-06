@@ -85,8 +85,8 @@ namespace Mattermost
         /// <param name="props"> A general JSON property bag to attach to the post. </param>
         /// <returns> Created post. </returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
-        Task<Post> CreatePostAsync(string channelId, string message = "", string replyToPostId = "", 
-            MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null, 
+        Task<Post> CreatePostAsync(string channelId, string message = "", string replyToPostId = "",
+            MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null,
             IDictionary<string, object>? props = null);
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Mattermost
         /// </summary>
         /// <param name="postId"> Post identifier. </param>
         /// <returns> True if deleted, otherwise false. </returns>
-        Task<bool> DeletePostAsync(string postId);
+        Task DeletePostAsync(string postId);
 
         /// <summary>
         /// Get a page of posts in a channel.
@@ -134,7 +134,7 @@ namespace Mattermost
         /// <param name="postId"> Post identifier to get thread posts. </param>
         /// <param name="fromPostId"> Post identifier to start from. </param>
         /// <returns> Collection of posts in thread format. </returns>
-        public Task<IEnumerable<Post>> GetThreadPostsAsync(string postId, string? fromPostId = null);
+        public Task<ChannelPostsResponse> GetThreadPostsAsync(string postId, string? fromPostId = null);
 
         #endregion
 
@@ -181,7 +181,7 @@ namespace Mattermost
         /// <param name="channelId"> Channel identifier. </param>
         /// <param name="userId"> User identifier. </param>
         /// <returns> True if deleted, otherwise false. </returns>
-        Task<bool> DeleteUserFromChannelAsync(string channelId, string userId);
+        Task DeleteUserFromChannelAsync(string channelId, string userId);
 
         /// <summary>
         /// Find channel by channel name and team name or identifier.
@@ -198,7 +198,7 @@ namespace Mattermost
         /// </summary>
         /// <param name="channelId"> Channel identifier. </param>
         /// <returns> True if archieved, otherwise false. </returns>
-        Task<bool> ArchiveChannelAsync(string channelId);
+        Task ArchiveChannelAsync(string channelId);
 
         /// <summary>
         /// Create a new direct message channel between current user and specified user. <br/>
@@ -302,7 +302,7 @@ namespace Mattermost
         /// <param name="isCallsEnabled"> New state. </param>
         /// <param name="channelId"> Channel identifier where calls must be in specified state. </param>
         /// <returns> True if calls state setted, otherwise false. </returns>
-        Task<bool> SetChannelCallStateAsync(string channelId, bool isCallsEnabled);
+        Task SetChannelCallStateAsync(string channelId, bool isCallsEnabled);
         
         /// <summary>
         /// Login with specified login identifier and password.

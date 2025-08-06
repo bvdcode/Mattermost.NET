@@ -16,7 +16,7 @@ namespace Mattermost.Extensions
             return response;
         }
 
-        internal static TResult GetResponse<TResult>(this HttpResponseMessage response)
+        internal static async Task<TResult> GetResponseAsync<TResult>(this HttpResponseMessage response)
         {
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
@@ -27,7 +27,7 @@ namespace Mattermost.Extensions
                 throw new AuthorizationException("Access denied");
             }
             response.EnsureSuccessStatusCode();
-            var responseContent = response.Content.ReadAsStringAsync().Result;
+            var responseContent = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<TResult>(responseContent) ?? throw new InvalidOperationException("Response is null");
         }
     }

@@ -47,13 +47,11 @@ namespace Mattermost
         /// </summary>
         /// <param name="fileId"> File identifier. </param>
         /// <returns> File details. </returns>
-        public async Task<FileDetails> GetFileDetailsAsync(string fileId)
+        public Task<FileDetails> GetFileDetailsAsync(string fileId)
         {
             CheckDisposed();
             CheckAuthorized();
-            string url = Routes.Files + "/" + fileId + "/info";
-            string json = await _http.GetStringAsync(url);
-            return JsonSerializer.Deserialize<FileDetails>(json)!;
+            return SendRequestAsync<FileDetails>(HttpMethod.Get, Routes.Files + "/" + fileId + "/info");
         }
 
         /// <summary>
@@ -95,7 +93,9 @@ namespace Mattermost
             result = result.EnsureSuccessStatusCode();
             cts.Cancel();
             string json = await result.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<FileResponse>(json)!.Files.First();
+            var response = JsonSerializer.Deserialize<FileResponse>(json)
+                ?? throw new JsonException("Failed to deserialize file response: " + json);
+            return response.Files.Single();
         }
     }
 }

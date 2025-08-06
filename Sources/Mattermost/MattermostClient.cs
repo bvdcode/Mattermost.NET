@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using Mattermost.Models.Users;
 using Mattermost.Models.Responses.Websocket;
+using System.Text.Json;
 
 namespace Mattermost
 {
@@ -130,7 +131,6 @@ namespace Mattermost
             CheckUrl(serverUri);
             _ws = new ClientWebSocket();
             _websocketUri = GetWebsocketUri(serverUri);
-            _userInfo = new User();
             _serverUri = serverUri;
             _http = new HttpClient() { BaseAddress = _serverUri, Timeout = TimeSpan.FromMinutes(60) };
         }
@@ -248,7 +248,7 @@ namespace Mattermost
             string token = result.Headers.GetValues("Token").FirstOrDefault()
                 ?? throw new AuthorizationException("Token not found in response headers");
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            _userInfo = result.GetResponse<User>();
+            _userInfo = await result.GetResponseAsync<User>();
             return _userInfo;
         }
 
@@ -468,8 +468,44 @@ namespace Mattermost
             {
                 throw new ApiKeyException("Login with API key error, server response: " + result.StatusCode);
             }
-            _userInfo = result.GetResponse<User>();
-            return _userInfo;
+            return await result.GetResponseAsync<User>();
+        }
+
+        private Task SendRequestAsync(HttpMethod method, string requestUri, object? payload = null, CancellationToken cancellationToken = default) =>
+            SendRequestAsync<object>(method, requestUri, payload, cancellationToken);
+
+        private async Task<TResult> SendRequestAsync<TResult>(HttpMethod method, string requestUri, object? payload = null, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            CheckAuthorized();
+            HttpRequestMessage request = new HttpRequestMessage(method, requestUri);
+            if (payload != null)
+            {
+                string jsonPayload = JsonSerializer.Serialize(payload);
+                request.Content = new StringContent(jsonPayload);
+                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            }
+            var response = await _http.SendAsync(request, cancellationToken);
+            string json = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                MattermostClientException exception;
+                try
+                {
+                    exception = JsonSerializer.Deserialize<MattermostClientException>(json)
+                        ?? throw new JsonException("Failed to deserialize error result: " + json);
+                }
+                catch (Exception)
+                {
+                    exception = new MattermostClientException("Unknown error, server response: " + response.StatusCode);
+                }
+                exception.StatusCode = response.StatusCode;
+                exception.ResponseJson = json;
+                exception.RequestUri = requestUri;
+                exception.RequestMethod = method.Method;
+                throw exception;
+            }
+            return JsonSerializer.Deserialize<TResult>(json) ?? throw new JsonException("Failed to deserialize result: " + json);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Mattermost.Enums;
-using System;
+﻿using System;
+using Mattermost.Enums;
 using System.Text.Json.Serialization;
 
 namespace Mattermost.Models.Channels
@@ -40,7 +40,7 @@ namespace Mattermost.Models.Channels
         public string TeamId { get; set; } = string.Empty;
 
         /// <summary>
-        /// Channel type: O (open) and P (private).
+        /// Channel type: O (open), P (private), or D (direct).
         /// </summary>
         [JsonPropertyName("type")]
         public string Type { get; set; } = string.Empty;
@@ -103,11 +103,5 @@ namespace Mattermost.Models.Channels
         /// </summary>
         [JsonPropertyName("creator_id")]
         public string CreatorUserId { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Channel link.
-        /// </summary>
-        [JsonIgnore]
-        public string Link { get; set; } = string.Empty;
     }
 }
