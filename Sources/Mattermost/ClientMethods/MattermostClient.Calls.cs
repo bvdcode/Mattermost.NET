@@ -13,7 +13,7 @@ namespace Mattermost
         /// </summary>
         /// <param name="channelId"> Channel identifier where calls must be in specified state. </param>
         /// <param name="isCallsEnabled"> New state. </param>
-        public async Task<bool> SetChannelCallStateAsync(string channelId, bool isCallsEnabled)
+        public async Task SetChannelCallStateAsync(string channelId, bool isCallsEnabled)
         {
             CheckDisposed();
             CheckAuthorized();
@@ -22,10 +22,7 @@ namespace Mattermost
             {
                 enabled = isCallsEnabled
             };
-            string json = JsonSerializer.Serialize(body);
-            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _http.PostAsync(url, content);
-            return response.IsSuccessStatusCode;
+            await SendRequestAsync(HttpMethod.Post, url, body);
         }
     }
 }

@@ -4,9 +4,9 @@ using System.Net.Http;
 using System.Text.Json;
 using Mattermost.Enums;
 using Mattermost.Constants;
+using Mattermost.Exceptions;
 using System.Threading.Tasks;
 using Mattermost.Models.Channels;
-using Mattermost.Exceptions;
 
 namespace Mattermost
 {
@@ -17,16 +17,11 @@ namespace Mattermost
         /// </summary>
         /// <param name="channelId"> Channel identifier. </param>
         /// <returns> Channel information. </returns>
-        public async Task<Channel> GetChannelAsync(string channelId)
+        public Task<Channel> GetChannelAsync(string channelId)
         {
             CheckDisposed();
             CheckAuthorized();
-            string url = Routes.Channels + "/" + channelId;
-            var response = await _http.GetAsync(url);
-            response = response.EnsureSuccessStatusCode();
-            string json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Channel>(json)
-                ?? throw new JsonException("Failed to deserialize channel information.");
+            return SendRequestAsync<Channel>(HttpMethod.Get, Routes.Channels + "/" + channelId);
         }
 
         /// <summary>
@@ -46,26 +41,29 @@ namespace Mattermost
             string url = isTeamId
                 ? Routes.Teams + $"/{escapedTeamIdOrName}/channels/name/{escapedChannelName}?include_deleted={includeDeleted}"
                 : Routes.Teams + $"/name/{escapedTeamIdOrName}/channels/name/{escapedChannelName}?include_deleted={includeDeleted}";
-            var response = await _http.GetAsync(url);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return null;
+                return await SendRequestAsync<Channel>(HttpMethod.Get, url);
             }
-            string json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Channel>(json);
+            catch (MattermostClientException ex)
+            {
+                if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                throw;
+            }
         }
 
         /// <summary>
         /// Archive channel by specified channel identifier.
         /// </summary>
         /// <param name="channelId"> Channel identifier. </param>
-        public async Task<bool> ArchiveChannelAsync(string channelId)
+        public Task ArchiveChannelAsync(string channelId)
         {
             CheckDisposed();
             CheckAuthorized();
-            string url = Routes.Channels + "/" + channelId;
-            var response = await _http.DeleteAsync(url);
-            return response.IsSuccessStatusCode;
+            return SendRequestAsync(HttpMethod.Delete, Routes.Channels + "/" + channelId);
         }
 
         /// <summary>
@@ -74,7 +72,7 @@ namespace Mattermost
         /// <param name="channelId"> Channel identifier. </param>
         /// <param name="userId"> User identifier. </param>
         /// <returns> Channel user information. </returns>
-        public async Task<ChannelUserInfo> AddUserToChannelAsync(string channelId, string userId)
+        public Task<ChannelUserInfo> AddUserToChannelAsync(string channelId, string userId)
         {
             CheckDisposed();
             CheckAuthorized();
@@ -83,12 +81,7 @@ namespace Mattermost
             {
                 user_id = userId
             };
-            string json = JsonSerializer.Serialize(body);
-            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _http.PostAsync(url, content);
-            response = response.EnsureSuccessStatusCode();
-            json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<ChannelUserInfo>(json)!;
+            return SendRequestAsync<ChannelUserInfo>(HttpMethod.Post, url, body);
         }
 
         /// <summary>
@@ -96,14 +89,12 @@ namespace Mattermost
         /// </summary>
         /// <param name="channelId"> Channel identifier. </param>
         /// <param name="userId"> User identifier. </param>
-        /// <returns> True if deleted, otherwise false. </returns>
-        public async Task<bool> DeleteUserFromChannelAsync(string channelId, string userId)
+        public Task DeleteUserFromChannelAsync(string channelId, string userId)
         {
             CheckDisposed();
             CheckAuthorized();
             string url = Routes.Channels + $"/{channelId}/members/{userId}";
-            var response = await _http.DeleteAsync(url);
-            return response.IsSuccessStatusCode;
+            return SendRequestAsync(HttpMethod.Delete, url);
         }
 
         /// <summary>
@@ -111,23 +102,15 @@ namespace Mattermost
         /// </summary>
         /// <param name="userIds"> Participant users. </param>
         /// <returns> Created channel info. </returns>
-        public async Task<Channel> CreateGroupChannelAsync(params string[] userIds)
+        public Task<Channel> CreateGroupChannelAsync(params string[] userIds)
         {
             CheckDisposed();
             CheckAuthorized();
-            string json = JsonSerializer.Serialize(userIds);
-            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _http.PostAsync(Routes.GroupChannels, content);
-            response = response.EnsureSuccessStatusCode();
-            json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<Channel>(json)!;
-
-            //TODO: create channel link
-            var team = await GetTeamAsync(result.TeamId);
-            result.Link = ServerAddress + team.Name + "/channels/" + result.Id;
-            //
-
-            return result;
+            if (userIds.Length < 2)
+            {
+                throw new ArgumentException("At least two user IDs are required to create a group channel.", nameof(userIds));
+            }
+            return SendRequestAsync<Channel>(HttpMethod.Post, Routes.GroupChannels, userIds);
         }
 
         /// <summary>
@@ -140,7 +123,7 @@ namespace Mattermost
         /// <param name="purpose"> Channel purpose (optional). </param>
         /// <param name="header"> Channel header (optional). </param>
         /// <returns> Created channel info. </returns>
-        public async Task<Channel> CreateChannelAsync(string teamId, string name, string displayName,
+        public Task<Channel> CreateChannelAsync(string teamId, string name, string displayName,
             ChannelType channelType, string purpose = "", string header = "")
         {
             CheckDisposed();
@@ -159,15 +142,7 @@ namespace Mattermost
                 header,
                 type = channelType.ToChannelChar()
             };
-            string json = JsonSerializer.Serialize(body);
-            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _http.PostAsync(Routes.Channels, content);
-            response = response.EnsureSuccessStatusCode();
-            json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<Channel>(json)!;
-            var team = await GetTeamAsync(teamId);
-            result.Link = ServerAddress + team.Name + "/channels/" + result.Id;
-            return result;
+            return SendRequestAsync<Channel>(HttpMethod.Post, Routes.Channels, body);
         }
 
         /// <summary>
@@ -190,22 +165,20 @@ namespace Mattermost
         /// <param name="userId1"> First user identifier to create direct channel with. </param>
         /// <param name="userId2"> Second user identifier to create direct channel with. </param>
         /// <returns>Created direct channel.</returns>
-        public async Task<Channel> CreateDirectChannelAsync(string userId1, string userId2)
+        public Task<Channel> CreateDirectChannelAsync(string userId1, string userId2)
         {
             CheckDisposed();
             CheckAuthorized();
-            var body = new[] { userId1, userId2 };
-            string json = JsonSerializer.Serialize(body);
-            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _http.PostAsync(Routes.Channels + "/direct", content);
-            json = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode)
+            if (string.IsNullOrWhiteSpace(userId1))
             {
-                throw new MattermostClientException($"Failed to create direct channel: {json}");
+                throw new ArgumentException("User ID #1 cannot be null or empty.", nameof(userId1));
             }
-            response.EnsureSuccessStatusCode();
-            return JsonSerializer.Deserialize<Channel>(json)
-                ?? throw new JsonException("Failed to deserialize channel information.");
+            if (string.IsNullOrWhiteSpace(userId2))
+            {
+                throw new ArgumentException("User ID #2 cannot be null or empty.", nameof(userId2));
+            }
+            var body = new[] { userId1, userId2 };
+            return SendRequestAsync<Channel>(HttpMethod.Post, Routes.Channels + "/direct", body);
         }
     }
 }

@@ -141,8 +141,8 @@ namespace Mattermost.Tests
             const string postId = "z6adks4emffu7cspkh6asjorkw"; // https://community.mattermost.com/core/messages/@feedbackbot
             var result = await client.GetThreadPostsAsync(postId);
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result.Count, Is.GreaterThan(1));
+            Assert.That(result.Posts, Is.Not.Empty);
+            Assert.That(result.Posts, Has.Count.GreaterThan(1));
         }
 
         [Test]

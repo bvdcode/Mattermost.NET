@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http;
+using System.Text.Json;
 using Mattermost.Constants;
 using Mattermost.Exceptions;
 using System.Threading.Tasks;
@@ -61,20 +62,12 @@ namespace Mattermost
         /// </summary>
         /// <param name="email"> Email address. </param>
         /// <returns> User information. </returns>
-        public async Task<User> GetUserByEmailAsync(string email)
+        public Task<User> GetUserByEmailAsync(string email)
         {
             CheckDisposed();
             CheckAuthorized();
             string url = Routes.Users + "/email/" + email.Trim();
-            var response = await _http.GetAsync(url);
-            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                throw new MattermostClientException("Access to user information by email is forbidden. Check your server settings or permissions.");
-            }
-            string json = await response.Content.ReadAsStringAsync();
-            User userInfo = JsonSerializer.Deserialize<User>(json)
-                ?? throw new JsonException($"Failed to deserialize user information for email '{email}': {json}");
-            return userInfo;
+            return SendRequestAsync<User>(HttpMethod.Get, url);
         }
     }
 }
