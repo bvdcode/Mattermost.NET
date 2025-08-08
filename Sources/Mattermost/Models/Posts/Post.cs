@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -109,13 +110,25 @@ namespace Mattermost.Models.Posts
         /// Files attached to the post.
         /// </summary>
         [JsonPropertyName("file_ids")]
-        public IEnumerable<string> FileIdentifiers { get; set; } = new List<string>();
+        public IList<string> FileIdentifiers { get; set; } = new List<string>();
 
         /// <summary>
         /// Post metadata.
         /// </summary>
         [JsonPropertyName("props")]
-        public Dictionary<string, object> Props { get; set; } = new Dictionary<string, object>();
+        public IDictionary<string, object> RawProps { get; set; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Post properties that can be attached to a post, such as file attachments or links.
+        /// </summary>
+        [JsonIgnore]
+        public PostProps Props => GetProps();
+
+        private PostProps GetProps()
+        {
+            string json = System.Text.Json.JsonSerializer.Serialize(RawProps);
+            return System.Text.Json.JsonSerializer.Deserialize<PostProps>(json) ?? new PostProps();
+        }
 
         /// <summary>
         /// Indicates whether the post is a root post in a thread or not.

@@ -14,13 +14,13 @@ namespace Mattermost.Models.Responses
         /// List of post IDs in the order they were created.
         /// </summary>
         [JsonPropertyName("order")]
-        public IEnumerable<string> Order { get; set; } = new List<string>();
+        public IReadOnlyList<string> Order { get; set; } = new List<string>();
 
         /// <summary>
         /// List of posts by id.
         /// </summary>
         [JsonPropertyName("posts")]
-        public IDictionary<string, Post> Posts { get; set; } = new Dictionary<string, Post>();
+        public IReadOnlyDictionary<string, Post> Posts { get; set; } = new Dictionary<string, Post>();
 
         /// <summary>
         /// The ID of next post. Not omitted when empty or not relevant.

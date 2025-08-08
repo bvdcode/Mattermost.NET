@@ -13,6 +13,7 @@ namespace Mattermost.Builders
     {
         private string text;
         private string channelId;
+        private PostProps? props;
         private string replyToPostId;
         private readonly List<string> files;
         private MessagePriority messagePriority;
@@ -105,6 +106,17 @@ namespace Mattermost.Builders
                 return this;
             }
             files.Add(fileId);
+            return this;
+        }
+
+        /// <summary>
+        /// Attach properties to post.
+        /// </summary>
+        /// <param name="postProps"></param>
+        /// <returns></returns>
+        public PostBuilder AddProps(PostProps postProps)
+        {
+            props = postProps;
             return this;
         }
 
