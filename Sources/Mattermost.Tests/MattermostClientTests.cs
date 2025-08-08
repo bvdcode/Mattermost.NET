@@ -1,10 +1,11 @@
 using System.Text.Json;
+using Mattermost.Enums;
 using Mattermost.Models;
+using Mattermost.Constants;
 using Mattermost.Exceptions;
 using Mattermost.Models.Users;
+using Mattermost.Models.Posts;
 using Mattermost.Models.Responses.Websocket.Posts;
-using Mattermost.Constants;
-using Mattermost.Enums;
 
 namespace Mattermost.Tests
 {
@@ -110,7 +111,7 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public void SendMessage_BigText_ThrowsException()
         {
-            const string channelId = "w5e788utqbfgickdfgsabp8wya"; // https://community.mattermost.com/core/channels/off-topic-pub
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
             string message = "A".PadRight(MattermostApiLimits.MaxPostMessageLength + 1, 'A');
             Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await client.CreatePostAsync(channelId, message));
         }
@@ -119,7 +120,7 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public void EditMessage_BigText_ThrowsException()
         {
-            const string channelId = "w5e788utqbfgickdfgsabp8wya"; // https://community.mattermost.com/core/channels/off-topic-pub
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
             string message = "A".PadRight(MattermostApiLimits.MaxPostMessageLength + 1, 'A');
             Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await client.UpdatePostAsync(channelId, message));
         }
@@ -206,6 +207,32 @@ namespace Mattermost.Tests
             var channel = await client.CreateDirectChannelAsync("zsdnqzetgj83xrwxxrze3i188r");
             Assert.That(channel, Is.Not.Null);
             Assert.That(channel.ChannelType, Is.EqualTo(ChannelType.Direct));
+        }
+
+        [Test]
+        public async Task CreatePostWithProps_ValidProps_ReceivedPostInfo()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(username, Is.Not.Empty);
+                Assert.That(password, Is.Not.Empty);
+                Assert.That(token, Is.Not.Empty);
+            });
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+            PostProps props = new();
+            props.Attachments.Add(new PostPropsAttachment()
+            {
+                Text = "Attachment text",
+            });
+            var post = await client.CreatePostAsync(channelId, "Test post with props", props: props);
+            Assert.That(post, Is.Not.Null);
+            Assert.That(post.RawProps, Is.Not.Null);
+            Assert.That(post.RawProps, Is.Not.Empty, "Post properties should not be empty.");
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(post.RawProps, Contains.Key("attachments"), "Post properties should contain 'attachments' key.");
+                Assert.That(post.Props, Is.Not.Null, "Post properties should not be null.");
+            }
         }
 
         [Test]

@@ -47,7 +47,7 @@ namespace Mattermost.Models.Channels
         /// Notify props for user in channel.
         /// </summary>
         [JsonPropertyName("notify_props")]
-        public NotifyProps NotifyProps { get; set; } = null!;
+        public NotifyProps NotifyProps { get; set; } = new NotifyProps();
 
         /// <summary>
         /// Last update time in milliseconds.

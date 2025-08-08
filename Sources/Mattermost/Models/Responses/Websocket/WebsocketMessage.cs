@@ -19,7 +19,7 @@ namespace Mattermost.Models.Responses.Websocket
         }
 
         [JsonPropertyName("status")]
-        public string StatusText { get; set; } = null!;
+        public string StatusText { get; set; } = string.Empty;
 
         [JsonPropertyName("event")]
         public string? EventText { get; set; }
