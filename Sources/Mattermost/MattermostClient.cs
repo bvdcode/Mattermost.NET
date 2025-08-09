@@ -1,19 +1,20 @@
-﻿using System;
+﻿using Mattermost.Constants;
+using Mattermost.Enums;
+using Mattermost.Events;
+using Mattermost.Exceptions;
+using Mattermost.Extensions;
+using Mattermost.Models;
+using Mattermost.Models.Responses.Websocket;
+using Mattermost.Models.Users;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
-using Mattermost.Enums;
-using System.Text.Json;
-using Mattermost.Events;
-using Mattermost.Constants;
-using Mattermost.Extensions;
-using Mattermost.Exceptions;
-using System.Net.WebSockets;
-using System.Threading.Tasks;
 using System.Net.Http.Headers;
-using Mattermost.Models.Users;
-using Mattermost.Models.Responses.Websocket;
+using System.Net.WebSockets;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mattermost
 {
@@ -491,8 +492,9 @@ namespace Mattermost
                 MattermostClientException exception;
                 try
                 {
-                    exception = JsonSerializer.Deserialize<MattermostClientException>(json)
+                    var details = JsonSerializer.Deserialize<MattermostApiErrorDetails>(json)
                         ?? throw new JsonException("Failed to deserialize error result: " + json);
+                    exception = new MattermostClientException(details.Message);
                 }
                 catch (Exception)
                 {
