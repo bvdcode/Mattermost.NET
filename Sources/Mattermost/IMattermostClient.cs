@@ -59,13 +59,7 @@ namespace Mattermost
         /// Create receiver <see cref="Task"/> with websocket polling.
         /// </summary>
         /// <returns> Receiver task. </returns>
-        Task StartReceivingAsync();
-
-        /// <summary>
-        /// Create receiver <see cref="Task"/> with websocket polling.
-        /// </summary>
-        /// <returns> Receiver task. </returns>
-        Task StartReceivingAsync(CancellationToken cancellationToken);
+        Task StartReceivingAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Stop receiving messages.
