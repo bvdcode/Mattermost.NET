@@ -8,6 +8,9 @@ namespace Mattermost.Exceptions
     /// </summary>
     public class MattermostClientException : Exception
     {
+        /// <summary>
+        /// Constructs a new instance of the <see cref="MattermostClientException"/> class with a default message.
+        /// </summary>
         internal MattermostClientException() { }
 
         internal MattermostClientException(string message) : base(message) { }

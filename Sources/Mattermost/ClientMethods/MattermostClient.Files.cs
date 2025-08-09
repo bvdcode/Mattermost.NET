@@ -20,7 +20,7 @@ namespace Mattermost
         public async Task<byte[]> GetFileAsync(string fileId)
         {
             CheckDisposed();
-            CheckAuthorized();
+            await CheckAuthorizedAsync();
             string url = Routes.Files + "/" + fileId;
             var response = await _http.GetAsync(url);
             response = response.EnsureSuccessStatusCode();
@@ -35,7 +35,7 @@ namespace Mattermost
         public async Task<Stream> GetFileStreamAsync(string fileId)
         {
             CheckDisposed();
-            CheckAuthorized();
+            await CheckAuthorizedAsync();
             string url = Routes.Files + "/" + fileId;
             var response = await _http.GetAsync(url);
             response = response.EnsureSuccessStatusCode();
@@ -50,7 +50,6 @@ namespace Mattermost
         public Task<FileDetails> GetFileDetailsAsync(string fileId)
         {
             CheckDisposed();
-            CheckAuthorized();
             return SendRequestAsync<FileDetails>(HttpMethod.Get, Routes.Files + "/" + fileId + "/info");
         }
 
@@ -79,7 +78,7 @@ namespace Mattermost
         public async Task<FileDetails> UploadFileAsync(string channelId, string fileName, Stream stream, Action<int>? progressChanged = null)
         {
             CheckDisposed();
-            CheckAuthorized();
+            await CheckAuthorizedAsync();
             string url = $"{Routes.Files}?channel_id={channelId}";
             MultipartFormDataContent content = new MultipartFormDataContent();
             StreamContent file = new StreamContent(stream);
