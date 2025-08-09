@@ -33,6 +33,58 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
+        public void AutologinTest_ValidToken_Works()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(token, Is.Not.Empty);
+            });
+
+            MattermostClient mmClient = new("https://community.mattermost.com", token);
+            var user = mmClient.CurrentUserInfo;
+            Assert.That(user, Is.Not.Null, "User should not be null after autologin.");
+            Assert.Multiple(() =>
+            {
+                Assert.That(user.Username, Is.Not.Null, "Username should not be null.");
+                Assert.That(user.Email, Is.EqualTo(username), "Email should match the autologin username.");
+                Assert.That(user.Id, Is.Not.Empty, "User ID should not be empty.");
+                Assert.That(user.Username, Is.Not.Empty, "Username should not be empty.");
+                Assert.That(user.Locale, Is.Not.Empty, "Locale should not be empty.");
+                Assert.That(user.IsBot, Is.False, "User should not be a bot.");
+                Assert.That(user.Timezone, Is.Not.Null, "Timezone should not be null.");
+                Assert.That(user.CreatedAt, Is.Not.EqualTo(default(DateTime)), "CreatedAt should not be default value.");
+                Assert.That(user.UpdatedAt, Is.Not.EqualTo(default(DateTime)), "UpdatedAt should not be default value.");
+            });
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void AutologinTest_InvalidToken_ThrowsException()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(token, Is.Not.Empty);
+            });
+            MattermostClient mmClient = new("https://community.mattermost.com", "invalid_token");
+            Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.GetMeAsync());
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void LoginTest_ValidToken_LoginThrowsException()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(username, Is.Not.Empty);
+                Assert.That(password, Is.Not.Empty);
+                Assert.That(token, Is.Not.Empty);
+            });
+            MattermostClient mmClient = new("https://community.mattermost.com", token);
+            Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.LoginAsync(username, password));
+        }
+
+        [Test]
+        [NonParallelizable]
         public void LoginTest_ValidCredentials_ReturnsToken()
         {
             Assert.Multiple(() =>

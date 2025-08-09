@@ -131,7 +131,7 @@ namespace Mattermost
             _ws = new ClientWebSocket();
             _websocketUri = GetWebsocketUri(serverUri);
             _serverUri = serverUri;
-            _http = new HttpClient() { BaseAddress = _serverUri, Timeout = TimeSpan.FromMinutes(60) };
+            _http = new HttpClient() { BaseAddress = _serverUri, Timeout = TimeSpan.FromMinutes(1) };
         }
 
         /// <summary>
