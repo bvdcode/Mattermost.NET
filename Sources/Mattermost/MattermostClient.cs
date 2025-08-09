@@ -1,20 +1,20 @@
-﻿using Mattermost.Constants;
-using Mattermost.Enums;
-using Mattermost.Events;
-using Mattermost.Exceptions;
-using Mattermost.Extensions;
-using Mattermost.Models;
-using Mattermost.Models.Responses.Websocket;
-using Mattermost.Models.Users;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.WebSockets;
+using Mattermost.Enums;
 using System.Text.Json;
 using System.Threading;
+using Mattermost.Models;
+using Mattermost.Events;
+using Mattermost.Constants;
+using Mattermost.Exceptions;
+using Mattermost.Extensions;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
+using Mattermost.Models.Users;
+using System.Net.Http.Headers;
+using Mattermost.Models.Responses.Websocket;
 
 namespace Mattermost
 {

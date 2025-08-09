@@ -143,7 +143,7 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public async Task GetUserById_ValidId_ReceivedUserInfo()
         {
-            const string userId = "79c6moookbyhtpwxhmd59d7c5a"; //
+            const string userId = "nm7fy5aztjgx9qqyj6qieca47c"; //
             // This is a valid user ID in the Mattermost community server.
             var user = await client.GetUserAsync(userId);
             Assert.That(user, Is.Not.Null);
