@@ -1,7 +1,6 @@
 ﻿using System.Net.Http;
 using System.Text.Json;
 using Mattermost.Constants;
-using Mattermost.Exceptions;
 using System.Threading.Tasks;
 using Mattermost.Models.Users;
 

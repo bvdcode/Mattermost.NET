@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
 using System.Net.Http;
-using System.Text.Json;
 using Mattermost.Enums;
 using Mattermost.Helpers;
 using Mattermost.Constants;
-using Mattermost.Exceptions;
 using System.Threading.Tasks;
 using Mattermost.Models.Posts;
 using System.Collections.Generic;
@@ -208,7 +204,6 @@ namespace Mattermost
                 url += $"?fromPost={fromPostId}";
             }
             return SendRequestAsync<ChannelPostsResponse>(HttpMethod.Get, url);
-
         }
 
         /// <summary>
