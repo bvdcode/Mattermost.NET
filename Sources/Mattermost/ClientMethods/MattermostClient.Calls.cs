@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Net.Http;
-using System.Text.Json;
+﻿using System.Net.Http;
 using Mattermost.Constants;
 using System.Threading.Tasks;
 
@@ -16,7 +14,6 @@ namespace Mattermost
         public async Task SetChannelCallStateAsync(string channelId, bool isCallsEnabled)
         {
             CheckDisposed();
-            CheckAuthorized();
             string url = Routes.Plugins + "/com.mattermost.calls/" + channelId;
             var body = new
             {

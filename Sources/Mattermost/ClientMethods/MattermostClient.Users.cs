@@ -3,6 +3,7 @@ using System.Text.Json;
 using Mattermost.Constants;
 using System.Threading.Tasks;
 using Mattermost.Models.Users;
+using System;
 
 namespace Mattermost
 {
@@ -15,13 +16,8 @@ namespace Mattermost
         public async Task<User> GetMeAsync()
         {
             CheckDisposed();
-            CheckAuthorized();
-            var response = await _http.GetAsync(Routes.Users + "/me");
-            response.EnsureSuccessStatusCode();
-            string json = await response.Content.ReadAsStringAsync();
-            _userInfo = JsonSerializer.Deserialize<User>(json)
-                ?? throw new JsonException("Failed to deserialize user information: " + json);
-            return _userInfo;
+            _cachedUserInfo = await SendRequestAsync<User>(HttpMethod.Get, Routes.Users + "/me");
+            return _cachedUserInfo.MemberwiseClone();
         }
 
         /// <summary>
@@ -29,15 +25,14 @@ namespace Mattermost
         /// </summary>
         /// <param name="userId"> User identifier. </param>
         /// <returns> User information. </returns>
-        public async Task<User> GetUserAsync(string userId)
+        public Task<User> GetUserAsync(string userId)
         {
             CheckDisposed();
-            CheckAuthorized();
-            string url = Routes.Users + "/" + userId;
-            string json = await _http.GetStringAsync(url);
-            User userInfo = JsonSerializer.Deserialize<User>(json)
-                ?? throw new JsonException($"Failed to deserialize user information for ID#{userId}: {json}");
-            return userInfo;
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+            }
+            return SendRequestAsync<User>(HttpMethod.Get, Routes.Users + "/" + userId);
         }
 
         /// <summary>
@@ -45,15 +40,15 @@ namespace Mattermost
         /// </summary>
         /// <param name="username"> Username. </param>
         /// <returns> User information. </returns>
-        public async Task<User> GetUserByUsernameAsync(string username)
+        public Task<User> GetUserByUsernameAsync(string username)
         {
             CheckDisposed();
-            CheckAuthorized();
-            string url = Routes.Users + "/username/" + username.Replace("@", string.Empty).Trim();
-            string json = await _http.GetStringAsync(url);
-            User userInfo = JsonSerializer.Deserialize<User>(json)
-                ?? throw new JsonException($"Failed to deserialize user information for username '{username}': {json}");
-            return userInfo;
+            string sanitizedUsername = username.Replace("@", string.Empty).Trim();
+            if (string.IsNullOrEmpty(sanitizedUsername))
+            {
+                throw new ArgumentException("Username cannot be null or empty.", nameof(username));
+            }
+            return SendRequestAsync<User>(HttpMethod.Get, Routes.Users + "/username/" + sanitizedUsername);
         }
 
         /// <summary>
@@ -64,7 +59,6 @@ namespace Mattermost
         public Task<User> GetUserByEmailAsync(string email)
         {
             CheckDisposed();
-            CheckAuthorized();
             string url = Routes.Users + "/email/" + email.Trim();
             return SendRequestAsync<User>(HttpMethod.Get, url);
         }

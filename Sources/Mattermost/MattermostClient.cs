@@ -64,7 +64,7 @@ namespace Mattermost
         /// <summary>
         /// User information.
         /// </summary>
-        public User CurrentUserInfo => _userInfo ?? 
+        public User CurrentUserInfo => _cachedUserInfo?.MemberwiseClone() ?? 
             throw new AuthorizationException("You must call any method that requires authorization, " +
                 "such as GetMeAsync if you use API key; if you want to use username and password, " +
                 "please call LoginAsync method first. This property (CurrentUserInfo) just returns user information " +
@@ -81,9 +81,9 @@ namespace Mattermost
         internal HttpClient HttpClient => _http;
 
         private bool _disposed;
-        private User? _userInfo;
         private ClientWebSocket _ws;
         private Task? _receiverTask;
+        private User? _cachedUserInfo;
         private readonly Uri _serverUri;
         private readonly string? _apiKey;
         private readonly HttpClient _http;
@@ -146,13 +146,13 @@ namespace Mattermost
         public async Task StartReceivingAsync(CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            CheckAuthorized();
+            await CheckAuthorizedAsync();
             await StopReceivingAsync();
             _ws = new ClientWebSocket();
             _receivingTokenSource = new CancellationTokenSource();
             var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken).Token;
 
-            Log("Starting receiving as user @" + _userInfo?.Username ?? "Unknown");
+            Log("Starting receiving as user @" + _cachedUserInfo?.Username ?? "Unknown");
             _receiverTask = Task.Run(async () =>
             {
                 while (!mergedToken.IsCancellationRequested)
@@ -169,7 +169,6 @@ namespace Mattermost
                     catch (OperationCanceledException)
                     {
                         Log("WebSocket receiving canceled");
-                        // Trigger OnDisconnected event
                         OnDisconnected?.Invoke(this, new DisconnectionEventArgs(WebSocketCloseStatus.NormalClosure, "Closed by client", DateTime.UtcNow));
                         break;
                     }
@@ -195,14 +194,11 @@ namespace Mattermost
                 try
                 {
                     await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", CancellationToken.None);
-
-                    // Trigger OnDisconnected event
                     OnDisconnected?.Invoke(this, new DisconnectionEventArgs(WebSocketCloseStatus.NormalClosure, "Closed by client", DateTime.UtcNow));
                     _ws.Dispose();
                 }
                 catch (Exception ex)
                 {
-                    // Log or handle the exception as appropriate
                     Log("Error while closing WebSocket", ex);
                     throw;
                 }
@@ -248,8 +244,8 @@ namespace Mattermost
             string token = result.Headers.GetValues("Token").FirstOrDefault()
                 ?? throw new AuthorizationException("Token not found in response headers");
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            _userInfo = await result.GetResponseAsync<User>();
-            return _userInfo;
+            _cachedUserInfo = await result.GetResponseAsync<User>();
+            return _cachedUserInfo.MemberwiseClone();
         }
 
         /// <summary>
@@ -260,7 +256,7 @@ namespace Mattermost
         public async Task LogoutAsync()
         {
             CheckDisposed();
-            CheckAuthorized();
+            await CheckAuthorizedAsync();
             var response = await _http.PostAsync(Routes.Users + "/logout", null);
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -268,7 +264,7 @@ namespace Mattermost
             }
             await StopReceivingAsync();
             _http.DefaultRequestHeaders.Authorization = null;
-            _userInfo = null;
+            _cachedUserInfo = null;
         }
 
         /// <summary>
@@ -303,7 +299,7 @@ namespace Mattermost
             {
                 case MattermostEvent.Posted:
                     var messageArgs = new MessageEventArgs(this, response, cancellationToken);
-                    if (_userInfo != null && messageArgs.Message.Post.UserId != _userInfo.Id)
+                    if (_cachedUserInfo != null && messageArgs.Message.Post.UserId != _cachedUserInfo.Id)
                     {
                         OnMessageReceived?.Invoke(this, messageArgs);
                     }
@@ -431,7 +427,7 @@ namespace Mattermost
             OnLogMessage?.Invoke(this, new LogEventArgs(message + $" (Exception: {ex.Message}"));
         }
 
-        private void CheckAuthorized()
+        private Task CheckAuthorizedAsync()
         {
             if (_http.DefaultRequestHeaders.Authorization == null
                 || _http.DefaultRequestHeaders.Authorization.Scheme != "Bearer"
@@ -439,13 +435,14 @@ namespace Mattermost
             {
                 if (!string.IsNullOrWhiteSpace(_apiKey))
                 {
-                    LoginWithApiKeyAsync(_apiKey).GetAwaiter().GetResult();
+                    return LoginWithApiKeyAsync(_apiKey);
                 }
                 else
                 {
                     throw new AuthorizationException("Authorization token is not set - call LoginAsync first or use constructor with API key (Personal Access Token)");
                 }
             }
+            return Task.CompletedTask;
         }
 
         private void CheckDisposed()
@@ -469,8 +466,8 @@ namespace Mattermost
             {
                 throw new ApiKeyException("Login with API key error, server response: " + result.StatusCode);
             }
-            _userInfo = await result.GetResponseAsync<User>();
-            return _userInfo ?? throw new ApiKeyException("Failed to retrieve user information with API key");
+            _cachedUserInfo = await result.GetResponseAsync<User>();
+            return _cachedUserInfo;
         }
 
         private Task SendRequestAsync(HttpMethod method, string requestUri, object? payload = null, CancellationToken cancellationToken = default) =>
@@ -479,7 +476,7 @@ namespace Mattermost
         private async Task<TResult> SendRequestAsync<TResult>(HttpMethod method, string requestUri, object? payload = null, CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            CheckAuthorized();
+            await CheckAuthorizedAsync();
             HttpRequestMessage request = new HttpRequestMessage(method, requestUri);
             if (payload != null)
             {

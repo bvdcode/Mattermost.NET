@@ -27,14 +27,13 @@ namespace Mattermost
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
             IEnumerable<string>? files = null, IDictionary<string, object>? rawProps = null)
         {
+            CheckDisposed();
             if (message.Length > MattermostApiLimits.MaxPostMessageLength)
             {
                 throw new ArgumentOutOfRangeException(nameof(message),
                     $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
 
-            CheckDisposed();
-            CheckAuthorized();
             Dictionary<string, object> metadata = new Dictionary<string, object>();
             if (priority != MessagePriority.Empty)
             {
@@ -72,14 +71,12 @@ namespace Mattermost
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
             IEnumerable<string>? files = null, PostProps? props = null)
         {
+            CheckDisposed();
             if (message.Length > MattermostApiLimits.MaxPostMessageLength)
             {
                 throw new ArgumentOutOfRangeException(nameof(message),
                     $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
-
-            CheckDisposed();
-            CheckAuthorized();
             Dictionary<string, object> metadata = new Dictionary<string, object>();
             if (priority != MessagePriority.Empty)
             {
@@ -112,14 +109,12 @@ namespace Mattermost
         /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         public Task<Post> UpdatePostWithRawPropsAsync(string postId, string newText, IDictionary<string, object>? rawProps = null)
         {
+            CheckDisposed();
             if (newText.Length > MattermostApiLimits.MaxPostMessageLength)
             {
                 throw new ArgumentOutOfRangeException(nameof(newText),
                     $"The message length exceeds the maximum number of characters allowed ({newText.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
-
-            CheckDisposed();
-            CheckAuthorized();
             var body = new
             {
                 message = newText,
@@ -138,14 +133,12 @@ namespace Mattermost
         /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         public Task<Post> UpdatePostAsync(string postId, string newText, PostProps? props = null)
         {
+            CheckDisposed();
             if (newText.Length > MattermostApiLimits.MaxPostMessageLength)
             {
                 throw new ArgumentOutOfRangeException(nameof(newText),
                     $"The message length exceeds the maximum number of characters allowed ({newText.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
-
-            CheckDisposed();
-            CheckAuthorized();
             var body = new
             {
                 message = newText,
@@ -162,7 +155,6 @@ namespace Mattermost
         public Task DeletePostAsync(string postId)
         {
             CheckDisposed();
-            CheckAuthorized();
             return SendRequestAsync(HttpMethod.Delete, Routes.Posts + "/" + postId);
         }
 
@@ -182,7 +174,6 @@ namespace Mattermost
             bool includeDeleted = false, DateTime? since = null)
         {
             CheckDisposed();
-            CheckAuthorized();
             string query = QueryHelpers.BuildChannelPostsQuery(page, perPage, beforePostId, afterPostId, includeDeleted, since);
             string url = $"{Routes.Channels}/{channelId}/posts?{query}";
             return SendRequestAsync<ChannelPostsResponse>(HttpMethod.Get, url);
@@ -197,7 +188,6 @@ namespace Mattermost
         public Task<ChannelPostsResponse> GetThreadPostsAsync(string postId, string? fromPostId = null)
         {
             CheckDisposed();
-            CheckAuthorized();
             string url = $"{Routes.Posts}/{postId}/thread";
             if (!string.IsNullOrEmpty(fromPostId))
             {
@@ -214,7 +204,6 @@ namespace Mattermost
         public Task<Post> GetPostAsync(string postId)
         {
             CheckDisposed();
-            CheckAuthorized();
             return SendRequestAsync<Post>(HttpMethod.Get, Routes.Posts + "/" + postId);
         }
     }

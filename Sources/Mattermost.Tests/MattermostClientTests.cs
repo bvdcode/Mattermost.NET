@@ -13,7 +13,7 @@ namespace Mattermost.Tests
     [SingleThreaded]
     public class MattermostClientTests
     {
-        private string username = string.Empty;
+        private string email = string.Empty;
         private string password = string.Empty;
         private string token = string.Empty;
         IMattermostClient client;
@@ -24,12 +24,12 @@ namespace Mattermost.Tests
         {
             string json = File.ReadAllText("secrets.json");
             var secrets = JsonSerializer.Deserialize<Secrets>(json)!;
-            username = secrets.Username;
+            email = secrets.Username;
             password = secrets.Password;
             token = secrets.Token;
             var mmClient = (IMattermostClient)new MattermostClient();
             client = mmClient;
-            await client.LoginAsync(username, password);
+            await client.LoginAsync(email, password);
         }
 
         [Test]
@@ -49,13 +49,13 @@ namespace Mattermost.Tests
                 Assert.That(token, Is.Not.Empty);
             });
 
-            MattermostClient mmClient = new("https://mm.tmk-group.digital", token);
+            MattermostClient mmClient = new("https://community.mattermost.com", token);
             var user = await mmClient.GetMeAsync();
             Assert.That(mmClient.CurrentUserInfo, Is.Not.Null, "User should not be null after autologin.");
             Assert.Multiple(() =>
             {
                 Assert.That(user.Username, Is.Not.Null, "Username should not be null.");
-                Assert.That(user.Email, Is.EqualTo(username), "Email should match the autologin username.");
+                Assert.That(user.Email, Is.EqualTo(email), "Email should match the autologin username.");
                 Assert.That(user.Id, Is.Not.Empty, "User ID should not be empty.");
                 Assert.That(user.Username, Is.Not.Empty, "Username should not be empty.");
                 Assert.That(user.Locale, Is.Not.Empty, "Locale should not be empty.");
@@ -75,7 +75,7 @@ namespace Mattermost.Tests
                 Assert.That(token, Is.Not.Empty);
             });
             MattermostClient mmClient = new("https://community.mattermost.com", "invalid_token");
-            Assert.ThrowsAsync<AuthorizationException>(mmClient.GetMeAsync);
+            Assert.ThrowsAsync<ApiKeyException>(mmClient.GetMeAsync);
         }
 
         [Test]
@@ -84,12 +84,12 @@ namespace Mattermost.Tests
         {
             Assert.Multiple(() =>
             {
-                Assert.That(username, Is.Not.Empty);
+                Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });
             MattermostClient mmClient = new("https://community.mattermost.com", token);
-            Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.LoginAsync(username, password));
+            Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.LoginAsync(email, password));
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace Mattermost.Tests
         {
             Assert.Multiple(() =>
             {
-                Assert.That(username, Is.Not.Empty);
+                Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
             });
             User result = client.CurrentUserInfo;
@@ -106,7 +106,7 @@ namespace Mattermost.Tests
             Assert.Multiple(() =>
             {
                 Assert.That(result.Username, Is.Not.Null);
-                Assert.That(result.Email, Is.EqualTo(username));
+                Assert.That(result.Email, Is.EqualTo(email));
                 Assert.That(result.Id, Is.Not.Empty);
                 Assert.That(result.Username, Is.Not.Empty);
                 Assert.That(result.Locale, Is.Not.Empty);
@@ -123,11 +123,31 @@ namespace Mattermost.Tests
         {
             Assert.Multiple(() =>
             {
-                Assert.That(username, Is.Not.Empty);
+                Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });
-            Assert.ThrowsAsync<AuthorizationException>(async () => await client.LoginAsync(username, "invalid"));
+            Assert.ThrowsAsync<AuthorizationException>(async () => await client.LoginAsync(email, "invalid"));
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task GetUser_ValidUsername_ReceivedUserInfo()
+        {
+            const string rawUsername = "bvd97"; // This is a valid username in the Mattermost community server.
+            var user = await client.GetUserAsync(rawUsername);
+            Assert.That(user, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(user.Username, Is.EqualTo(rawUsername));
+                Assert.That(user.Email, Is.EqualTo(email));
+                Assert.That(user.Id, Is.Not.Empty);
+                Assert.That(user.Locale, Is.Not.Empty);
+                Assert.That(user.IsBot, Is.False);
+                Assert.That(user.Timezone, Is.Not.Null);
+                Assert.That(user.CreatedAt, Is.Not.EqualTo(default(DateTime)));
+                Assert.That(user.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
+            });
         }
 
         [Test]
@@ -136,7 +156,7 @@ namespace Mattermost.Tests
         {
             Assert.Multiple(() =>
             {
-                Assert.That(username, Is.Not.Empty);
+                Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });
@@ -235,15 +255,15 @@ namespace Mattermost.Tests
         {
             Assert.Multiple(() =>
             {
-                Assert.That(username, Is.Not.Empty);
+                Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });
             try
             {
-                var user = await client.GetUserByEmailAsync(username);
+                var user = await client.GetUserByEmailAsync(email);
                 Assert.That(user, Is.Not.Null);
-                Assert.That(user.Email, Is.EqualTo(username));
+                Assert.That(user.Email, Is.EqualTo(email));
             }
             catch (MattermostClientException ex)
             {
@@ -260,7 +280,7 @@ namespace Mattermost.Tests
         {
             Assert.Multiple(() =>
             {
-                Assert.That(username, Is.Not.Empty);
+                Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });
@@ -274,7 +294,7 @@ namespace Mattermost.Tests
         {
             Assert.Multiple(() =>
             {
-                Assert.That(username, Is.Not.Empty);
+                Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });
@@ -315,7 +335,7 @@ namespace Mattermost.Tests
         {
             Assert.Multiple(() =>
             {
-                Assert.That(username, Is.Not.Empty);
+                Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
                 Assert.That(token, Is.Not.Empty);
             });

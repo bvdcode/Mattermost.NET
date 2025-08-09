@@ -20,7 +20,6 @@ namespace Mattermost
         public Task<Channel> GetChannelAsync(string channelId)
         {
             CheckDisposed();
-            CheckAuthorized();
             return SendRequestAsync<Channel>(HttpMethod.Get, Routes.Channels + "/" + channelId);
         }
 
@@ -35,7 +34,6 @@ namespace Mattermost
         public async Task<Channel?> FindChannelByNameAsync(string teamIdOrName, string channelName, bool isTeamId = true, bool includeDeleted = true)
         {
             CheckDisposed();
-            CheckAuthorized();
             string escapedTeamIdOrName = Uri.EscapeDataString(teamIdOrName);
             string escapedChannelName = Uri.EscapeDataString(channelName);
             string url = isTeamId
@@ -62,7 +60,6 @@ namespace Mattermost
         public Task ArchiveChannelAsync(string channelId)
         {
             CheckDisposed();
-            CheckAuthorized();
             return SendRequestAsync(HttpMethod.Delete, Routes.Channels + "/" + channelId);
         }
 
@@ -75,7 +72,6 @@ namespace Mattermost
         public Task<ChannelUserInfo> AddUserToChannelAsync(string channelId, string userId)
         {
             CheckDisposed();
-            CheckAuthorized();
             string url = Routes.Channels + $"/{channelId}/members";
             var body = new
             {
@@ -92,7 +88,6 @@ namespace Mattermost
         public Task DeleteUserFromChannelAsync(string channelId, string userId)
         {
             CheckDisposed();
-            CheckAuthorized();
             string url = Routes.Channels + $"/{channelId}/members/{userId}";
             return SendRequestAsync(HttpMethod.Delete, url);
         }
@@ -105,7 +100,6 @@ namespace Mattermost
         public Task<Channel> CreateGroupChannelAsync(params string[] userIds)
         {
             CheckDisposed();
-            CheckAuthorized();
             if (userIds.Length < 2)
             {
                 throw new ArgumentException("At least two user IDs are required to create a group channel.", nameof(userIds));
@@ -127,7 +121,6 @@ namespace Mattermost
             ChannelType channelType, string purpose = "", string header = "")
         {
             CheckDisposed();
-            CheckAuthorized();
             const int maxChannelDisplayNameLength = 64;
             if (displayName.Length > maxChannelDisplayNameLength)
             {
@@ -168,7 +161,6 @@ namespace Mattermost
         public Task<Channel> CreateDirectChannelAsync(string userId1, string userId2)
         {
             CheckDisposed();
-            CheckAuthorized();
             if (string.IsNullOrWhiteSpace(userId1))
             {
                 throw new ArgumentException("User ID #1 cannot be null or empty.", nameof(userId1));
