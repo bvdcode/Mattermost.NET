@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using Mattermost.Enums;
+using System.Text.Json;
 using Mattermost.Events;
 using Mattermost.Constants;
 using Mattermost.Extensions;
@@ -13,7 +14,6 @@ using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using Mattermost.Models.Users;
 using Mattermost.Models.Responses.Websocket;
-using System.Text.Json;
 
 namespace Mattermost
 {
@@ -119,7 +119,6 @@ namespace Mattermost
         /// <param name="serverUrl"> Server URL with HTTP(S) scheme. </param>
         /// <exception cref="ArgumentException"></exception>
         public MattermostClient(string serverUrl) : this(new Uri(serverUrl)) { }
-
         /// <summary>
         /// Create <see cref="MattermostClient"/> with specified server address JWT access token.
         /// </summary>
@@ -261,6 +260,7 @@ namespace Mattermost
             }
             await StopReceivingAsync();
             _http.DefaultRequestHeaders.Authorization = null;
+            _userInfo = null;
         }
 
         /// <summary>
