@@ -15,6 +15,7 @@ namespace Mattermost.Tests
         private string email = string.Empty;
         private string password = string.Empty;
         private string token = string.Empty;
+        private string customInstance = string.Empty;
         IMattermostClient client;
 
         [SetUp]
@@ -26,6 +27,7 @@ namespace Mattermost.Tests
             email = secrets.Username;
             password = secrets.Password;
             token = secrets.Token;
+            customInstance = secrets.CustomInstance;
             var mmClient = (IMattermostClient)new MattermostClient();
             client = mmClient;
             await client.LoginAsync(email, password);
@@ -43,12 +45,16 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public async Task AutologinTest_ValidToken_Works()
         {
+            if (string.IsNullOrWhiteSpace(customInstance))
+            {
+                Assert.Ignore("Custom instance is not set, skipping autologin test.");
+            }
             if (string.IsNullOrEmpty(token))
             {
                 Assert.Ignore("Token is empty, skipping autologin test.");
             }
 
-            MattermostClient mmClient = new("https://community.mattermost.com", token);
+            MattermostClient mmClient = new(customInstance, token);
             var user = await mmClient.GetMeAsync();
             Assert.That(mmClient.CurrentUserInfo, Is.Not.Null, "User should not be null after autologin.");
             Assert.Multiple(() =>
