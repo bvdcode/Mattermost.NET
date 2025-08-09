@@ -173,5 +173,14 @@ namespace Mattermost.Models.Users
         /// </summary>
         [JsonPropertyName("disable_welcome_email")]
         public bool DisableWelcomeEmail { get; set; }
+
+        /// <summary>
+        /// Creates a shallow copy of the current <see cref="User"/> object.
+        /// </summary>
+        /// <returns>A shallow copy of the current <see cref="User"/> object.</returns>
+        public new User MemberwiseClone()
+        {
+            return (User)base.MemberwiseClone();
+        }
     }
 }
