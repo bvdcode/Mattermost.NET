@@ -12,5 +12,8 @@ namespace Mattermost.Models
 
         [JsonPropertyName("token")]
         public string Token { get; set; } = string.Empty;
+
+        [JsonPropertyName("customInstance")]
+        public string CustomInstance { get; set; } = string.Empty;
     }
 }
