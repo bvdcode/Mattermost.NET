@@ -6,6 +6,7 @@ using Mattermost.Exceptions;
 using Mattermost.Models.Users;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses.Websocket.Posts;
+using System.Threading.Tasks;
 
 namespace Mattermost.Tests
 {
@@ -33,16 +34,24 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
-        public void AutologinTest_ValidToken_Works()
+        public void UserInfo_GetUserInfo_ThrowsExceptionIfNotLoggedIn()
+        {
+            MattermostClient mmClient = new("https://community.mattermost.com");
+            Assert.Throws<AuthorizationException>(() => _ = mmClient.CurrentUserInfo, "CurrentUserInfo should throw an exception if not logged in.");
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task AutologinTest_ValidToken_Works()
         {
             Assert.Multiple(() =>
             {
                 Assert.That(token, Is.Not.Empty);
             });
 
-            MattermostClient mmClient = new("https://community.mattermost.com", token);
-            var user = mmClient.CurrentUserInfo;
-            Assert.That(user, Is.Not.Null, "User should not be null after autologin.");
+            MattermostClient mmClient = new("https://mm.tmk-group.digital", token);
+            var user = await mmClient.GetMeAsync();
+            Assert.That(mmClient.CurrentUserInfo, Is.Not.Null, "User should not be null after autologin.");
             Assert.Multiple(() =>
             {
                 Assert.That(user.Username, Is.Not.Null, "Username should not be null.");
@@ -66,7 +75,7 @@ namespace Mattermost.Tests
                 Assert.That(token, Is.Not.Empty);
             });
             MattermostClient mmClient = new("https://community.mattermost.com", "invalid_token");
-            Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.GetMeAsync());
+            Assert.ThrowsAsync<AuthorizationException>(mmClient.GetMeAsync);
         }
 
         [Test]
@@ -91,7 +100,6 @@ namespace Mattermost.Tests
             {
                 Assert.That(username, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
-                Assert.That(token, Is.Not.Empty);
             });
             User result = client.CurrentUserInfo;
             Assert.That(result, Is.Not.Null);

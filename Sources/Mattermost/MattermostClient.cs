@@ -64,7 +64,11 @@ namespace Mattermost
         /// <summary>
         /// User information.
         /// </summary>
-        public User CurrentUserInfo => _userInfo ?? throw new InvalidOperationException("You must login first");
+        public User CurrentUserInfo => _userInfo ?? 
+            throw new AuthorizationException("You must call any method that requires authorization, " +
+                "such as GetMeAsync if you use API key; if you want to use username and password, " +
+                "please call LoginAsync method first. This property (CurrentUserInfo) just returns user information " +
+                "which is set after successful authorization or GetMeAsync invocation.");
 
         /// <summary>
         /// Base server address.
@@ -224,6 +228,10 @@ namespace Mattermost
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
                 throw new ArgumentException("Username or password is empty");
+            }
+            if (!string.IsNullOrWhiteSpace(_apiKey))
+            {
+                throw new AuthorizationException("You cannot use API key and login with username/password at the same time");
             }
             CheckDisposed();
             var body = new
@@ -431,11 +439,11 @@ namespace Mattermost
             {
                 if (!string.IsNullOrWhiteSpace(_apiKey))
                 {
-                    LoginWithApiKeyAsync(_apiKey).Wait();
+                    LoginWithApiKeyAsync(_apiKey).GetAwaiter().GetResult();
                 }
                 else
                 {
-                    throw new AuthorizationException("Authorization token is not set - call LoginAsync first or use constructor with API key");
+                    throw new AuthorizationException("Authorization token is not set - call LoginAsync first or use constructor with API key (Personal Access Token)");
                 }
             }
         }
