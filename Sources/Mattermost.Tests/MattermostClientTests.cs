@@ -69,10 +69,6 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public void AutologinTest_InvalidToken_ThrowsException()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(token, Is.Not.Empty);
-            });
             MattermostClient mmClient = new("https://community.mattermost.com", "invalid_token");
             Assert.ThrowsAsync<ApiKeyException>(mmClient.GetMeAsync);
         }
@@ -85,7 +81,6 @@ namespace Mattermost.Tests
             {
                 Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
-                Assert.That(token, Is.Not.Empty);
             });
             MattermostClient mmClient = new("https://community.mattermost.com", token);
             Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.LoginAsync(email, password));
@@ -120,12 +115,7 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public void LoginTest_InvalidCredentials_ThrowsException()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(email, Is.Not.Empty);
-                Assert.That(password, Is.Not.Empty);
-                Assert.That(token, Is.Not.Empty);
-            });
+            Assert.That(email, Is.Not.Empty);
             Assert.ThrowsAsync<AuthorizationException>(async () => await client.LoginAsync(email, "invalid"));
         }
 
@@ -133,7 +123,7 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public async Task GetUser_ValidUsername_ReceivedUserInfo()
         {
-            const string rawUsername = "bvd97"; // This is a valid username in the Mattermost community server.
+            const string rawUsername = "@bvd97"; // This is a valid username in the Mattermost community server.
             var user = await client.GetUserAsync(rawUsername);
             Assert.That(user, Is.Not.Null);
             Assert.Multiple(() =>
@@ -153,12 +143,6 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public async Task ConnectWebSocket_ServerConnected()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(email, Is.Not.Empty);
-                Assert.That(password, Is.Not.Empty);
-                Assert.That(token, Is.Not.Empty);
-            });
             await client.StartReceivingAsync();
             await Task.Delay(1000);
             Assert.That(client.IsConnected, Is.True);
@@ -252,12 +236,7 @@ namespace Mattermost.Tests
         [Test]
         public async Task GetUserByEmail_ValidEmail_ReceivedUserInfo()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(email, Is.Not.Empty);
-                Assert.That(password, Is.Not.Empty);
-                Assert.That(token, Is.Not.Empty);
-            });
+            Assert.That(email, Is.Not.Empty);
             try
             {
                 var user = await client.GetUserByEmailAsync(email);
@@ -277,12 +256,6 @@ namespace Mattermost.Tests
         [Test]
         public async Task CreateDirectChannel_ValidUserId_ReceivedChannelInfo()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(email, Is.Not.Empty);
-                Assert.That(password, Is.Not.Empty);
-                Assert.That(token, Is.Not.Empty);
-            });
             var channel = await client.CreateDirectChannelAsync("zsdnqzetgj83xrwxxrze3i188r");
             Assert.That(channel, Is.Not.Null);
             Assert.That(channel.ChannelType, Is.EqualTo(ChannelType.Direct));
@@ -291,12 +264,6 @@ namespace Mattermost.Tests
         [Test]
         public async Task CreatePostWithProps_ValidProps_ReceivedPostInfo()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(email, Is.Not.Empty);
-                Assert.That(password, Is.Not.Empty);
-                Assert.That(token, Is.Not.Empty);
-            });
             const string channelId = "w5e788utqbfgickdfgsabp8wya";
             PostProps props = new();
             props.Attachments.Add(new PostPropsAttachment()
@@ -332,12 +299,6 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public async Task Z_Logout_Successful()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(email, Is.Not.Empty);
-                Assert.That(password, Is.Not.Empty);
-                Assert.That(token, Is.Not.Empty);
-            });
             await client.LogoutAsync();
             Assert.ThrowsAsync<AuthorizationException>(client.GetMeAsync);
         }
