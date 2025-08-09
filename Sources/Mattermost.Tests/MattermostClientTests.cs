@@ -75,14 +75,14 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
-        public void LoginTest_ValidToken_LoginThrowsException()
+        public void LoginTest_ProvidedToken_LoginThrowsException()
         {
             Assert.Multiple(() =>
             {
                 Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
             });
-            MattermostClient mmClient = new("https://community.mattermost.com", token);
+            MattermostClient mmClient = new("https://community.mattermost.com", "abcabcabc");
             Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.LoginAsync(email, password));
         }
 
@@ -121,16 +121,37 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
-        public async Task GetUser_ValidUsername_ReceivedUserInfo()
+        public async Task GetUserByUsername_ValidUsername_ReceivedUserInfo()
         {
-            const string rawUsername = "@bvd97"; // This is a valid username in the Mattermost community server.
-            var user = await client.GetUserAsync(rawUsername);
+            const string rawUsername = "bvd97"; // This is a valid username in the Mattermost community server.
+            var user = await client.GetUserByUsernameAsync(rawUsername);
             Assert.That(user, Is.Not.Null);
             Assert.Multiple(() =>
             {
                 Assert.That(user.Username, Is.EqualTo(rawUsername));
                 Assert.That(user.Email, Is.EqualTo(email));
                 Assert.That(user.Id, Is.Not.Empty);
+                Assert.That(user.Locale, Is.Not.Empty);
+                Assert.That(user.IsBot, Is.False);
+                Assert.That(user.Timezone, Is.Not.Null);
+                Assert.That(user.CreatedAt, Is.Not.EqualTo(default(DateTime)));
+                Assert.That(user.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
+            });
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task GetUserById_ValidId_ReceivedUserInfo()
+        {
+            const string userId = "79c6moookbyhtpwxhmd59d7c5a"; //
+            // This is a valid user ID in the Mattermost community server.
+            var user = await client.GetUserAsync(userId);
+            Assert.That(user, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(user.Id, Is.EqualTo(userId));
+                Assert.That(user.Username, Is.Not.Empty);
+                Assert.That(user.Email, Is.EqualTo(email));
                 Assert.That(user.Locale, Is.Not.Empty);
                 Assert.That(user.IsBot, Is.False);
                 Assert.That(user.Timezone, Is.Not.Null);
