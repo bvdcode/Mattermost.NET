@@ -232,6 +232,8 @@ namespace Mattermost.Tests
             {
                 Assert.That(post.RawProps, Contains.Key("attachments"), "Post properties should contain 'attachments' key.");
                 Assert.That(post.Props, Is.Not.Null, "Post properties should not be null.");
+                Assert.That(post.Props.Attachments, Is.Not.Null, "Post properties attachments should not be null.");
+                Assert.That(post.Props.Attachments, Is.Not.Empty, "Post properties attachments should not be empty.");
             }
         }
 

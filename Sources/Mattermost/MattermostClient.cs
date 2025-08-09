@@ -24,7 +24,7 @@ namespace Mattermost
     {
         /// <summary>
         /// Called when client is connected to server WebSocket after
-        /// <see cref="StartReceivingAsync()"/> method.
+        /// <see cref="StartReceivingAsync(CancellationToken)"/> method.
         /// </summary>
         public event EventHandler<ConnectionEventArgs>? OnConnected;
 
@@ -36,7 +36,7 @@ namespace Mattermost
 
         /// <summary>
         /// Event called when new message received.
-        /// You have to call <see cref="StartReceivingAsync()"/> method to start receiving messages.
+        /// You have to call <see cref="StartReceivingAsync(CancellationToken)"/> method to start receiving messages.
         /// </summary>
         public event EventHandler<MessageEventArgs>? OnMessageReceived;
 
@@ -47,7 +47,7 @@ namespace Mattermost
 
         /// <summary>
         /// Event called when user status updated.
-        /// You have to call <see cref="StartReceivingAsync()"/> method to start receiving status updates.
+        /// You have to call <see cref="StartReceivingAsync(CancellationToken)"/> method to start receiving status updates.
         /// </summary>
         public event EventHandler<UserStatusChangeEventArgs>? OnStatusUpdated;
 
@@ -136,18 +136,11 @@ namespace Mattermost
         }
 
         /// <summary>
-        /// Start receiving messages asynchronously.
-        /// </summary>
-        /// <returns> Receiver task. </returns>
-        /// <exception cref="ApiKeyException"></exception>
-        public Task StartReceivingAsync() => StartReceivingAsync(CancellationToken.None);
-
-        /// <summary>
         /// Start receiving messages asynchronously with cancellation token.
         /// </summary>
         /// <returns> Receiver task. </returns>
         /// <exception cref="ApiKeyException"></exception>
-        public async Task StartReceivingAsync(CancellationToken cancellationToken)
+        public async Task StartReceivingAsync(CancellationToken cancellationToken = default)
         {
             CheckDisposed();
             CheckAuthorized();
@@ -468,7 +461,8 @@ namespace Mattermost
             {
                 throw new ApiKeyException("Login with API key error, server response: " + result.StatusCode);
             }
-            return await result.GetResponseAsync<User>();
+            _userInfo = await result.GetResponseAsync<User>();
+            return _userInfo ?? throw new ApiKeyException("Failed to retrieve user information with API key");
         }
 
         private Task SendRequestAsync(HttpMethod method, string requestUri, object? payload = null, CancellationToken cancellationToken = default) =>
