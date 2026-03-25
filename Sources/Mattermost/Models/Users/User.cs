@@ -46,7 +46,7 @@ namespace Mattermost.Models.Users
         /// The time in milliseconds a user was deleted.
         /// </summary>
         [JsonPropertyName("delete_at")]
-        public int DeletedAtUnixTimestamp { get; set; }
+        public long DeletedAtUnixTimestamp { get; set; }
 
         /// <summary>
         /// The <see cref="DateTime"/> a user was deleted in UTC format.
