@@ -57,7 +57,7 @@ namespace Mattermost.Tests
             MattermostClient mmClient = new(customInstance, token);
             var user = await mmClient.GetMeAsync();
             Assert.That(mmClient.CurrentUserInfo, Is.Not.Null, "User should not be null after autologin.");
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(user.Username, Is.Not.Null, "Username should not be null.");
                 Assert.That(user.Email, Is.Not.Empty, "Email should not be empty.");
@@ -66,9 +66,9 @@ namespace Mattermost.Tests
                 Assert.That(user.Locale, Is.Not.Empty, "Locale should not be empty.");
                 Assert.That(user.IsBot, Is.False, "User should not be a bot.");
                 Assert.That(user.Timezone, Is.Not.Null, "Timezone should not be null.");
-                Assert.That(user.CreatedAt, Is.Not.EqualTo(default(DateTime)), "CreatedAt should not be default value.");
-                Assert.That(user.UpdatedAt, Is.Not.EqualTo(default(DateTime)), "UpdatedAt should not be default value.");
-            });
+                Assert.That(user.CreatedAt, Is.Not.Default, "CreatedAt should not be default value.");
+                Assert.That(user.UpdatedAt, Is.Not.Default, "UpdatedAt should not be default value.");
+            }
         }
 
         [Test]
@@ -83,11 +83,11 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public void LoginTest_ProvidedToken_LoginThrowsException()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
-            });
+            }
             MattermostClient mmClient = new("https://community.mattermost.com", "abcabcabc");
             Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.LoginAsync(email, password));
         }
@@ -96,14 +96,14 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public void LoginTest_ValidCredentials_ReturnsToken()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(email, Is.Not.Empty);
                 Assert.That(password, Is.Not.Empty);
-            });
+            }
             User result = client.CurrentUserInfo;
             Assert.That(result, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.Username, Is.Not.Null);
                 Assert.That(result.Email, Is.EqualTo(email));
@@ -112,9 +112,9 @@ namespace Mattermost.Tests
                 Assert.That(result.Locale, Is.Not.Empty);
                 Assert.That(result.IsBot, Is.False);
                 Assert.That(result.Timezone, Is.Not.Null);
-                Assert.That(result.CreatedAt, Is.Not.EqualTo(default(DateTime)));
-                Assert.That(result.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
-            });
+                Assert.That(result.CreatedAt, Is.Not.Default);
+                Assert.That(result.UpdatedAt, Is.Not.Default);
+            }
         }
 
         [Test]
@@ -132,7 +132,7 @@ namespace Mattermost.Tests
             const string rawUsername = "bvd97"; // This is a valid username in the Mattermost community server.
             var user = await client.GetUserByUsernameAsync(rawUsername);
             Assert.That(user, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(user.Username, Is.EqualTo(rawUsername));
                 Assert.That(user.Email, Is.EqualTo(email));
@@ -140,9 +140,9 @@ namespace Mattermost.Tests
                 Assert.That(user.Locale, Is.Not.Empty);
                 Assert.That(user.IsBot, Is.False);
                 Assert.That(user.Timezone, Is.Not.Null);
-                Assert.That(user.CreatedAt, Is.Not.EqualTo(default(DateTime)));
-                Assert.That(user.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
-            });
+                Assert.That(user.CreatedAt, Is.Not.Default);
+                Assert.That(user.UpdatedAt, Is.Not.Default);
+            }
         }
 
         [Test]
@@ -153,7 +153,7 @@ namespace Mattermost.Tests
             // This is a valid user ID in the Mattermost community server.
             var user = await client.GetUserAsync(userId);
             Assert.That(user, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(user.Id, Is.EqualTo(userId));
                 Assert.That(user.Username, Is.Not.Empty);
@@ -161,9 +161,9 @@ namespace Mattermost.Tests
                 Assert.That(user.Locale, Is.Not.Empty);
                 Assert.That(user.IsBot, Is.False);
                 Assert.That(user.Timezone, Is.Not.Null);
-                Assert.That(user.CreatedAt, Is.Not.EqualTo(default(DateTime)));
-                Assert.That(user.UpdatedAt, Is.Not.EqualTo(default(DateTime)));
-            });
+                Assert.That(user.CreatedAt, Is.Not.Default);
+                Assert.That(user.UpdatedAt, Is.Not.Default);
+            }
         }
 
         [Test]

@@ -89,6 +89,7 @@ namespace Mattermost
         private readonly string? _apiKey;
         private readonly HttpClient _http;
         private readonly Uri _websocketUri;
+        private const int DefaultHttpClientTimeoutSeconds = 60;
         private CancellationTokenSource _receivingTokenSource;
 
         /// <summary>
@@ -124,6 +125,7 @@ namespace Mattermost
         /// <param name="serverUrl"> Server URL with HTTP(S) scheme. </param>
         /// <exception cref="ArgumentException"></exception>
         public MattermostClient(string serverUrl) : this(new Uri(serverUrl)) { }
+
         /// <summary>
         /// Create <see cref="MattermostClient"/> with specified server address JWT access token.
         /// </summary>
@@ -136,7 +138,7 @@ namespace Mattermost
             _ws = new ClientWebSocket();
             _websocketUri = GetWebsocketUri(serverUri);
             _serverUri = serverUri;
-            _http = new HttpClient() { BaseAddress = _serverUri, Timeout = TimeSpan.FromMinutes(1) };
+            _http = new HttpClient() { BaseAddress = _serverUri, Timeout = TimeSpan.FromSeconds(DefaultHttpClientTimeoutSeconds) };
         }
 
         /// <summary>
@@ -356,7 +358,7 @@ namespace Mattermost
             {
                 throw new AuthorizationException("Authorization token is not set - call LoginAsync first");
             }
-            var uri = new Uri(_websocketUri + Routes.WebSocket);
+            Uri uri = new Uri(_websocketUri + Routes.WebSocket);
             if (_ws.State != WebSocketState.None)
             {
                 try
