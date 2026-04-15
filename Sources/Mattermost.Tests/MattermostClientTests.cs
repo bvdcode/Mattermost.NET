@@ -1,11 +1,11 @@
-using System.Text.Json;
-using Mattermost.Enums;
-using Mattermost.Models;
 using Mattermost.Constants;
+using Mattermost.Enums;
 using Mattermost.Exceptions;
-using Mattermost.Models.Users;
+using Mattermost.Models;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses.Websocket.Posts;
+using Mattermost.Models.Users;
+using System.Text.Json;
 
 namespace Mattermost.Tests
 {

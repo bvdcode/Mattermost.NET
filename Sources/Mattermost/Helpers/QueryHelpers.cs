@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace Mattermost.Helpers
 {

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Mattermost.Models.Enums;
 using System.Text.Json.Serialization;
-using Mattermost.Models.Enums;
 
 namespace Mattermost.Models.Responses.Websocket.Users
 {

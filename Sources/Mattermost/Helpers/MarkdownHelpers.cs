@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Mattermost.Models.Enums;
+using System;
 using System.Linq;
-using Mattermost.Models.Enums;
 
 namespace Mattermost.Helpers
 {

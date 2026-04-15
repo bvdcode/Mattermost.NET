@@ -1,7 +1,7 @@
-﻿using System;
-using System.Text.Json;
-using Mattermost.Enums;
+﻿using Mattermost.Enums;
+using System;
 using System.Net.WebSockets;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Mattermost.Models.Responses.Websocket
