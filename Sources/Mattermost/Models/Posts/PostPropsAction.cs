@@ -30,6 +30,6 @@ namespace Mattermost.Models.Posts
         /// </summary>
         [JsonPropertyName("style")]
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public ActionStyle? Style { get; set; } = ActionStyle.Default;
+        public ActionStyle? Style { get; set; }
     }
 }
