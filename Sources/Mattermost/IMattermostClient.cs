@@ -1,17 +1,16 @@
-﻿using System;
-using System.IO;
+﻿using Mattermost.Constants;
 using Mattermost.Enums;
-using System.Threading;
-using Mattermost.Models;
 using Mattermost.Events;
-using Mattermost.Constants;
-using Mattermost.Exceptions;
-using System.Threading.Tasks;
-using Mattermost.Models.Posts;
-using Mattermost.Models.Users;
-using System.Collections.Generic;
+using Mattermost.Models;
 using Mattermost.Models.Channels;
+using Mattermost.Models.Posts;
 using Mattermost.Models.Responses;
+using Mattermost.Models.Users;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mattermost
 {
@@ -321,7 +320,7 @@ namespace Mattermost
         /// <param name="channelId"> Channel identifier where calls must be in specified state. </param>
         /// <returns> True if calls state setted, otherwise false. </returns>
         Task SetChannelCallStateAsync(string channelId, bool isCallsEnabled);
-        
+
         /// <summary>
         /// Login with specified login identifier and password.
         /// </summary>

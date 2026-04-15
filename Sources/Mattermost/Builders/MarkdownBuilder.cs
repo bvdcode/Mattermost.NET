@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Mattermost.Builders
+﻿namespace Mattermost.Builders
 {
     internal class MarkdownBuilder
     {

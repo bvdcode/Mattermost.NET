@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Mattermost.Constants;
+using Mattermost.Enums;
+using Mattermost.Events;
+using Mattermost.Exceptions;
+using Mattermost.Extensions;
+using Mattermost.Models;
+using Mattermost.Models.Responses.Websocket;
+using Mattermost.Models.Users;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using Mattermost.Enums;
+using System.Net.Http.Headers;
+using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
-using Mattermost.Models;
-using Mattermost.Events;
-using Mattermost.Constants;
-using Mattermost.Exceptions;
-using Mattermost.Extensions;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
-using Mattermost.Models.Users;
-using System.Net.Http.Headers;
-using Mattermost.Models.Responses.Websocket;
 
 namespace Mattermost
 {
@@ -65,7 +65,7 @@ namespace Mattermost
         /// <summary>
         /// User information.
         /// </summary>
-        public User CurrentUserInfo => _cachedUserInfo?.MemberwiseClone() ?? 
+        public User CurrentUserInfo => _cachedUserInfo?.MemberwiseClone() ??
             throw new AuthorizationException("You must call any method that requires authorization, " +
                 "such as GetMeAsync if you use API key; if you want to use username and password, " +
                 "please call LoginAsync method first. This property (CurrentUserInfo) just returns user information " +

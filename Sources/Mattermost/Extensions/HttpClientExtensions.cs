@@ -1,8 +1,8 @@
-﻿using System;
-using System.Text;
+﻿using Mattermost.Exceptions;
+using System;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
-using Mattermost.Exceptions;
 using System.Threading.Tasks;
 
 namespace Mattermost.Extensions

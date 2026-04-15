@@ -1,6 +1,6 @@
-﻿using System.Threading;
-using Mattermost.Enums;
+﻿using Mattermost.Enums;
 using Mattermost.Models.Responses.Websocket;
+using System.Threading;
 
 namespace Mattermost.Events
 {

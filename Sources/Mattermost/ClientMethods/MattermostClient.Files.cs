@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Mattermost.Constants;
+using Mattermost.Models;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
-using Mattermost.Models;
-using Mattermost.Constants;
 using System.Threading.Tasks;
 
 namespace Mattermost

@@ -1,7 +1,7 @@
-﻿using System.Net.Http;
-using Mattermost.Constants;
-using System.Threading.Tasks;
+﻿using Mattermost.Constants;
 using Mattermost.Models.Teams;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Mattermost
 {
