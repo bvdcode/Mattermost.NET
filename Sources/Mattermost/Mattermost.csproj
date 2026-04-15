@@ -28,7 +28,7 @@
 		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
 		<None Include="package-icon.png" Pack="true" PackagePath="\" />
 		<None Include="..\..\LICENSE.md" Pack="true" PackagePath="LICENSE.md" />
-		<PackageReference Include="System.Text.Json" Version="10.0.5" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.201" PrivateAssets="All" />
+		<PackageReference Include="System.Text.Json" Version="10.0.6" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.202" PrivateAssets="All" />
 	</ItemGroup>
 </Project>
