@@ -11,26 +11,31 @@ namespace Mattermost.Models.Posts
         /// <summary>
         /// Default style (standard button appearance).
         /// </summary>
+        [JsonStringEnumMemberName("default")]
         Default,
 
         /// <summary>
         /// Primary style (emphasized button, blue).
         /// </summary>
+        [JsonStringEnumMemberName("primary")]
         Primary,
 
         /// <summary>
         /// Warning style (cautious action, yellow/orange).
         /// </summary>
+        [JsonStringEnumMemberName("warning")]
         Warning,
 
         /// <summary>
         /// Success style (positive action, green).
         /// </summary>
+        [JsonStringEnumMemberName("success")]
         Success,
 
         /// <summary>
         /// Danger style (destructive action, red).
         /// </summary>
-        Danger
+        [JsonStringEnumMemberName("danger")]
+        Danger,
     }
 }
