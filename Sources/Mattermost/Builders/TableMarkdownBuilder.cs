@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Mattermost.Models.Enums;
+using System;
 using System.Text;
-using Mattermost.Models.Enums;
 
 namespace Mattermost.Builders
 {

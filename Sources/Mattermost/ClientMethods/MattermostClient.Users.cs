@@ -1,9 +1,8 @@
-﻿using System.Net.Http;
-using System.Text.Json;
-using Mattermost.Constants;
-using System.Threading.Tasks;
+﻿using Mattermost.Constants;
 using Mattermost.Models.Users;
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Mattermost
 {

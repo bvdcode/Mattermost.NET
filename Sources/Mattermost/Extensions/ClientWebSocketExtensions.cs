@@ -1,12 +1,12 @@
-﻿using System;
-using System.Text;
-using System.Net.Http;
-using System.Threading;
-using System.Text.Json;
-using System.Net.WebSockets;
-using System.Threading.Tasks;
-using Mattermost.Models.Requests.Websocket;
+﻿using Mattermost.Models.Requests.Websocket;
 using Mattermost.Models.Responses.Websocket;
+using System;
+using System.Net.Http;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mattermost.Extensions
 {

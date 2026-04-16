@@ -1,8 +1,8 @@
-﻿using System;
-using Mattermost.Enums;
-using System.Threading.Tasks;
+﻿using Mattermost.Enums;
 using Mattermost.Models.Posts;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Mattermost.Builders
 {

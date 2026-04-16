@@ -1,11 +1,11 @@
-using System.Text.Json;
-using Mattermost.Enums;
-using Mattermost.Models;
 using Mattermost.Constants;
+using Mattermost.Enums;
 using Mattermost.Exceptions;
-using Mattermost.Models.Users;
+using Mattermost.Models;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses.Websocket.Posts;
+using Mattermost.Models.Users;
+using System.Text.Json;
 
 namespace Mattermost.Tests
 {
@@ -308,6 +308,40 @@ namespace Mattermost.Tests
                 Assert.That(post.Props.Attachments, Is.Not.Null, "Post properties attachments should not be null.");
                 Assert.That(post.Props.Attachments, Is.Not.Empty, "Post properties attachments should not be empty.");
             }
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task CreatePostWithActionStyle_GetPost_StyleIsPersisted()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+            const ActionStyle expectedStyle = ActionStyle.Danger;
+
+            PostProps props = new();
+            props.Attachments.Add(new PostPropsAttachment
+            {
+                Text = "Attachment with action style",
+                Actions =
+                {
+                    new PostPropsAction
+                    {
+                        Id = "action-style-test",
+                        Name = "Danger action",
+                        Style = expectedStyle,
+                        Integration = new Integration
+                        {
+                            Url = "https://example.com/action-style-test"
+                        }
+                    }
+                }
+            });
+
+            var createdPost = await client.CreatePostAsync(channelId, "Test post with action style", props: props);
+            var loadedPost = await client.GetPostAsync(createdPost.Id);
+
+            Assert.That(loadedPost.Props.Attachments, Is.Not.Empty, "Post attachments should not be empty.");
+            Assert.That(loadedPost.Props.Attachments[0].Actions, Is.Not.Empty, "Post attachment actions should not be empty.");
+            Assert.That(loadedPost.Props.Attachments[0].Actions[0].Style, Is.EqualTo(expectedStyle), "Action style should be preserved after loading post.");
         }
 
         [Test]
