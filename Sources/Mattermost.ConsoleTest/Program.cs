@@ -1,7 +1,5 @@
-﻿using System.Text.Json;
-using Mattermost.Builders;
-using Mattermost.Enums;
-using Mattermost.Models;
+﻿using Mattermost.Models;
+using System.Text.Json;
 
 namespace Mattermost.ConsoleTest
 {

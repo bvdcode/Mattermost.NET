@@ -1,5 +1,5 @@
-﻿using System;
-using Mattermost.Enums;
+﻿using Mattermost.Enums;
+using System;
 using System.Text.Json.Serialization;
 
 namespace Mattermost.Models.Channels
@@ -58,7 +58,7 @@ namespace Mattermost.Models.Channels
                 "D" => ChannelType.Direct,
                 _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, null)
             };
-            set => Type = value.ToChannelChar() 
+            set => Type = value.ToChannelChar()
                 ?? throw new ArgumentOutOfRangeException(nameof(value), value, null);
         }
 

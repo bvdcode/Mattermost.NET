@@ -1,12 +1,12 @@
-﻿using System;
-using System.Net.Http;
+﻿using Mattermost.Constants;
 using Mattermost.Enums;
 using Mattermost.Helpers;
-using Mattermost.Constants;
-using System.Threading.Tasks;
 using Mattermost.Models.Posts;
-using System.Collections.Generic;
 using Mattermost.Models.Responses;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Mattermost
 {

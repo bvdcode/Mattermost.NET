@@ -1,5 +1,5 @@
-﻿using System.Text.Json;
-using Mattermost.Models.Posts;
+﻿using Mattermost.Models.Posts;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Mattermost.Models.Responses.Websocket.Posts

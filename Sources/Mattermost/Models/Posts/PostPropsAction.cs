@@ -24,5 +24,12 @@ namespace Mattermost.Models.Posts
         /// </summary>
         [JsonPropertyName("integration")]
         public Integration Integration { get; set; } = new Integration();
+
+        /// <summary>
+        /// The visual style of the action.
+        /// </summary>
+        [JsonPropertyName("style")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ActionStyle? Style { get; set; }
     }
 }
