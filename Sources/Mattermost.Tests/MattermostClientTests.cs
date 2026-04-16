@@ -311,6 +311,40 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        [NonParallelizable]
+        public async Task CreatePostWithActionStyle_GetPost_StyleIsPersisted()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+            const ActionStyle expectedStyle = ActionStyle.Danger;
+
+            PostProps props = new();
+            props.Attachments.Add(new PostPropsAttachment
+            {
+                Text = "Attachment with action style",
+                Actions =
+                {
+                    new PostPropsAction
+                    {
+                        Id = "action-style-test",
+                        Name = "Danger action",
+                        Style = expectedStyle,
+                        Integration = new Integration
+                        {
+                            Url = "https://example.com/action-style-test"
+                        }
+                    }
+                }
+            });
+
+            var createdPost = await client.CreatePostAsync(channelId, "Test post with action style", props: props);
+            var loadedPost = await client.GetPostAsync(createdPost.Id);
+
+            Assert.That(loadedPost.Props.Attachments, Is.Not.Empty, "Post attachments should not be empty.");
+            Assert.That(loadedPost.Props.Attachments[0].Actions, Is.Not.Empty, "Post attachment actions should not be empty.");
+            Assert.That(loadedPost.Props.Attachments[0].Actions[0].Style, Is.EqualTo(expectedStyle), "Action style should be preserved after loading post.");
+        }
+
+        [Test]
         public void DisposeClient_SendRequest_ThrowsException()
         {
             var client = new MattermostClient();
