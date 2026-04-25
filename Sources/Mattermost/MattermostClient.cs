@@ -1,4 +1,4 @@
-﻿using Mattermost.Constants;
+using Mattermost.Constants;
 using Mattermost.Enums;
 using Mattermost.Events;
 using Mattermost.Exceptions;
@@ -7,11 +7,12 @@ using Mattermost.Models;
 using Mattermost.Models.Responses.Websocket;
 using Mattermost.Models.Users;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.WebSockets;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace Mattermost
         public event EventHandler<ConnectionEventArgs>? OnConnected;
 
         /// <summary>
-        /// Called when client is disconnected from server WebSocket after 
+        /// Called when client is disconnected from server WebSocket after
         /// <see cref="StopReceivingAsync()"/> method or when server closes connection.
         /// </summary>
         public event EventHandler<DisconnectionEventArgs>? OnDisconnected;
@@ -60,16 +61,23 @@ namespace Mattermost
         /// <summary>
         /// Specifies whether the client is connected to the server with WebSocket.
         /// </summary>
-        public bool IsConnected => _ws.State == WebSocketState.Open;
+        public bool IsConnected => !_disposed && _ws.State == WebSocketState.Open;
 
         /// <summary>
         /// User information.
         /// </summary>
-        public User CurrentUserInfo => _cachedUserInfo?.MemberwiseClone() ??
-            throw new AuthorizationException("You must call any method that requires authorization, " +
-                "such as GetMeAsync if you use API key; if you want to use username and password, " +
-                "please call LoginAsync method first. This property (CurrentUserInfo) just returns user information " +
-                "which is set after successful authorization or GetMeAsync invocation.");
+        public User CurrentUserInfo
+        {
+            get
+            {
+                CheckDisposed();
+                return _cachedUserInfo?.MemberwiseClone() ??
+                    throw new AuthorizationException("You must call any method that requires authorization, " +
+                        "such as GetMeAsync if you use API key; if you want to use username and password, " +
+                        "please call LoginAsync method first. This property (CurrentUserInfo) just returns user information " +
+                        "which is set after successful authorization or GetMeAsync invocation.");
+            }
+        }
 
         /// <summary>
         /// Base server address.
@@ -93,74 +101,139 @@ namespace Mattermost
         private readonly Uri _serverUri;
         private readonly string? _apiKey;
         private readonly HttpClient _http;
+        private readonly bool _ownsHttpClient;
         private readonly Uri _websocketUri;
+        private string? _accessToken;
         private const int DefaultHttpClientTimeoutSeconds = 60;
         private CancellationTokenSource _receivingTokenSource;
+        private CancellationTokenSource? _linkedReceivingTokenSource;
 
         /// <summary>
         /// Create <see cref="MattermostClient"/> with default server address.
         /// </summary>
-        /// <exception cref="ArgumentException"></exception>
-        public MattermostClient() : this(Routes.DefaultBaseUrl) { }
-
-        /// <summary>
-        /// Create <see cref="MattermostClient"/> with specified server address and API key.
-        /// </summary>
-        /// <param name="serverUrl"> Server URL with HTTP(S) scheme. </param>
-        /// <param name="apiKey"> API key, ex. bot token or personal access token. </param>
-        public MattermostClient(string serverUrl, string apiKey) : this(new Uri(serverUrl), apiKey) { }
-
-        /// <summary>
-        /// Create <see cref="MattermostClient"/> with specified server address and API key.
-        /// </summary>
-        /// <param name="serverUri"> Server URI with HTTP(S) scheme. </param>
-        /// <param name="apiKey"> API key, ex. bot token or personal access token. </param>
-        public MattermostClient(Uri serverUri, string apiKey) : this(serverUri)
+        public MattermostClient()
+            : this(new ClientInitialization(ParseServerUri(Routes.DefaultBaseUrl), null, null))
         {
-            if (string.IsNullOrWhiteSpace(apiKey))
-            {
-                throw new ApiKeyException("API key is empty");
-            }
-            _apiKey = apiKey;
         }
 
         /// <summary>
-        /// Create <see cref="MattermostClient"/> with specified server address JWT access token.
+        /// Create <see cref="MattermostClient"/> with specified server address.
         /// </summary>
-        /// <param name="serverUrl"> Server URL with HTTP(S) scheme. </param>
-        /// <exception cref="ArgumentException"></exception>
-        public MattermostClient(string serverUrl) : this(new Uri(serverUrl)) { }
+        /// <param name="serverUrl">Server URL with HTTP(S) scheme.</param>
+        public MattermostClient(string serverUrl)
+            : this(new ClientInitialization(ParseServerUri(serverUrl), null, null))
+        {
+        }
 
         /// <summary>
-        /// Create <see cref="MattermostClient"/> with specified server address JWT access token.
+        /// Create <see cref="MattermostClient"/> with specified server address.
         /// </summary>
-        /// <param name="serverUri"> Server URI with HTTP(S) scheme. </param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="serverUri">Server URI with HTTP(S) scheme.</param>
         public MattermostClient(Uri serverUri)
+            : this(new ClientInitialization(ValidateServerUri(serverUri, nameof(serverUri)), null, null))
+        {
+        }
+
+        /// <summary>
+        /// Create <see cref="MattermostClient"/> with specified server address and API key.
+        /// </summary>
+        /// <param name="serverUrl">Server URL with HTTP(S) scheme.</param>
+        /// <param name="apiKey">API key, ex. bot token or personal access token.</param>
+        public MattermostClient(string serverUrl, string apiKey)
+            : this(new ClientInitialization(ParseServerUri(serverUrl), ValidateApiKey(apiKey), null))
+        {
+        }
+
+        /// <summary>
+        /// Create <see cref="MattermostClient"/> with specified server address and API key.
+        /// </summary>
+        /// <param name="serverUri">Server URI with HTTP(S) scheme.</param>
+        /// <param name="apiKey">API key, ex. bot token or personal access token.</param>
+        public MattermostClient(Uri serverUri, string apiKey)
+            : this(new ClientInitialization(ValidateServerUri(serverUri, nameof(serverUri)), ValidateApiKey(apiKey), null))
+        {
+        }
+
+        /// <summary>
+        /// Create <see cref="MattermostClient"/> with specified server address and external HTTP transport.
+        /// </summary>
+        /// <param name="serverUrl">Server URL with HTTP(S) scheme.</param>
+        /// <param name="httpClient">External HTTP client instance.</param>
+        public MattermostClient(string serverUrl, HttpClient httpClient)
+            : this(new ClientInitialization(ParseServerUri(serverUrl), null, ValidateHttpClient(httpClient)))
+        {
+        }
+
+        /// <summary>
+        /// Create <see cref="MattermostClient"/> with specified server address and external HTTP transport.
+        /// </summary>
+        /// <param name="serverUri">Server URI with HTTP(S) scheme.</param>
+        /// <param name="httpClient">External HTTP client instance.</param>
+        public MattermostClient(Uri serverUri, HttpClient httpClient)
+            : this(new ClientInitialization(ValidateServerUri(serverUri, nameof(serverUri)), null, ValidateHttpClient(httpClient)))
+        {
+        }
+
+        /// <summary>
+        /// Create <see cref="MattermostClient"/> with specified server address, API key and external HTTP transport.
+        /// </summary>
+        /// <param name="serverUrl">Server URL with HTTP(S) scheme.</param>
+        /// <param name="apiKey">API key, ex. bot token or personal access token.</param>
+        /// <param name="httpClient">External HTTP client instance.</param>
+        public MattermostClient(string serverUrl, string apiKey, HttpClient httpClient)
+            : this(new ClientInitialization(ParseServerUri(serverUrl), ValidateApiKey(apiKey), ValidateHttpClient(httpClient)))
+        {
+        }
+
+        /// <summary>
+        /// Create <see cref="MattermostClient"/> with specified server address, API key and external HTTP transport.
+        /// </summary>
+        /// <param name="serverUri">Server URI with HTTP(S) scheme.</param>
+        /// <param name="apiKey">API key, ex. bot token or personal access token.</param>
+        /// <param name="httpClient">External HTTP client instance.</param>
+        public MattermostClient(Uri serverUri, string apiKey, HttpClient httpClient)
+            : this(new ClientInitialization(ValidateServerUri(serverUri, nameof(serverUri)), ValidateApiKey(apiKey), ValidateHttpClient(httpClient)))
+        {
+        }
+
+        private MattermostClient(ClientInitialization initialization)
         {
             _receivingTokenSource = new CancellationTokenSource();
-            CheckUrl(serverUri);
+            _serverUri = initialization.ServerUri;
+            _apiKey = initialization.ApiKey;
             _ws = new ClientWebSocket();
-            _websocketUri = GetWebsocketUri(serverUri);
-            _serverUri = serverUri;
-            _http = new HttpClient() { BaseAddress = _serverUri, Timeout = TimeSpan.FromSeconds(DefaultHttpClientTimeoutSeconds) };
+            _websocketUri = GetWebsocketUri(initialization.ServerUri);
+
+            if (initialization.HttpClient == null)
+            {
+                _http = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(DefaultHttpClientTimeoutSeconds)
+                };
+                _ownsHttpClient = true;
+            }
+            else
+            {
+                _http = initialization.HttpClient;
+                _ownsHttpClient = false;
+            }
         }
 
         /// <summary>
         /// Start receiving messages asynchronously with cancellation token.
         /// </summary>
-        /// <returns> Receiver task. </returns>
-        /// <exception cref="ApiKeyException"></exception>
+        /// <returns>Receiver task.</returns>
         public async Task StartReceivingAsync(CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            await CheckAuthorizedAsync();
-            await StopReceivingAsync();
-            _ws = new ClientWebSocket();
-            _receivingTokenSource = new CancellationTokenSource();
-            var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken).Token;
+            await CheckAuthorizedAsync().ConfigureAwait(false);
+            await StopReceivingAsync().ConfigureAwait(false);
 
-            Log("Starting receiving as user @" + _cachedUserInfo?.Username ?? "Unknown");
+            _linkedReceivingTokenSource?.Dispose();
+            _linkedReceivingTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_receivingTokenSource.Token, cancellationToken);
+            CancellationToken mergedToken = _linkedReceivingTokenSource.Token;
+
+            Log("Starting receiving as user @" + (_cachedUserInfo?.Username ?? "Unknown"));
             _receiverTask = Task.Run(async () =>
             {
                 while (!mergedToken.IsCancellationRequested)
@@ -169,10 +242,11 @@ namespace Mattermost
                     {
                         if (_ws.State != WebSocketState.Open)
                         {
-                            await ConnectAsync(mergedToken);
+                            await ConnectAsync(mergedToken).ConfigureAwait(false);
                         }
-                        var response = await _ws.ReceiveAsync(mergedToken);
-                        await HandleResponseAsync(response, mergedToken);
+
+                        var response = await _ws.ReceiveAsync(mergedToken).ConfigureAwait(false);
+                        await HandleResponseAsync(response, mergedToken).ConfigureAwait(false);
                     }
                     catch (OperationCanceledException)
                     {
@@ -183,7 +257,14 @@ namespace Mattermost
                     catch (Exception ex)
                     {
                         Log("Error in receiving messages", ex);
-                        await Task.Delay(1_000);
+                        try
+                        {
+                            await Task.Delay(1_000, mergedToken).ConfigureAwait(false);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            break;
+                        }
                     }
                 }
             }, mergedToken);
@@ -195,15 +276,21 @@ namespace Mattermost
         public async Task StopReceivingAsync()
         {
             CheckDisposed();
-            _receivingTokenSource?.Cancel();
 
-            if (_ws != null && _ws.State == WebSocketState.Open)
+            _receivingTokenSource.Cancel();
+            _linkedReceivingTokenSource?.Cancel();
+
+            if (_ws.State == WebSocketState.Open
+                || _ws.State == WebSocketState.CloseReceived
+                || _ws.State == WebSocketState.CloseSent)
             {
                 try
                 {
-                    await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", CancellationToken.None);
+                    await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", CancellationToken.None).ConfigureAwait(false);
                     OnDisconnected?.Invoke(this, new DisconnectionEventArgs(WebSocketCloseStatus.NormalClosure, "Closed by client", DateTime.UtcNow));
-                    _ws.Dispose();
+                }
+                catch (OperationCanceledException)
+                {
                 }
                 catch (Exception ex)
                 {
@@ -214,9 +301,31 @@ namespace Mattermost
 
             if (_receiverTask != null)
             {
-                await _receiverTask;  // Wait for the receiving task to complete
-                _receiverTask.Dispose();
+                try
+                {
+                    await _receiverTask.ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                finally
+                {
+                    if (_receiverTask.IsCompleted)
+                    {
+                        _receiverTask.Dispose();
+                    }
+                    _receiverTask = null;
+                }
             }
+
+            _linkedReceivingTokenSource?.Dispose();
+            _linkedReceivingTokenSource = null;
+
+            _receivingTokenSource.Dispose();
+            _receivingTokenSource = new CancellationTokenSource();
+
+            _ws.Dispose();
+            _ws = new ClientWebSocket();
         }
 
         /// <summary>
@@ -237,41 +346,68 @@ namespace Mattermost
             {
                 throw new AuthorizationException("You cannot use API key and login with username/password at the same time");
             }
+
             CheckDisposed();
             var body = new
             {
                 login_id = username,
                 password
             };
-            const string url = Routes.Users + "/login";
-            var result = await _http.PostAsJsonAsync(url, body);
+
+            using HttpResponseMessage result = await SendHttpRequestAsync(
+                HttpMethod.Post,
+                Routes.Users + "/login",
+                payload: body,
+                requiresAuthorization: false).ConfigureAwait(false);
+
             if (!result.IsSuccessStatusCode)
             {
                 throw new AuthorizationException("Login error, server response: " + result.StatusCode);
             }
-            string token = result.Headers.GetValues("Token").FirstOrDefault()
-                ?? throw new AuthorizationException("Token not found in response headers");
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            _cachedUserInfo = await result.GetResponseAsync<User>();
+
+            if (!result.Headers.TryGetValues("Token", out IEnumerable<string>? tokenValues))
+            {
+                throw new AuthorizationException("Token not found in response headers");
+            }
+
+            string? token = null;
+            foreach (string value in tokenValues)
+            {
+                token = value;
+                break;
+            }
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new AuthorizationException("Token not found in response headers");
+            }
+
+            _accessToken = token;
+            _cachedUserInfo = await result.GetResponseAsync<User>().ConfigureAwait(false);
             return _cachedUserInfo.MemberwiseClone();
         }
 
         /// <summary>
         /// Logout from server.
         /// </summary>
-        /// <returns> Task representing logout operation. </returns>
+        /// <returns>Task representing logout operation.</returns>
         /// <exception cref="MattermostClientException">Throws if server response is not successful.</exception>
         public async Task LogoutAsync()
         {
             CheckDisposed();
-            await CheckAuthorizedAsync();
-            var response = await _http.PostAsync(Routes.Users + "/logout", null);
+            await CheckAuthorizedAsync().ConfigureAwait(false);
+
+            using HttpResponseMessage response = await SendHttpRequestAsync(
+                HttpMethod.Post,
+                Routes.Users + "/logout").ConfigureAwait(false);
+
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 throw new MattermostClientException("Logout error, server response: " + response.StatusCode);
             }
-            await StopReceivingAsync();
-            _http.DefaultRequestHeaders.Authorization = null;
+
+            await StopReceivingAsync().ConfigureAwait(false);
+            _accessToken = null;
             _cachedUserInfo = null;
         }
 
@@ -280,16 +416,47 @@ namespace Mattermost
         /// </summary>
         public void Dispose()
         {
-            if (!_disposed)
+            if (_disposed)
             {
-                _ws.Dispose();
-                _http.Dispose();
-                _disposed = true;
-                _receivingTokenSource.Dispose();
-                if (_receiverTask != null && _receiverTask.IsCompleted)
+                return;
+            }
+
+            _disposed = true;
+
+            try
+            {
+                _receivingTokenSource.Cancel();
+                _linkedReceivingTokenSource?.Cancel();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if (_ws.State == WebSocketState.Open
+                    || _ws.State == WebSocketState.CloseReceived
+                    || _ws.State == WebSocketState.CloseSent)
                 {
-                    _receiverTask.Dispose();
+                    _ws.Abort();
                 }
+            }
+            catch
+            {
+            }
+
+            _ws.Dispose();
+            _receivingTokenSource.Dispose();
+            _linkedReceivingTokenSource?.Dispose();
+
+            if (_receiverTask != null && _receiverTask.IsCompleted)
+            {
+                _receiverTask.Dispose();
+            }
+
+            if (_ownsHttpClient)
+            {
+                _http.Dispose();
             }
         }
 
@@ -303,6 +470,7 @@ namespace Mattermost
             {
                 Log("Error when calling OnEventReceived", ex);
             }
+
             switch (response.Event)
             {
                 case MattermostEvent.Posted:
@@ -323,7 +491,7 @@ namespace Mattermost
                     break;
             }
 
-            // Handle the case when the server closes the connection
+            // Handle the case when the server closes the connection.
             if (response.MessageType == WebSocketMessageType.Close)
             {
                 OnDisconnected?.Invoke(this, new DisconnectionEventArgs(response.CloseStatus, response.CloseStatusDescription, DateTime.UtcNow));
@@ -358,7 +526,8 @@ namespace Mattermost
                         progress = result;
                         progressChanged?.Invoke(result);
                     }
-                    await Task.Delay(100);
+
+                    await Task.Delay(100).ConfigureAwait(false);
                     if (token.IsCancellationRequested || result >= 100)
                     {
                         break;
@@ -369,17 +538,20 @@ namespace Mattermost
 
         private async Task ConnectAsync(CancellationToken cancellationToken)
         {
-            if (_http.DefaultRequestHeaders.Authorization == null)
+            CheckDisposed();
+
+            if (string.IsNullOrWhiteSpace(_accessToken))
             {
                 throw new AuthorizationException("Authorization token is not set - call LoginAsync first");
             }
-            Uri uri = new Uri(_websocketUri + Routes.WebSocket);
+
+            Uri uri = BuildRequestUri(_websocketUri, Routes.WebSocket);
             if (_ws.State != WebSocketState.None)
             {
                 try
                 {
                     Log("Closing websocket connection from state " + _ws.State);
-                    await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", cancellationToken);
+                    await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing connection", cancellationToken).ConfigureAwait(false);
                     _ws.Dispose();
                 }
                 catch (Exception ex)
@@ -387,52 +559,120 @@ namespace Mattermost
                     Log("Closing websocket connection with error", ex);
                 }
             }
+
             _ws = new ClientWebSocket();
             try
             {
                 Log("Opening new websocket connection...");
-                await _ws.ConnectAsync(uri, cancellationToken);
-                if (_http.DefaultRequestHeaders.Authorization == null
-                    || _http.DefaultRequestHeaders.Authorization.Scheme != "Bearer"
-                    || string.IsNullOrWhiteSpace(_http.DefaultRequestHeaders.Authorization.Parameter))
+                await _ws.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
+
+                if (string.IsNullOrWhiteSpace(_accessToken))
                 {
                     throw new AuthorizationException("Authorization token is not set - call LoginAsync first");
                 }
-                string token = _http.DefaultRequestHeaders.Authorization.Parameter.Replace("Bearer ", string.Empty);
-                var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token });
+
+                var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token = _accessToken }).ConfigureAwait(false);
                 if (result.Status != MattermostStatus.Ok)
                 {
                     throw new AuthorizationException("Authentication error, server response: " + result.Status);
                 }
-                Log("WebSocket connection established with state " + _ws.State);
 
-                // Trigger OnConnected event
+                Log("WebSocket connection established with state " + _ws.State);
                 OnConnected?.Invoke(this, new ConnectionEventArgs(uri, DateTime.UtcNow));
             }
             catch (Exception ex)
             {
-                // Handle connection error
-                Log($"WebSocket connection failed", ex);
+                Log("WebSocket connection failed", ex);
                 OnDisconnected?.Invoke(this, new DisconnectionEventArgs(null, ex.Message, DateTime.UtcNow));
             }
         }
 
-        private Uri GetWebsocketUri(Uri serverUri)
+        private static Uri GetWebsocketUri(Uri serverUri)
         {
-            string serverUrl = serverUri.ToString();
-            string websockerUrl = serverUrl
-                .Replace("https://", "wss://")
-                .Replace("http://", "ws://");
-            return new Uri(websockerUrl);
+            UriBuilder builder = new UriBuilder(serverUri)
+            {
+                Scheme = string.Equals(serverUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)
+                    ? "wss"
+                    : "ws",
+                Port = serverUri.IsDefaultPort ? -1 : serverUri.Port,
+                Path = "/",
+                Query = string.Empty,
+                Fragment = string.Empty
+            };
+            return builder.Uri;
         }
 
-        private void CheckUrl(Uri serverUri)
+        private static Uri ParseServerUri(string serverUrl)
         {
-            string url = serverUri.ToString();
-            if (!url.Contains("http"))
+            if (string.IsNullOrWhiteSpace(serverUrl))
             {
-                throw new ArgumentException("Scheme must be 'http' or 'https'");
+                throw new ArgumentException("Server URL cannot be null or empty.", nameof(serverUrl));
             }
+
+            if (!Uri.TryCreate(serverUrl, UriKind.Absolute, out Uri? serverUri))
+            {
+                throw new ArgumentException("Server URL must be a valid absolute URI.", nameof(serverUrl));
+            }
+
+            return ValidateServerUri(serverUri, nameof(serverUrl));
+        }
+
+        private static Uri ValidateServerUri(Uri serverUri, string parameterName)
+        {
+            if (serverUri == null)
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+
+            if (!serverUri.IsAbsoluteUri)
+            {
+                throw new ArgumentException("Server URI must be absolute.", parameterName);
+            }
+
+            bool isValidScheme = string.Equals(serverUri.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(serverUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase);
+            if (!isValidScheme)
+            {
+                throw new ArgumentException("Scheme must be 'http' or 'https'.", parameterName);
+            }
+
+            return serverUri;
+        }
+
+        private static string ValidateApiKey(string apiKey)
+        {
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new ApiKeyException("API key is empty");
+            }
+
+            return apiKey;
+        }
+
+        private static HttpClient ValidateHttpClient(HttpClient httpClient)
+        {
+            if (httpClient == null)
+            {
+                throw new ArgumentNullException(nameof(httpClient));
+            }
+
+            return httpClient;
+        }
+
+        private sealed class ClientInitialization
+        {
+            public ClientInitialization(Uri serverUri, string? apiKey, HttpClient? httpClient)
+            {
+                ServerUri = serverUri;
+                ApiKey = apiKey;
+                HttpClient = httpClient;
+            }
+
+            public Uri ServerUri { get; }
+
+            public string? ApiKey { get; }
+
+            public HttpClient? HttpClient { get; }
         }
 
         private void Log(string message)
@@ -442,24 +682,21 @@ namespace Mattermost
 
         private void Log(string message, Exception ex)
         {
-            OnLogMessage?.Invoke(this, new LogEventArgs(message + $" (Exception: {ex.Message}"));
+            OnLogMessage?.Invoke(this, new LogEventArgs(message + $" (Exception: {ex.Message})"));
         }
 
         private Task CheckAuthorizedAsync()
         {
-            if (_http.DefaultRequestHeaders.Authorization == null
-                || _http.DefaultRequestHeaders.Authorization.Scheme != "Bearer"
-                || string.IsNullOrWhiteSpace(_http.DefaultRequestHeaders.Authorization.Parameter))
+            if (string.IsNullOrWhiteSpace(_accessToken))
             {
                 if (!string.IsNullOrWhiteSpace(_apiKey))
                 {
                     return LoginWithApiKeyAsync(_apiKey);
                 }
-                else
-                {
-                    throw new AuthorizationException("Authorization token is not set - call LoginAsync first or use constructor with API key (Personal Access Token)");
-                }
+
+                throw new AuthorizationException("Authorization token is not set - call LoginAsync first or use constructor with API key (Personal Access Token)");
             }
+
             return Task.CompletedTask;
         }
 
@@ -478,13 +715,20 @@ namespace Mattermost
             {
                 throw new ApiKeyException("API key is empty");
             }
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-            var result = await _http.GetAsync(Routes.Users + "/me");
+
+            using HttpResponseMessage result = await SendHttpRequestAsync(
+                HttpMethod.Get,
+                Routes.Users + "/me",
+                requiresAuthorization: false,
+                authorizationTokenOverride: apiKey).ConfigureAwait(false);
+
             if (!result.IsSuccessStatusCode)
             {
                 throw new ApiKeyException("Login with API key error, server response: " + result.StatusCode);
             }
-            _cachedUserInfo = await result.GetResponseAsync<User>();
+
+            _cachedUserInfo = await result.GetResponseAsync<User>().ConfigureAwait(false);
+            _accessToken = apiKey;
             return _cachedUserInfo;
         }
 
@@ -493,17 +737,13 @@ namespace Mattermost
 
         private async Task<TResult> SendRequestAsync<TResult>(HttpMethod method, string requestUri, object? payload = null, CancellationToken cancellationToken = default)
         {
-            CheckDisposed();
-            await CheckAuthorizedAsync();
-            HttpRequestMessage request = new HttpRequestMessage(method, requestUri);
-            if (payload != null)
-            {
-                string jsonPayload = JsonSerializer.Serialize(payload);
-                request.Content = new StringContent(jsonPayload);
-                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            }
-            var response = await _http.SendAsync(request, cancellationToken);
-            string json = await response.Content.ReadAsStringAsync();
+            using HttpResponseMessage response = await SendHttpRequestAsync(
+                method,
+                requestUri,
+                payload,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 MattermostClientException exception;
@@ -517,13 +757,88 @@ namespace Mattermost
                 {
                     exception = new MattermostClientException("Unknown error, server response: " + response.StatusCode);
                 }
+
                 exception.StatusCode = response.StatusCode;
                 exception.ResponseJson = json;
-                exception.RequestUri = requestUri;
+                exception.RequestUri = BuildRequestUri(requestUri).ToString();
                 exception.RequestMethod = method.Method;
                 throw exception;
             }
+
             return JsonSerializer.Deserialize<TResult>(json) ?? throw new JsonException("Failed to deserialize result: " + json);
+        }
+
+        private async Task<HttpResponseMessage> SendHttpRequestAsync(
+            HttpMethod method,
+            string route,
+            object? payload = null,
+            HttpContent? content = null,
+            bool requiresAuthorization = true,
+            string? authorizationTokenOverride = null,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+
+            if (requiresAuthorization)
+            {
+                await CheckAuthorizedAsync().ConfigureAwait(false);
+            }
+
+            using HttpRequestMessage request = new HttpRequestMessage(method, BuildRequestUri(route));
+            bool hasExternalContent = content != null;
+            if (hasExternalContent)
+            {
+                request.Content = content;
+            }
+            else if (payload != null)
+            {
+                string jsonPayload = JsonSerializer.Serialize(payload);
+                request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            }
+
+            string? accessToken = authorizationTokenOverride;
+            if (requiresAuthorization && string.IsNullOrWhiteSpace(accessToken))
+            {
+                accessToken = _accessToken;
+            }
+
+            if (!string.IsNullOrWhiteSpace(accessToken))
+            {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            }
+
+            try
+            {
+                return await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                // External content ownership belongs to the caller.
+                if (hasExternalContent)
+                {
+                    request.Content = null;
+                }
+            }
+        }
+
+        private Uri BuildRequestUri(string route)
+        {
+            return BuildRequestUri(_serverUri, route);
+        }
+
+        private static Uri BuildRequestUri(Uri baseUri, string route)
+        {
+            if (string.IsNullOrWhiteSpace(route))
+            {
+                throw new ArgumentException("Route cannot be null or empty.", nameof(route));
+            }
+
+            if (Uri.TryCreate(route, UriKind.Absolute, out Uri? absoluteUri))
+            {
+                return absoluteUri;
+            }
+
+            return new Uri(baseUri, route);
         }
     }
 }
