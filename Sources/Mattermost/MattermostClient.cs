@@ -689,9 +689,10 @@ namespace Mattermost
         {
             if (string.IsNullOrWhiteSpace(_accessToken))
             {
-                if (!string.IsNullOrWhiteSpace(_apiKey))
+                string? apiKey = _apiKey;
+                if (!string.IsNullOrWhiteSpace(apiKey))
                 {
-                    return LoginWithApiKeyAsync(_apiKey);
+                    return LoginWithApiKeyAsync(apiKey!);
                 }
 
                 throw new AuthorizationException("Authorization token is not set - call LoginAsync first or use constructor with API key (Personal Access Token)");
@@ -833,7 +834,7 @@ namespace Mattermost
                 throw new ArgumentException("Route cannot be null or empty.", nameof(route));
             }
 
-            bool hasExplicitScheme = route.Contains(Uri.SchemeDelimiter, StringComparison.Ordinal);
+            bool hasExplicitScheme = route.IndexOf(Uri.SchemeDelimiter, StringComparison.Ordinal) >= 0;
             if (hasExplicitScheme && Uri.TryCreate(route, UriKind.Absolute, out Uri? absoluteUri))
             {
                 return absoluteUri;

@@ -9,6 +9,8 @@ namespace Mattermost.Helpers
     /// </summary>
     public class QueryHelpers
     {
+        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         /// <summary>
         /// Builds a query string for retrieving posts from a channel.
         /// </summary>
@@ -40,7 +42,7 @@ namespace Mattermost.Helpers
                 {
                     throw new ArgumentOutOfRangeException(nameof(since), "Value must be in UTC.");
                 }
-                if (since < DateTime.UnixEpoch)
+                if (since < UnixEpoch)
                 {
                     throw new ArgumentOutOfRangeException(nameof(since), "Value must be greater than or equal to Unix epoch (1970-01-01T00:00:00Z).");
                 }

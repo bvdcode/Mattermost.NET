@@ -14,8 +14,8 @@ namespace Mattermost
 
         public ResponseContentStream(Stream innerStream, HttpResponseMessage response)
         {
-            _innerStream = innerStream;
-            _response = response;
+            _innerStream = innerStream ?? throw new ArgumentNullException(nameof(innerStream));
+            _response = response ?? throw new ArgumentNullException(nameof(response));
         }
 
         public override bool CanRead => !_disposed && _innerStream.CanRead;
@@ -37,10 +37,44 @@ namespace Mattermost
             _innerStream.Flush();
         }
 
+        public override Task FlushAsync(CancellationToken cancellationToken)
+        {
+            return _innerStream.FlushAsync(cancellationToken);
+        }
+
         public override int Read(byte[] buffer, int offset, int count)
         {
             return _innerStream.Read(buffer, offset, count);
         }
+
+        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            return _innerStream.ReadAsync(buffer, offset, count, cancellationToken);
+        }
+
+#if NETSTANDARD2_1
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            return _innerStream.ReadAsync(buffer, cancellationToken);
+        }
+#endif
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            _innerStream.Write(buffer, offset, count);
+        }
+
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            return _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
+        }
+
+#if NETSTANDARD2_1
+        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            return _innerStream.WriteAsync(buffer, cancellationToken);
+        }
+#endif
 
         public override long Seek(long offset, SeekOrigin origin)
         {
@@ -52,36 +86,7 @@ namespace Mattermost
             _innerStream.SetLength(value);
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            _innerStream.Write(buffer, offset, count);
-        }
-
-        public override Task FlushAsync(CancellationToken cancellationToken)
-        {
-            return _innerStream.FlushAsync(cancellationToken);
-        }
-
-        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            return _innerStream.ReadAsync(buffer, offset, count, cancellationToken);
-        }
-
-        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
-        {
-            return _innerStream.ReadAsync(buffer, cancellationToken);
-        }
-
-        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            return _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
-        }
-
-        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
-        {
-            return _innerStream.WriteAsync(buffer, cancellationToken);
-        }
-
+#if NETSTANDARD2_1
         public override async ValueTask DisposeAsync()
         {
             if (_disposed)
@@ -99,6 +104,7 @@ namespace Mattermost
                 _response.Dispose();
             }
         }
+#endif
 
         protected override void Dispose(bool disposing)
         {
