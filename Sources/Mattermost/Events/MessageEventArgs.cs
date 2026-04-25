@@ -25,11 +25,18 @@ namespace Mattermost.Events
         /// </summary>
         public PostInfo Message { get; } = null!;
 
-        internal MessageEventArgs(IMattermostClient mattermostBot, WebsocketMessage response, CancellationToken cancellationToken)
+        /// <summary>
+        /// Specifies whether the current authorized user is the message author.
+        /// </summary>
+        public bool IsCurrentUser { get; }
+
+        internal MessageEventArgs(IMattermostClient mattermostBot, WebsocketMessage response, CancellationToken cancellationToken, string? currentUserId = null)
         {
             Client = mattermostBot;
             CancellationToken = cancellationToken;
             Message = response.GetData<PostInfo>();
+            IsCurrentUser = !string.IsNullOrWhiteSpace(currentUserId) &&
+                string.Equals(Message.Post.UserId, currentUserId, StringComparison.Ordinal);
         }
     }
 }

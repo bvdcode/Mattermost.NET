@@ -77,6 +77,11 @@ namespace Mattermost
         public Uri ServerAddress => _serverUri;
 
         /// <summary>
+        /// Client behavior configuration.
+        /// </summary>
+        public MattermostClientOptions Options { get; } = new MattermostClientOptions();
+
+        /// <summary>
         /// Extension methods needed for this client, hidden from public.
         /// </summary>
         internal HttpClient HttpClient => _http;
@@ -301,8 +306,8 @@ namespace Mattermost
             switch (response.Event)
             {
                 case MattermostEvent.Posted:
-                    var messageArgs = new MessageEventArgs(this, response, cancellationToken);
-                    if (_cachedUserInfo != null && messageArgs.Message.Post.UserId != _cachedUserInfo.Id)
+                    var messageArgs = new MessageEventArgs(this, response, cancellationToken, _cachedUserInfo?.Id);
+                    if (ShouldDispatchMessage(messageArgs))
                     {
                         OnMessageReceived?.Invoke(this, messageArgs);
                     }
@@ -325,6 +330,16 @@ namespace Mattermost
             }
 
             return Task.CompletedTask;
+        }
+
+        private bool ShouldDispatchMessage(MessageEventArgs messageArgs)
+        {
+            if (_cachedUserInfo == null)
+            {
+                return false;
+            }
+
+            return Options.ShouldDispatchMessage(messageArgs);
         }
 
         private void StartProgressTracker(Stream fs, CancellationToken token, Action<int> progressChanged)
