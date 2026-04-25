@@ -399,5 +399,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /Sources/Mattermost.Tests/secrets.json
-/Sources/Mattermost.Tests/secrets.token.json
 /Sources/Mattermost.ConsoleTest/secrets.json
