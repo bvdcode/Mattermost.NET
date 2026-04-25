@@ -388,7 +388,7 @@ https://github.com/bvdcode/Mattermost.NET/issues/new?template=Blank+issue
 
 # Target framework
 
-Mattermost.NET targets `.NET Standard 2.1`.
+Mattermost.NET targets both `.NET Standard 2.0` and `.NET Standard 2.1`.
 
 ---
 
