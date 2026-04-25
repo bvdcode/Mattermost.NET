@@ -14,6 +14,8 @@ Mattermost.NET is a ready-to-use .NET Standard library for building Mattermost b
 
 It provides a clean, strongly typed wrapper around the Mattermost API, including messages, channels, users, file uploads, post props, and real-time WebSocket events. The client supports token-based authentication, username/password login, automatic WebSocket reconnects, custom `HttpClient` transport, and configurable incoming message filtering.
 
+For a detailed endpoint map and implementation status, see [API coverage](https://github.com/bvdcode/Mattermost.NET/blob/main/API_COVERAGE.md).
+
 ---
 
 # Installation
