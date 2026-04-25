@@ -14,6 +14,7 @@ namespace Mattermost
         /// <returns> Team information. </returns>
         public Task<Team> GetTeamAsync(string teamId)
         {
+            CheckDisposed();
             return SendRequestAsync<Team>(HttpMethod.Get, Routes.Teams + "/" + teamId);
         }
     }
