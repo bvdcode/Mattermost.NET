@@ -65,7 +65,7 @@ namespace Mattermost.Tests
                 Assert.That(user.Id, Is.Not.Empty, "User ID should not be empty.");
                 Assert.That(user.Username, Is.Not.Empty, "Username should not be empty.");
                 Assert.That(user.Locale, Is.Not.Empty, "Locale should not be empty.");
-                Assert.That(user.IsBot, Is.False, "User should not be a bot.");
+                Assert.That(user.IsBot, Is.True, "User should be a bot."); // Testing mm chatgpt bot, which is a bot user.
                 Assert.That(user.Timezone, Is.Not.Null, "Timezone should not be null.");
                 Assert.That(user.CreatedAt, Is.Not.Default, "CreatedAt should not be default value.");
                 Assert.That(user.UpdatedAt, Is.Not.Default, "UpdatedAt should not be default value.");

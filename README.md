@@ -10,15 +10,17 @@
 
 # Mattermost.NET
 
-Ready-to-use **.NET Standard** library for convenient development of Mattermost bots.
+Mattermost.NET is a ready-to-use .NET Standard library for building Mattermost bots and integrations in C#.
 
-> Mattermost.NET is a production-ready .NET Standard library for building bots and integrations for the Mattermost platform. It provides a clean, strongly-typed C# interface over the Mattermost API, with support for messaging, channel management, file uploads, and real-time WebSocket updates. The client handles authentication, reconnection, and offers async methods for most operations. Published on NuGet under the MIT license.
+It provides a clean, strongly typed wrapper around the Mattermost API, including messages, channels, users, file uploads, post props, and real-time WebSocket events. The client supports token-based authentication, username/password login, automatic WebSocket reconnects, custom `HttpClient` transport, and configurable incoming message filtering.
+
+For a detailed endpoint map and implementation status, see [API coverage](https://github.com/bvdcode/Mattermost.NET/blob/main/API_COVERAGE.md).
 
 ---
 
 # Installation
 
-The library is available as a NuGet package. You can install it using the NuGet Package Manager or the `dotnet` CLI.
+Install the package from NuGet:
 
 ```bash
 dotnet add package Mattermost.NET
@@ -26,92 +28,373 @@ dotnet add package Mattermost.NET
 
 ---
 
-# Usage
-
-## Create a new bot
+# Quick start
 
 ```csharp
-using Mattermost.NET;
-const string server = "https://mm.your-server.com"; // or https://community.mattermost.com by default
-MattermostClient client = new(server);
+using Mattermost;
+
+const string server = "https://mm.your-server.com";
+const string token = "your-personal-access-token-or-bot-token";
+const string channelId = "target-channel-id";
+
+using var client = new MattermostClient(server, token);
+
+await client.CreatePostAsync(channelId, "Hello from Mattermost.NET!");
 ```
 
-## Using a custom HttpClient
+---
+
+# Authentication
+
+## Use a personal access token or bot token
 
 ```csharp
-using Mattermost.NET;
+using Mattermost;
+
+const string server = "https://mm.your-server.com";
+const string token = "your-personal-access-token-or-bot-token";
+
+using var client = new MattermostClient(server, token);
+
+var me = await client.GetMeAsync();
+Console.WriteLine($"Authenticated as @{me.Username}");
+```
+
+When a token is provided through the constructor, Mattermost.NET validates and caches the current user on the first authorized API call.
+
+## Use username and password
+
+```csharp
+using Mattermost;
+
+const string server = "https://mm.your-server.com";
+
+using var client = new MattermostClient(server);
+
+var me = await client.LoginAsync("username-or-email", "password");
+Console.WriteLine($"Authenticated as @{me.Username}");
+```
+
+You cannot use `LoginAsync` on a client that was constructed with an API token.
+
+---
+
+# Receiving real-time events
+
+Call `StartReceivingAsync` to connect to the Mattermost WebSocket API and receive events.
+
+```csharp
+using Mattermost;
+
+const string server = "https://mm.your-server.com";
+const string token = "your-personal-access-token-or-bot-token";
+
+using var client = new MattermostClient(server, token);
+
+client.OnConnected += (_, e) =>
+{
+    Console.WriteLine($"Connected to {e.Uri}");
+};
+
+client.OnDisconnected += (_, e) =>
+{
+    Console.WriteLine($"Disconnected: {e.CloseStatusDescription}");
+};
+
+client.OnLogMessage += (_, e) =>
+{
+    Console.WriteLine(e.Message);
+};
+
+client.OnMessageReceived += (_, e) =>
+{
+    string text = e.Message.Post.Text ?? string.Empty;
+
+    if (string.Equals(text, "ping", StringComparison.OrdinalIgnoreCase))
+    {
+        _ = e.Client.CreatePostAsync(e.Message.Post.ChannelId, "pong");
+    }
+};
+
+await client.StartReceivingAsync();
+
+Console.WriteLine("Bot is running. Press Enter to stop.");
+Console.ReadLine();
+
+await client.StopReceivingAsync();
+```
+
+The client automatically reconnects when the WebSocket connection is lost. You only need `StartReceivingAsync` when you want to receive WebSocket events; regular REST API calls work without it.
+
+---
+
+# Incoming message filtering
+
+By default, `MattermostClient` ignores messages authored by the currently authorized user. This prevents common bot loops where a bot reacts to its own posts.
+
+```csharp
+client.Options.IgnoreOwnMessages = true; // default
+```
+
+To receive the bot's own messages too, disable this option:
+
+```csharp
+client.Options.IgnoreOwnMessages = false;
+```
+
+`MessageEventArgs.IsCurrentUser` tells whether the received message was authored by the currently authorized user.
+
+```csharp
+client.OnMessageReceived += (_, e) =>
+{
+    if (e.IsCurrentUser)
+    {
+        Console.WriteLine("Received my own message.");
+    }
+};
+```
+
+You can also provide a custom incoming message filter. Return `true` to dispatch `OnMessageReceived`; return `false` to suppress the event.
+
+```csharp
+client.Options.IncomingMessageFilter = e =>
+{
+    string text = e.Message.Post.Text ?? string.Empty;
+    return text.StartsWith("!", StringComparison.Ordinal);
+};
+```
+
+The custom filter runs after the built-in own-message filter. If you want the custom filter to evaluate own messages, set `IgnoreOwnMessages` to `false`.
+
+```csharp
+client.Options.IgnoreOwnMessages = false;
+client.Options.IncomingMessageFilter = e => !e.IsCurrentUser;
+```
+
+---
+
+# Using a custom HttpClient
+
+You can pass your own `HttpClient` when you need custom transport behavior, such as a proxy, timeout, custom handler, logging handler, or `IHttpClientFactory` integration.
+
+```csharp
+using Mattermost;
 using System.Net;
 using System.Net.Http;
 
 const string server = "https://mm.your-server.com";
+const string token = "your-personal-access-token-or-bot-token";
 
-HttpClientHandler handler = new HttpClientHandler
+var handler = new HttpClientHandler
 {
     Proxy = new WebProxy("http://corp-proxy:8080")
 };
 
-HttpClient httpClient = new HttpClient(handler)
+using var httpClient = new HttpClient(handler)
 {
     Timeout = TimeSpan.FromSeconds(20)
 };
 
-MattermostClient client = new(server, httpClient);
+using var client = new MattermostClient(server, token, httpClient);
+
+var me = await client.GetMeAsync();
+Console.WriteLine($"Authenticated as @{me.Username}");
 ```
 
-When `HttpClient` is passed from outside, Mattermost.NET uses it only as transport and never disposes it.
-`server`/`serverUri` remains required and is always used as the Mattermost server identity.
-`HttpClient.BaseAddress` is not used as a source of the Mattermost server URL.
-`HttpClient.DefaultRequestHeaders` belong to the caller. If you set a global `Authorization` there,
-`HttpClient` may still send it. Mattermost.NET does not mutate or suppress caller defaults.
+When an external `HttpClient` is provided, Mattermost.NET uses it only as transport and does not dispose it. The Mattermost server URL still comes from `server` / `serverUri`; `HttpClient.BaseAddress` is not used as the Mattermost server identity.
 
-## Authenticate the bot with credentials
+Mattermost.NET sends authentication per request and does not mutate `HttpClient.DefaultRequestHeaders.Authorization`. Any default headers configured by the caller remain owned by the caller.
+
+Available constructors:
 
 ```csharp
-var botUser = await client.LoginAsync(username, password);
-// Or you can use constructor if you have API key, ex. personal or bot token
-// It will automatically authenticate the bot
-const string token = "37VlFKySIZn6gryA85cR1GKBQkjmfRZ6";
-MattermostClient client = new(server, token);
+new MattermostClient();
+new MattermostClient(string serverUrl);
+new MattermostClient(Uri serverUri);
+new MattermostClient(string serverUrl, string apiKey);
+new MattermostClient(Uri serverUri, string apiKey);
+new MattermostClient(string serverUrl, HttpClient httpClient);
+new MattermostClient(Uri serverUri, HttpClient httpClient);
+new MattermostClient(string serverUrl, string apiKey, HttpClient httpClient);
+new MattermostClient(Uri serverUri, string apiKey, HttpClient httpClient);
 ```
 
-## Subscribe to post updates
+---
+
+# Common operations
+
+## Send a message
 
 ```csharp
-client.OnMessageReceived += ClientOnMessageReceived;
+await client.CreatePostAsync(channelId, "Hello, World!");
+```
 
-private static void ClientOnMessageReceived(object? sender, MessageEventArgs e)
+## Reply to a thread
+
+```csharp
+await client.CreatePostAsync(
+    channelId: channelId,
+    message: "Thread reply",
+    replyToPostId: rootPostId);
+```
+
+## Edit a post
+
+```csharp
+await client.UpdatePostAsync(postId, "Updated message text");
+```
+
+## Delete a post
+
+```csharp
+await client.DeletePostAsync(postId);
+```
+
+## Upload a file and attach it to a post
+
+```csharp
+var file = await client.UploadFileAsync(channelId, "report.pdf", stream);
+
+await client.CreatePostAsync(
+    channelId: channelId,
+    message: "Uploaded report",
+    files: new[] { file.Id });
+```
+
+## Read channel posts
+
+```csharp
+var posts = await client.GetChannelPostsAsync(channelId, perPage: 60);
+
+foreach (var post in posts.Posts.Values)
 {
-    if (string.IsNullOrWhiteSpace(e.Message.Post.Text))
-    {
-        return;
-    }
-    e.Client.SendMessageAsync(e.Message.Post.ChannelId, "Hello, World!");
+    Console.WriteLine(post.Text);
 }
 ```
 
-## Start the bot updates
+## Get current user
 
 ```csharp
-await client.StartReceivingAsync();
+var me = await client.GetMeAsync();
+Console.WriteLine(me.Username);
 ```
 
-> **Note:** The bot will automatically reconnect if the connection is lost. It's not required to call `StartReceivingAsync` if you don't want to receive updates through the WebSocket connection.
-
-## Stop the bot
+## Find users
 
 ```csharp
-await client.StopReceivingAsync();
+var byId = await client.GetUserAsync(userId);
+var byUsername = await client.GetUserByUsernameAsync("username");
+var byEmail = await client.GetUserByEmailAsync("user@example.com");
 ```
 
-> The rest of the methods are implemented according to the Mattermost API. You can find them in [IMattermostClient](https://github.com/bvdcode/Mattermost.NET/blob/main/Sources/Mattermost/IMattermostClient.cs).
+## Work with channels
 
-> If you are looking for another methods, please visit the [Mattermost API documentation](https://api.mattermost.com/) and create an issue in the [GitHub repository](https://github.com/bvdcode/Mattermost.NET/issues/new?template=Blank+issue) with what exact methods you need - I will add them as soon as possible.
+```csharp
+var channel = await client.GetChannelAsync(channelId);
+var found = await client.FindChannelByNameAsync(teamId, "town-square");
+var direct = await client.CreateDirectChannelAsync(userId);
+```
+
+---
+
+# Post props and attachments
+
+Mattermost.NET supports Mattermost post props, including attachments and interactive action metadata.
+
+```csharp
+using Mattermost.Models.Posts;
+
+var props = new PostProps();
+props.Attachments.Add(new PostPropsAttachment
+{
+    Text = "Attachment text"
+});
+
+await client.CreatePostAsync(
+    channelId: channelId,
+    message: "Message with props",
+    props: props);
+```
+
+Raw props are also supported when you need to send a custom JSON property bag.
+
+```csharp
+var rawProps = new Dictionary<string, object>
+{
+    ["custom_key"] = "custom value"
+};
+
+await client.CreatePostWithRawPropsAsync(
+    channelId: channelId,
+    message: "Message with raw props",
+    rawProps: rawProps);
+```
+
+---
+
+# Builders
+
+## PostBuilder
+
+```csharp
+using Mattermost.Builders;
+using Mattermost.Enums;
+
+await new PostBuilder()
+    .ToChannel(channelId)
+    .AddText("Important message")
+    .SetPriority(MessagePriority.Important)
+    .SendMessageAsync(client);
+```
+
+## Markdown table builder
+
+```csharp
+using Mattermost.Builders;
+using Mattermost.Models.Enums;
+
+string table = new TableMarkdownBuilder(3, TableAlignment.Center)
+    .AddHeader("Name", "Status", "Score")
+    .AddRow("Build", "OK", 100)
+    .AddRow("Tests", "OK", 100)
+    .ToString();
+
+await client.CreatePostAsync(channelId, table);
+```
+
+---
+
+# API coverage
+
+The public API is exposed through `IMattermostClient` and includes:
+
+- authentication and logout;
+- current user, users by id, username, or email;
+- create, update, delete, read, and list posts;
+- thread posts;
+- channel lookup, creation, archiving, and membership changes;
+- direct and group channels;
+- file upload, download, streaming, and metadata;
+- Calls plugin channel state;
+- WebSocket events for messages, status changes, connection changes, and raw events.
+
+See [`IMattermostClient`](https://github.com/bvdcode/Mattermost.NET/blob/main/Sources/Mattermost/IMattermostClient.cs) for the full list of implemented methods.
+
+Missing a Mattermost API method? Please open an issue with the exact Mattermost endpoint or scenario you need:
+
+https://github.com/bvdcode/Mattermost.NET/issues/new?template=Blank+issue
+
+---
+
+# Target framework
+
+Mattermost.NET targets `.NET Standard 2.1`.
 
 ---
 
 # License
 
-Distributed under the MIT License. See LICENSE.md for more information.
+Distributed under the MIT License. See [LICENSE.md](https://github.com/bvdcode/Mattermost.NET/blob/main/LICENSE.md) for more information.
 
 # Contact
 
