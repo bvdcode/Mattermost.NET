@@ -10,7 +10,7 @@ namespace Mattermost.Tests
         [Test]
         public async Task CustomServerAndToken_Autologin_Works()
         {
-            const string secretsFileName = "secrets.token.json";
+            const string secretsFileName = "secrets.json";
             if (!File.Exists(secretsFileName))
             {
                 Assert.Ignore($"{secretsFileName} not found. Provide custom server URL and token to run this test.");
