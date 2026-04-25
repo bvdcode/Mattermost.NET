@@ -20,11 +20,10 @@ namespace Mattermost
         public async Task<byte[]> GetFileAsync(string fileId)
         {
             CheckDisposed();
-            await CheckAuthorizedAsync();
             string url = Routes.Files + "/" + fileId;
-            var response = await _http.GetAsync(url);
-            response = response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsByteArrayAsync();
+            using HttpResponseMessage response = await SendHttpRequestAsync(HttpMethod.Get, url).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -35,11 +34,19 @@ namespace Mattermost
         public async Task<Stream> GetFileStreamAsync(string fileId)
         {
             CheckDisposed();
-            await CheckAuthorizedAsync();
             string url = Routes.Files + "/" + fileId;
-            var response = await _http.GetAsync(url);
-            response = response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStreamAsync();
+            HttpResponseMessage response = await SendHttpRequestAsync(HttpMethod.Get, url).ConfigureAwait(false);
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                return new ResponseContentStream(stream, response);
+            }
+            catch
+            {
+                response.Dispose();
+                throw;
+            }
         }
 
         /// <summary>
@@ -64,7 +71,7 @@ namespace Mattermost
         {
             FileInfo fileInfo = new FileInfo(filePath);
             using var fs = fileInfo.OpenRead();
-            return await UploadFileAsync(channelId, fileInfo.Name, fs, progressChanged);
+            return await UploadFileAsync(channelId, fileInfo.Name, fs, progressChanged).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -78,20 +85,20 @@ namespace Mattermost
         public async Task<FileDetails> UploadFileAsync(string channelId, string fileName, Stream stream, Action<int>? progressChanged = null)
         {
             CheckDisposed();
-            await CheckAuthorizedAsync();
             string url = $"{Routes.Files}?channel_id={channelId}";
-            MultipartFormDataContent content = new MultipartFormDataContent();
-            StreamContent file = new StreamContent(stream);
+            using MultipartFormDataContent content = new MultipartFormDataContent();
+            using StreamContent file = new StreamContent(stream);
             content.Add(file, "files", fileName);
-            CancellationTokenSource cts = new CancellationTokenSource();
+            using CancellationTokenSource cts = new CancellationTokenSource();
             if (progressChanged != null)
             {
                 StartProgressTracker(stream, cts.Token, progressChanged);
             }
-            var result = await _http.PostAsync(url, content);
-            result = result.EnsureSuccessStatusCode();
+
+            using HttpResponseMessage result = await SendHttpRequestAsync(HttpMethod.Post, url, content: content).ConfigureAwait(false);
+            result.EnsureSuccessStatusCode();
             cts.Cancel();
-            string json = await result.Content.ReadAsStringAsync();
+            string json = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
             var response = JsonSerializer.Deserialize<FileResponse>(json)
                 ?? throw new JsonException("Failed to deserialize file response: " + json);
             return response.Files.Single();

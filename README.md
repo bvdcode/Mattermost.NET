@@ -61,6 +61,8 @@ MattermostClient client = new(server, httpClient);
 When `HttpClient` is passed from outside, Mattermost.NET uses it only as transport and never disposes it.
 `server`/`serverUri` remains required and is always used as the Mattermost server identity.
 `HttpClient.BaseAddress` is not used as a source of the Mattermost server URL.
+`HttpClient.DefaultRequestHeaders` belong to the caller. If you set a global `Authorization` there,
+`HttpClient` may still send it. Mattermost.NET does not mutate or suppress caller defaults.
 
 ## Authenticate the bot with credentials
 
