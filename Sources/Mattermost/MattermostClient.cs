@@ -833,7 +833,8 @@ namespace Mattermost
                 throw new ArgumentException("Route cannot be null or empty.", nameof(route));
             }
 
-            if (Uri.TryCreate(route, UriKind.Absolute, out Uri? absoluteUri))
+            bool hasExplicitScheme = route.Contains(Uri.SchemeDelimiter, StringComparison.Ordinal);
+            if (hasExplicitScheme && Uri.TryCreate(route, UriKind.Absolute, out Uri? absoluteUri))
             {
                 return absoluteUri;
             }

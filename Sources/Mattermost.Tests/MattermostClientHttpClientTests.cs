@@ -224,6 +224,30 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        public async Task LeadingSlashRoute_DoesNotBecomeFileScheme_OnApiKeyAuthorization()
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
+            {
+                string? path = request.RequestUri?.AbsolutePath;
+                return path switch
+                {
+                    "/api/v4/users/me" => CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("slash-route-user")),
+                    _ => new HttpResponseMessage(HttpStatusCode.NotFound)
+                };
+            });
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
+
+            User user = await client.GetMeAsync();
+
+            Assert.That(user.Id, Is.EqualTo("slash-route-user"));
+            Assert.That(handler.Requests, Has.Count.EqualTo(2));
+            Assert.That(handler.Requests.All(static request => request.RequestUri?.Scheme == Uri.UriSchemeHttps), Is.True);
+            Assert.That(handler.Requests.All(static request => request.RequestUri == new Uri("https://mattermost.example/api/v4/users/me")), Is.True);
+        }
+
+        [Test]
         public async Task GetFileAsync_UsesAbsoluteUri_AndPerRequestAuthorization()
         {
             byte[] expected = new byte[] { 1, 2, 3, 4 };
