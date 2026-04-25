@@ -18,21 +18,33 @@ namespace Mattermost.Extensions
         {
             string json = JsonSerializer.Serialize(obj);
             byte[] data = Encoding.UTF8.GetBytes(json);
-            return webSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None);
+
+            return webSocket.SendAsync(
+                new ArraySegment<byte>(data),
+                WebSocketMessageType.Text,
+                true,
+                CancellationToken.None);
         }
 
         internal static async Task<WebsocketMessage> ReceiveAsync(this ClientWebSocket webSocket, CancellationToken cancellationToken)
         {
             byte[] buffer = new byte[ushort.MaxValue * 1024];
-            var response = await webSocket.ReceiveAsync(buffer, cancellationToken);
+
+            WebSocketReceiveResult response = await webSocket.ReceiveAsync(
+                new ArraySegment<byte>(buffer),
+                cancellationToken).ConfigureAwait(false);
+
             Array.Resize(ref buffer, response.Count);
+
             var result = JsonSerializer.Deserialize<WebsocketMessage>(buffer)!;
             result.Raw = Encoding.UTF8.GetString(buffer);
             result.MessageType = response.MessageType;
+
             if (result.MessageType == WebSocketMessageType.Close)
             {
                 result.UpdateCloseStatusInfo(result.CloseStatus, result.CloseStatusDescription);
             }
+
             return result;
         }
 
@@ -45,15 +57,18 @@ namespace Mattermost.Extensions
                 Action = action,
                 Data = data
             };
-            await webSocket.SendAsync(body);
+
+            await webSocket.SendAsync(body).ConfigureAwait(false);
+
             for (int i = 0; i < tryCount; i++)
             {
-                var result = await webSocket.ReceiveAsync(CancellationToken.None);
+                var result = await webSocket.ReceiveAsync(CancellationToken.None).ConfigureAwait(false);
                 if (result.Seq == body.Seq)
                 {
                     return result;
                 }
             }
+
             throw new HttpRequestException($"Request was sent but no response received with seq {body.Seq}.");
         }
     }
