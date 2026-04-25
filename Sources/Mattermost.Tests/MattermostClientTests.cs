@@ -1,5 +1,6 @@
 using Mattermost.Constants;
 using Mattermost.Enums;
+using Mattermost.Events;
 using Mattermost.Exceptions;
 using Mattermost.Models;
 using Mattermost.Models.Posts;
@@ -207,18 +208,23 @@ namespace Mattermost.Tests
             var configurableClient = client as MattermostClient ?? throw new InvalidOperationException("Client should be MattermostClient.");
 
             configurableClient.Options.IgnoreOwnMessages = false;
-            client.OnMessageReceived += (sender, e) =>
+            void handler(object? sender, MessageEventArgs e)
             {
                 if (string.Equals(e.Message.Post.Text, message, StringComparison.Ordinal) && e.IsCurrentUser)
                 {
                     ownMessageReceived.TrySetResult(true);
                 }
-            };
+            }
+            client.OnMessageReceived += handler;
 
             try
             {
                 await client.StartReceivingAsync();
-                await Task.Delay(1000);
+                for (int i = 0; i < 20 && !client.IsConnected; i++)
+                {
+                    await Task.Delay(250);
+                }
+                Assert.That(client.IsConnected, Is.True, "WebSocket should be connected before sending a message.");
                 await client.CreatePostAsync(channelId, message);
 
                 var completedTask = await Task.WhenAny(ownMessageReceived.Task, Task.Delay(TimeSpan.FromSeconds(10)));
@@ -226,8 +232,112 @@ namespace Mattermost.Tests
             }
             finally
             {
+                client.OnMessageReceived -= handler;
                 configurableClient.Options.IgnoreOwnMessages = true;
-                await client.StopReceivingAsync();
+                configurableClient.Options.IncomingMessageFilter = null;
+                try
+                {
+                    await client.StopReceivingAsync();
+                }
+                catch (OperationCanceledException)
+                {
+                }
+            }
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task SendOwnMessage_IncomingMessageFilterReturnsFalse_EventNotReceived()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+            string message = $"self-message-filter-false-{Guid.NewGuid():N}";
+            TaskCompletionSource<bool> ownMessageReceived = new();
+            var configurableClient = client as MattermostClient ?? throw new InvalidOperationException("Client should be MattermostClient.");
+
+            configurableClient.Options.IgnoreOwnMessages = false;
+            configurableClient.Options.IncomingMessageFilter = e => !e.IsCurrentUser;
+            void handler(object? sender, MessageEventArgs e)
+            {
+                if (string.Equals(e.Message.Post.Text, message, StringComparison.Ordinal) && e.IsCurrentUser)
+                {
+                    ownMessageReceived.TrySetResult(true);
+                }
+            }
+            client.OnMessageReceived += handler;
+
+            try
+            {
+                await client.StartReceivingAsync();
+                for (int i = 0; i < 20 && !client.IsConnected; i++)
+                {
+                    await Task.Delay(250);
+                }
+                Assert.That(client.IsConnected, Is.True, "WebSocket should be connected before sending a message.");
+                await client.CreatePostAsync(channelId, message);
+
+                var completedTask = await Task.WhenAny(ownMessageReceived.Task, Task.Delay(TimeSpan.FromSeconds(5)));
+                Assert.That(completedTask, Is.Not.EqualTo(ownMessageReceived.Task), "Own message event should be filtered out when IncomingMessageFilter returns false.");
+            }
+            finally
+            {
+                client.OnMessageReceived -= handler;
+                configurableClient.Options.IgnoreOwnMessages = true;
+                configurableClient.Options.IncomingMessageFilter = null;
+                try
+                {
+                    await client.StopReceivingAsync();
+                }
+                catch (OperationCanceledException)
+                {
+                }
+            }
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task SendOwnMessage_IncomingMessageFilterReturnsTrue_EventReceived()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+            string message = $"self-message-filter-true-{Guid.NewGuid():N}";
+            TaskCompletionSource<bool> ownMessageReceived = new();
+            var configurableClient = client as MattermostClient ?? throw new InvalidOperationException("Client should be MattermostClient.");
+
+            configurableClient.Options.IgnoreOwnMessages = false;
+            configurableClient.Options.IncomingMessageFilter = e => e.IsCurrentUser;
+            void handler(object? sender, MessageEventArgs e)
+            {
+                if (string.Equals(e.Message.Post.Text, message, StringComparison.Ordinal) && e.IsCurrentUser)
+                {
+                    ownMessageReceived.TrySetResult(true);
+                }
+            }
+            client.OnMessageReceived += handler;
+
+            try
+            {
+                await client.StartReceivingAsync();
+                for (int i = 0; i < 20 && !client.IsConnected; i++)
+                {
+                    await Task.Delay(250);
+                }
+                Assert.That(client.IsConnected, Is.True, "WebSocket should be connected before sending a message.");
+                await client.CreatePostAsync(channelId, message);
+
+                var completedTask = await Task.WhenAny(ownMessageReceived.Task, Task.Delay(TimeSpan.FromSeconds(10)));
+                Assert.That(completedTask, Is.EqualTo(ownMessageReceived.Task), "Own message event should be dispatched when IncomingMessageFilter returns true.");
+            }
+            finally
+            {
+                client.OnMessageReceived -= handler;
+                configurableClient.Options.IgnoreOwnMessages = true;
+                configurableClient.Options.IncomingMessageFilter = null;
+                try
+                {
+                    await client.StopReceivingAsync();
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
 
