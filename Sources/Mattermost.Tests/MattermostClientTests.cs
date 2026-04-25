@@ -129,7 +129,7 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public async Task GetUserByUsername_ValidUsername_ReceivedUserInfo()
         {
-            const string rawUsername = "bvd97"; // This is a valid username in the Mattermost community server.
+            const string rawUsername = "bvdcode"; // This is a valid username in the Mattermost community server.
             var user = await client.GetUserByUsernameAsync(rawUsername);
             Assert.That(user, Is.Not.Null);
             using (Assert.EnterMultipleScope())
@@ -182,8 +182,8 @@ namespace Mattermost.Tests
         [NonParallelizable]
         public async Task SendMessageToBot_ReceivedFromEvent()
         {
-            const string message = "/ping";
-            const string botId = "w5e788utqbfgickdfgsabp8wya";
+            const string message = "dick"; // I use Moderation Bot for testing, so I can send a message to it and it will respond with a message.
+            const string botId = "ca6ni33mjpfafjw7uiy7tafznr";
             await client.StartReceivingAsync();
             await Task.Delay(1000);
             List<PostInfo> receivedMessages = [];
@@ -194,7 +194,7 @@ namespace Mattermost.Tests
             await client.CreatePostAsync(botId, message);
             await Task.Delay(1000);
             Assert.That(receivedMessages, Is.Not.Empty);
-            Assert.That(receivedMessages[0].Post.Text, Is.EqualTo(":tada: Thanks for helping us make Mattermost better!"));
+            Assert.That(receivedMessages[0].Post.Text, Is.EqualTo("_A post with potentially offensive content was flagged and removed._"));
         }
 
         [Test]
