@@ -199,6 +199,40 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
+        public async Task SendOwnMessage_IgnoreOwnMessagesDisabled_ReceivedFromEvent()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+            string message = $"self-message-test-{Guid.NewGuid():N}";
+            TaskCompletionSource<bool> ownMessageReceived = new();
+            var configurableClient = client as MattermostClient ?? throw new InvalidOperationException("Client should be MattermostClient.");
+
+            configurableClient.Options.IgnoreOwnMessages = false;
+            client.OnMessageReceived += (sender, e) =>
+            {
+                if (string.Equals(e.Message.Post.Text, message, StringComparison.Ordinal) && e.IsCurrentUser)
+                {
+                    ownMessageReceived.TrySetResult(true);
+                }
+            };
+
+            try
+            {
+                await client.StartReceivingAsync();
+                await Task.Delay(1000);
+                await client.CreatePostAsync(channelId, message);
+
+                var completedTask = await Task.WhenAny(ownMessageReceived.Task, Task.Delay(TimeSpan.FromSeconds(10)));
+                Assert.That(completedTask, Is.EqualTo(ownMessageReceived.Task), "Own message event should be dispatched when IgnoreOwnMessages is disabled.");
+            }
+            finally
+            {
+                configurableClient.Options.IgnoreOwnMessages = true;
+                await client.StopReceivingAsync();
+            }
+        }
+
+        [Test]
+        [NonParallelizable]
         public void SendMessage_BigText_ThrowsException()
         {
             const string channelId = "w5e788utqbfgickdfgsabp8wya";
