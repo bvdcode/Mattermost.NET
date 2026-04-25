@@ -145,6 +145,7 @@ namespace Mattermost
         /// <returns>Created direct channel.</returns>
         public Task<Channel> CreateDirectChannelAsync(string userId)
         {
+            CheckDisposed();
             return CreateDirectChannelAsync(CurrentUserInfo.Id, userId);
         }
 
