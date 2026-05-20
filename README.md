@@ -330,6 +330,61 @@ await client.CreatePostWithRawPropsAsync(
     rawProps: rawProps);
 ```
 
+## Interactive message buttons and menus
+
+Message actions support Mattermost buttons and select menus.
+
+```csharp
+using Mattermost.Models.Posts;
+using System.Collections.Generic;
+
+var props = new PostProps();
+props.Attachments.Add(new PostPropsAttachment
+{
+    Text = "Choose an option",
+    Actions =
+    {
+        new PostPropsSelectAction
+        {
+            Id = "actionoptions",
+            Name = "Select an option...",
+            DefaultOption = "opt2",
+            Integration = new Integration
+            {
+                Url = "https://example.com/actionoptions",
+                Context =
+                {
+                    ["action"] = "do_something"
+                }
+            },
+            Options = new List<PostActionOption>
+            {
+                new PostActionOption("Option1", "opt1"),
+                new PostActionOption("Option2", "opt2"),
+                new PostActionOption("Option3", "opt3")
+            }
+        }
+    }
+});
+
+await client.CreatePostAsync(channelId, "Message with a select menu", props: props);
+```
+
+For server-populated menus, set `DataSource` instead of `Options`:
+
+```csharp
+new PostPropsSelectAction
+{
+    Id = "actionusers",
+    Name = "Select a user...",
+    DataSource = PostActionDataSource.Users,
+    Integration = new Integration
+    {
+        Url = "https://example.com/actionusers"
+    }
+};
+```
+
 ---
 
 # Builders

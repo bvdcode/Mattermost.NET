@@ -489,6 +489,73 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        [NonParallelizable]
+        public async Task CreatePostWithSelectActions_GetPost_ActionFieldsArePersisted()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+
+            PostProps props = new();
+            props.Attachments.Add(new PostPropsAttachment
+            {
+                Text = "Attachment with select actions",
+                Actions =
+                {
+                    new PostPropsSelectAction
+                    {
+                        Id = "actionoptions",
+                        Name = "Select an option...",
+                        DefaultOption = "opt2",
+                        Integration = new Integration
+                        {
+                            Url = "https://example.com/actionoptions",
+                            Context =
+                            {
+                                ["action"] = "select_static_option"
+                            }
+                        },
+                        Options = new List<PostActionOption>
+                        {
+                            new PostActionOption("Option1", "opt1"),
+                            new PostActionOption("Option2", "opt2"),
+                            new PostActionOption("Option3", "opt3")
+                        }
+                    },
+                    new PostPropsSelectAction
+                    {
+                        Id = "actionusers",
+                        Name = "Select a user...",
+                        DataSource = PostActionDataSource.Users,
+                        Integration = new Integration
+                        {
+                            Url = "https://example.com/actionusers",
+                            Context =
+                            {
+                                ["action"] = "select_user"
+                            }
+                        }
+                    }
+                }
+            });
+
+            var createdPost = await client.CreatePostAsync(channelId, "Test post with select actions", props: props);
+            var loadedPost = await client.GetPostAsync(createdPost.Id);
+
+            Assert.That(loadedPost.Props.Attachments, Is.Not.Empty, "Post attachments should not be empty.");
+            Assert.That(loadedPost.Props.Attachments[0].Actions, Has.Count.EqualTo(2), "Post actions should be preserved.");
+
+            PostPropsAction staticSelect = loadedPost.Props.Attachments[0].Actions.Single(action => action.Id == "actionoptions");
+            Assert.That(staticSelect.Type, Is.EqualTo(PostActionType.Select));
+            Assert.That(staticSelect.DefaultOption, Is.EqualTo("opt2"));
+            Assert.That(staticSelect.Options, Has.Count.EqualTo(3));
+            Assert.That(staticSelect.Options![1].Text, Is.EqualTo("Option2"));
+            Assert.That(staticSelect.Options[1].Value, Is.EqualTo("opt2"));
+
+            PostPropsAction usersSelect = loadedPost.Props.Attachments[0].Actions.Single(action => action.Id == "actionusers");
+            Assert.That(usersSelect.Type, Is.EqualTo(PostActionType.Select));
+            Assert.That(usersSelect.DataSource, Is.EqualTo(PostActionDataSource.Users));
+        }
+
+        [Test]
         public void DisposeClient_SendRequest_ThrowsException()
         {
             var client = new MattermostClient();

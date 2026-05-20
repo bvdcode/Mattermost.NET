@@ -88,7 +88,7 @@ Last reviewed: 2026-04-25
 
 | Mattermost endpoint | Mattermost.NET method | Status | Notes |
 |---|---|---:|---|
-| `POST /api/v4/posts` | `CreatePostAsync(...)` | ✅ | Supports message, root/reply ID, file IDs, priority metadata, and typed `PostProps`. |
+| `POST /api/v4/posts` | `CreatePostAsync(...)` | ✅ | Supports message, root/reply ID, file IDs, priority metadata, and typed `PostProps`, including interactive buttons and select menus. |
 | `POST /api/v4/posts` | `CreatePostWithRawPropsAsync(...)` | ✅ | Same endpoint, but accepts raw props dictionary. |
 | `GET /api/v4/posts/{post_id}` | `GetPostAsync(string postId)` | ✅ | Gets a post by ID. |
 | `PUT /api/v4/posts/{post_id}/patch` | `UpdatePostAsync(...)` | ✅ | Patch-style update for message and typed props. |
