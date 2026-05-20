@@ -7,7 +7,6 @@
 		<Company>bvdcode</Company>
 		<Product>Mattermost.NET</Product>
 		<Description>Ready-to-use library for convenient development of Mattermost bots with real-time updates.</Description>
-		<PackageReleaseNotes>Release 4.0.5. Adds typed support for Mattermost interactive post action menus, including button and select actions, static options, user data sources, default selections, and integration context payloads. Updates the public API coverage notes and README examples so the new action models are documented alongside the existing post action style support.</PackageReleaseNotes>
 		<Copyright>Copyright © Vadim Belov 2025</Copyright>
 		<Summary>Ready-to-use library for convenient development of Mattermost bots with real-time updates.</Summary>
 		<NeutralLanguage>en-US</NeutralLanguage>
