@@ -399,6 +399,76 @@ app.MapPost("/mattermost/actions", (PostActionIntegrationRequest request) =>
 });
 ```
 
+## Interactive dialogs
+
+Interactive message actions and slash commands can open Mattermost interactive dialogs. Use the action payload's `trigger_id`, build an `InteractiveDialog`, and call `OpenInteractiveDialogAsync`.
+
+```csharp
+using Mattermost;
+using Mattermost.Models.Dialogs;
+using Mattermost.Models.Posts;
+using System.Collections.Generic;
+
+app.MapPost("/mattermost/actions", async (
+    PostActionIntegrationRequest request,
+    IMattermostClient mattermostClient) =>
+{
+    InteractiveDialog dialog = new InteractiveDialog
+    {
+        Title = "Create ticket",
+        Elements = new List<InteractiveDialogElement>
+        {
+            new InteractiveDialogElement
+            {
+                DisplayName = "Summary",
+                Name = "summary",
+                Type = InteractiveDialogElementType.Text
+            }
+        }
+    };
+
+    await mattermostClient.OpenInteractiveDialogAsync(
+        request.TriggerId,
+        "https://example.com/mattermost/dialogs/submit",
+        dialog);
+
+    return Results.Ok();
+});
+```
+
+The submit URL is your application endpoint. Deserialize the submitted payload with `InteractiveDialogSubmissionRequest` and return `InteractiveDialogResponse` when validation errors or multi-step form updates are needed.
+
+```csharp
+using Mattermost.Models.Dialogs;
+using System.Collections.Generic;
+using System.Text.Json;
+
+app.MapPost("/mattermost/dialogs/submit", (InteractiveDialogSubmissionRequest request) =>
+{
+    JsonElement summaryElement;
+    if (!request.Submission.TryGetValue("summary", out summaryElement)
+        || string.IsNullOrWhiteSpace(summaryElement.GetString()))
+    {
+        return Results.Ok(new InteractiveDialogResponse
+        {
+            Errors = new Dictionary<string, string>
+            {
+                ["summary"] = "Summary is required."
+            }
+        });
+    }
+
+    return Results.Ok(new InteractiveDialogResponse
+    {
+        Type = "ok"
+    });
+});
+```
+
+For dynamic selects, set `InteractiveDialogElement.DataSource` to `InteractiveDialogDataSource.Dynamic`, set `DataSourceUrl`, and return `InteractiveDialogLookupResponse` from that lookup endpoint. For refresh or multi-step flows, set `InteractiveDialog.SourceUrl` and return `InteractiveDialogResponse` with `Type = "form"` and the replacement `Form`.
+
+See Mattermost's [interactive dialogs documentation](https://developers.mattermost.com/integrate/plugins/interactive-dialogs/) for the full server-side flow and field behavior.
+
 ---
 
 # Builders
