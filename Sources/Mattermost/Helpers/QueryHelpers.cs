@@ -84,7 +84,7 @@ namespace Mattermost.Helpers
                 {
                     throw new ArgumentOutOfRangeException(nameof(since), "Value must be greater than or equal to Unix epoch (1970-01-01T00:00:00Z).");
                 }
-                query.Add(nameof(since), new DateTimeOffset(since.Value).ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture));
+                query.Add(nameof(since), new DateTimeOffset(since.Value).ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture));
             }
             if (!string.IsNullOrWhiteSpace(beforePostId))
             {

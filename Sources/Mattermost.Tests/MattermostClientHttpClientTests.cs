@@ -1,3 +1,4 @@
+using Mattermost.Exceptions;
 using Mattermost.Models;
 using Mattermost.Models.Channels;
 using Mattermost.Models.Posts;
@@ -470,6 +471,77 @@ namespace Mattermost.Tests
             Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Delete && request.RequestUri?.AbsolutePath == "/api/v4/users/current-user/posts/post-1/reactions/white_check_mark"), Is.True);
             Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Post && request.RequestUri?.AbsolutePath == "/api/v4/posts/post-1/pin"), Is.True);
             Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Post && request.RequestUri?.AbsolutePath == "/api/v4/posts/post-1/unpin"), Is.True);
+        }
+
+        [Test]
+        public async Task GetReactionsAsync_ErrorResponse_ThrowsMattermostClientException()
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
+            {
+                string? path = request.RequestUri?.AbsolutePath;
+                if (path == "/api/v4/users/me")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("current-user"));
+                }
+
+                if (request.Method == HttpMethod.Get && path == "/api/v4/posts/missing-post/reactions")
+                {
+                    return CreateJsonResponse(
+                        HttpStatusCode.NotFound,
+                        "{\"id\":\"api.context.permissions.app_error\",\"message\":\"missing post\",\"detailed_error\":\"\",\"request_id\":\"request-1\",\"status_code\":404}");
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            });
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
+
+            MattermostClientException? exception = Assert.ThrowsAsync<MattermostClientException>(async () => await client.GetReactionsAsync("missing-post"));
+
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception!.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(exception.Message, Is.EqualTo("missing post"));
+            Assert.That(exception.ResponseJson, Does.Contain("\"status_code\":404"));
+            Assert.That(exception.RequestUri, Is.EqualTo("https://mattermost.example/api/v4/posts/missing-post/reactions"));
+            Assert.That(exception.RequestMethod, Is.EqualTo("GET"));
+        }
+
+        [Test]
+        public async Task GetReactionsAsync_NullSuccessBody_ReturnsEmptyList()
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
+            {
+                string? path = request.RequestUri?.AbsolutePath;
+                if (path == "/api/v4/users/me")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("current-user"));
+                }
+
+                if (request.Method == HttpMethod.Get && path == "/api/v4/posts/post-without-reactions/reactions")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "null");
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            });
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
+
+            IList<Reaction> reactions = await client.GetReactionsAsync("post-without-reactions");
+
+            Assert.That(reactions, Is.Empty);
+            Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/posts/post-without-reactions/reactions"), Is.True);
+        }
+
+        [Test]
+        public void ReactionEmojiName_Null_ThrowsArgumentException()
+        {
+            using MattermostClient client = new MattermostClient("https://mattermost.example");
+
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.AddReactionAsync("post-1", null!));
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.RemoveReactionAsync("post-1", null!));
         }
 
         [Test]
