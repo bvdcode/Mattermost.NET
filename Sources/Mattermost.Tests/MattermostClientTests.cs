@@ -4,10 +4,12 @@ using Mattermost.Events;
 using Mattermost.Exceptions;
 using Mattermost.Models;
 using Mattermost.Models.Channels;
+using Mattermost.Models.Dialogs;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses.Websocket.Posts;
 using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
+using System.Text;
 using System.Text.Json;
 
 namespace Mattermost.Tests
@@ -626,6 +628,52 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        [NonParallelizable]
+        public async Task OpenInteractiveDialog_PostActionTrigger_LiveInstanceOpensDialog()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+
+            using HttpClient httpClient = new HttpClient();
+            string webhookToken = await CreateWebhookTokenAsync(httpClient);
+            string actionUrl = "https://webhook.site/" + webhookToken;
+            string actionId = "dialog-smoke-" + Guid.NewGuid().ToString("N");
+            Post? createdPost = null;
+
+            try
+            {
+                string authToken = await LoginForApiTokenAsync(httpClient);
+                PostProps props = CreateDialogSmokePostProps(actionId, actionUrl);
+                createdPost = await client.CreatePostAsync(
+                    channelId,
+                    "Dialog live smoke " + Guid.NewGuid().ToString("N"),
+                    props: props);
+
+                await PerformPostActionAsync(httpClient, authToken, createdPost.Id, actionId);
+                PostActionIntegrationRequest actionRequest = await WaitForActionCallbackAsync(httpClient, webhookToken);
+
+                using MattermostClient unauthenticatedClient = new MattermostClient();
+                await unauthenticatedClient.OpenInteractiveDialogAsync(
+                    actionRequest.TriggerId,
+                    actionUrl,
+                    CreateLiveSmokeDialog());
+
+                Assert.That(actionRequest.UserId, Is.EqualTo(client.CurrentUserInfo.Id));
+                Assert.That(actionRequest.PostId, Is.EqualTo(createdPost.Id));
+                Assert.That(actionRequest.TriggerId, Is.Not.Empty);
+                Assert.That(actionRequest.Context["action"].GetString(), Is.EqualTo("open_dialog_smoke"));
+            }
+            finally
+            {
+                if (createdPost is not null)
+                {
+                    await client.DeletePostAsync(createdPost.Id);
+                }
+
+                await DeleteWebhookTokenAsync(httpClient, webhookToken);
+            }
+        }
+
+        [Test]
         public void DisposeClient_SendRequest_ThrowsException()
         {
             var client = new MattermostClient();
@@ -643,6 +691,152 @@ namespace Mattermost.Tests
         {
             await client.LogoutAsync();
             Assert.ThrowsAsync<AuthorizationException>(client.GetMeAsync);
+        }
+
+        private async Task<string> LoginForApiTokenAsync(HttpClient httpClient)
+        {
+            using StringContent content = CreateJsonContent(new
+            {
+                login_id = email,
+                password
+            });
+            using HttpResponseMessage response = await httpClient.PostAsync(BuildApiUri("users/login"), content);
+            response.EnsureSuccessStatusCode();
+
+            if (!response.Headers.TryGetValues("Token", out IEnumerable<string>? tokenValues))
+            {
+                throw new AssertionException("Mattermost login response did not include a token header.");
+            }
+
+            string token = tokenValues.FirstOrDefault() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new AssertionException("Mattermost login token header was empty.");
+            }
+
+            return token;
+        }
+
+        private async Task<string> CreateWebhookTokenAsync(HttpClient httpClient)
+        {
+            using StringContent content = CreateJsonContent(new
+            {
+                default_status = 200,
+                default_content = "{}",
+                default_content_type = "application/json",
+                expiry = 3600
+            });
+            using HttpResponseMessage response = await httpClient.PostAsync("https://webhook.site/token", content);
+            response.EnsureSuccessStatusCode();
+            string json = await response.Content.ReadAsStringAsync();
+            using JsonDocument document = JsonDocument.Parse(json);
+
+            return document.RootElement.GetProperty("uuid").GetString()
+                ?? throw new AssertionException("Webhook token response did not include uuid.");
+        }
+
+        private static async Task DeleteWebhookTokenAsync(HttpClient httpClient, string webhookToken)
+        {
+            if (string.IsNullOrWhiteSpace(webhookToken))
+            {
+                return;
+            }
+
+            using HttpResponseMessage response = await httpClient.DeleteAsync("https://webhook.site/token/" + webhookToken);
+        }
+
+        private async Task PerformPostActionAsync(HttpClient httpClient, string authToken, string postId, string actionId)
+        {
+            using HttpRequestMessage request = new HttpRequestMessage(
+                HttpMethod.Post,
+                BuildApiUri("posts/" + postId + "/actions/" + actionId));
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
+
+            using HttpResponseMessage response = await httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+        }
+
+        private static async Task<PostActionIntegrationRequest> WaitForActionCallbackAsync(
+            HttpClient httpClient,
+            string webhookToken)
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                await Task.Delay(500);
+                using HttpResponseMessage response = await httpClient.GetAsync(
+                    "https://webhook.site/token/" + webhookToken + "/requests?sorting=newest");
+                response.EnsureSuccessStatusCode();
+                string json = await response.Content.ReadAsStringAsync();
+                using JsonDocument document = JsonDocument.Parse(json);
+                JsonElement data = document.RootElement.GetProperty("data");
+                if (data.GetArrayLength() == 0)
+                {
+                    continue;
+                }
+
+                string content = data[0].GetProperty("content").GetString() ?? string.Empty;
+                PostActionIntegrationRequest? request = JsonSerializer.Deserialize<PostActionIntegrationRequest>(content);
+                if (request is not null && !string.IsNullOrWhiteSpace(request.TriggerId))
+                {
+                    return request;
+                }
+            }
+
+            throw new AssertionException("Mattermost did not send a post action callback with trigger_id.");
+        }
+
+        private Uri BuildApiUri(string route)
+        {
+            return new Uri(client.ServerAddress, "/api/v4/" + route);
+        }
+
+        private static StringContent CreateJsonContent(object payload)
+        {
+            return new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+        }
+
+        private static PostProps CreateDialogSmokePostProps(string actionId, string actionUrl)
+        {
+            PostProps props = new PostProps();
+            props.Attachments.Add(new PostPropsAttachment
+            {
+                Text = "Open dialog smoke",
+                Actions =
+                {
+                    new PostPropsButtonAction
+                    {
+                        Id = actionId,
+                        Name = "Open",
+                        Integration = new Integration
+                        {
+                            Url = actionUrl,
+                            Context =
+                            {
+                                ["action"] = "open_dialog_smoke"
+                            }
+                        }
+                    }
+                }
+            });
+
+            return props;
+        }
+
+        private static InteractiveDialog CreateLiveSmokeDialog()
+        {
+            return new InteractiveDialog
+            {
+                Title = "Live dialog smoke",
+                Elements = new List<InteractiveDialogElement>
+                {
+                    new InteractiveDialogElement
+                    {
+                        DisplayName = "Summary",
+                        Name = "summary",
+                        Type = InteractiveDialogElementType.Text
+                    }
+                }
+            };
         }
     }
 }

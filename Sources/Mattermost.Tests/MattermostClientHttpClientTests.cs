@@ -406,16 +406,11 @@ namespace Mattermost.Tests
         }
 
         [Test]
-        public async Task OpenInteractiveDialogAsync_UsesExpectedRouteAndPayload()
+        public async Task OpenInteractiveDialogAsync_UsesExpectedRoutePayloadAndNoAuthorization()
         {
             RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
             {
                 string? path = request.RequestUri?.AbsolutePath;
-                if (path == "/api/v4/users/me")
-                {
-                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("dialog-user"));
-                }
-
                 if (request.Method == HttpMethod.Post && path == "/api/v4/actions/dialogs/open")
                 {
                     return CreateJsonResponse(HttpStatusCode.OK, "{\"status\":\"OK\"}");
@@ -439,7 +434,7 @@ namespace Mattermost.Tests
             };
 
             using HttpClient externalHttpClient = new HttpClient(handler);
-            using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
+            using MattermostClient client = new MattermostClient("https://mattermost.example", externalHttpClient);
 
             await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialog);
 
@@ -449,12 +444,54 @@ namespace Mattermost.Tests
 
             Assert.That(dialogRequest.RequestUri, Is.EqualTo(new Uri("https://mattermost.example/api/v4/actions/dialogs/open")));
             Assert.That(dialogRequest.Method, Is.EqualTo(HttpMethod.Post));
-            Assert.That(dialogRequest.Authorization?.Scheme, Is.EqualTo("Bearer"));
-            Assert.That(dialogRequest.Authorization?.Parameter, Is.EqualTo("api-key"));
+            Assert.That(dialogRequest.Authorization, Is.Null);
             Assert.That(root.GetProperty("trigger_id").GetString(), Is.EqualTo("trigger-1"));
             Assert.That(root.GetProperty("url").GetString(), Is.EqualTo("https://example.com/dialog/submit"));
             Assert.That(root.GetProperty("dialog").GetProperty("callback_id").GetString(), Is.EqualTo("create-ticket"));
             Assert.That(root.GetProperty("dialog").GetProperty("elements")[0].GetProperty("type").GetString(), Is.EqualTo("text"));
+        }
+
+        [Test]
+        public async Task OpenInteractiveDialogAsync_ErrorResponse_ThrowsMattermostClientException()
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
+            {
+                string? path = request.RequestUri?.AbsolutePath;
+                if (request.Method == HttpMethod.Post && path == "/api/v4/actions/dialogs/open")
+                {
+                    return CreateJsonResponse(
+                        HttpStatusCode.BadRequest,
+                        "{\"id\":\"api.context.invalid_param.app_error\",\"message\":\"invalid trigger\",\"detailed_error\":\"\",\"request_id\":\"request-1\",\"status_code\":400}");
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            });
+            InteractiveDialog dialog = new InteractiveDialog
+            {
+                Title = "Create Ticket",
+                Elements = new List<InteractiveDialogElement>
+                {
+                    new InteractiveDialogElement
+                    {
+                        DisplayName = "Title",
+                        Name = "title",
+                        Type = InteractiveDialogElementType.Text
+                    }
+                }
+            };
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient("https://mattermost.example", externalHttpClient);
+
+            MattermostClientException? exception = Assert.ThrowsAsync<MattermostClientException>(
+                async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialog));
+
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            Assert.That(exception.Message, Is.EqualTo("invalid trigger"));
+            Assert.That(exception.ResponseJson, Does.Contain("\"status_code\":400"));
+            Assert.That(exception.RequestUri, Is.EqualTo("https://mattermost.example/api/v4/actions/dialogs/open"));
+            Assert.That(exception.RequestMethod, Is.EqualTo("POST"));
         }
 
         [Test]
@@ -486,11 +523,93 @@ namespace Mattermost.Tests
                     }
                 }
             };
+            InteractiveDialog dialogWithActionButtonWithoutConfiguration = new InteractiveDialog
+            {
+                Title = "Create Ticket",
+                Elements = new List<InteractiveDialogElement>
+                {
+                    new InteractiveDialogElement
+                    {
+                        DisplayName = "Open Child",
+                        Name = "open_child",
+                        Type = InteractiveDialogElementType.ActionButton
+                    }
+                }
+            };
+            InteractiveDialog dialogWithActionButtonWithoutUrl = new InteractiveDialog
+            {
+                Title = "Create Ticket",
+                Elements = new List<InteractiveDialogElement>
+                {
+                    new InteractiveDialogElement
+                    {
+                        DisplayName = "Open Child",
+                        Name = "open_child",
+                        Type = InteractiveDialogElementType.ActionButton,
+                        ActionButton = new InteractiveDialogActionButton()
+                    }
+                }
+            };
 
             Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("", "https://example.com/dialog/submit", dialog));
             Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "", dialog));
             Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", new InteractiveDialog()));
             Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithInvalidElement));
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithActionButtonWithoutConfiguration));
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithActionButtonWithoutUrl));
+        }
+
+        [Test]
+        public void OpenInteractiveDialogAsync_DynamicSelectWithoutDataSourceUrl_ThrowsArgumentException()
+        {
+            using MattermostClient client = new MattermostClient("https://mattermost.example");
+            InteractiveDialog dialog = new InteractiveDialog
+            {
+                Title = "Create Ticket",
+                Elements = new List<InteractiveDialogElement>
+                {
+                    new InteractiveDialogElement
+                    {
+                        DisplayName = "Assignee",
+                        Name = "assignee",
+                        Type = InteractiveDialogElementType.Select,
+                        DataSource = InteractiveDialogDataSource.Dynamic
+                    }
+                }
+            };
+
+            ArgumentException? exception = Assert.ThrowsAsync<ArgumentException>(
+                async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialog));
+
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception!.ParamName, Is.EqualTo(nameof(InteractiveDialogElement.DataSourceUrl)));
+        }
+
+        [Test]
+        public void OpenInteractiveDialogAsync_RefreshWithoutSourceUrl_ThrowsArgumentException()
+        {
+            using MattermostClient client = new MattermostClient("https://mattermost.example");
+            InteractiveDialog dialog = new InteractiveDialog
+            {
+                Title = "Create Ticket",
+                Elements = new List<InteractiveDialogElement>
+                {
+                    new InteractiveDialogElement
+                    {
+                        DisplayName = "Ticket Type",
+                        Name = "ticket_type",
+                        Type = InteractiveDialogElementType.Select,
+                        DataSource = InteractiveDialogDataSource.Users,
+                        Refresh = true
+                    }
+                }
+            };
+
+            ArgumentException? exception = Assert.ThrowsAsync<ArgumentException>(
+                async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialog));
+
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception!.ParamName, Is.EqualTo(nameof(InteractiveDialog.SourceUrl)));
         }
 
         [Test]

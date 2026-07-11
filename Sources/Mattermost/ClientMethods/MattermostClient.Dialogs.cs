@@ -33,7 +33,7 @@ namespace Mattermost
         {
             CheckDisposed();
             ValidateOpenInteractiveDialogRequest(request);
-            return SendRequestAsync(HttpMethod.Post, Routes.Dialogs + "/open", request);
+            return SendUnauthenticatedRequestAsync(HttpMethod.Post, Routes.Dialogs + "/open", request);
         }
 
         private static void ValidateOpenInteractiveDialogRequest(OpenInteractiveDialogRequest request)
@@ -61,9 +61,19 @@ namespace Mattermost
                 throw new ArgumentException("Dialog elements cannot be null.", nameof(dialog.Elements));
             }
 
+            bool requiresSourceUrl = false;
             foreach (InteractiveDialogElement element in dialog.Elements)
             {
                 ValidateInteractiveDialogElement(element);
+                if (element.Refresh.GetValueOrDefault())
+                {
+                    requiresSourceUrl = true;
+                }
+            }
+
+            if (requiresSourceUrl)
+            {
+                ThrowIfWhiteSpace(dialog.SourceUrl, nameof(dialog.SourceUrl));
             }
         }
 
@@ -80,9 +90,31 @@ namespace Mattermost
             {
                 throw new ArgumentException("Dialog element type must be specified.", nameof(element.Type));
             }
+
+            if (element.Type.Value == InteractiveDialogElementType.ActionButton)
+            {
+                ValidateInteractiveDialogActionButton(element.ActionButton);
+            }
+
+            if (element.DataSource == InteractiveDialogDataSource.Dynamic)
+            {
+                ThrowIfWhiteSpace(element.DataSourceUrl, nameof(element.DataSourceUrl));
+            }
         }
 
-        private static void ThrowIfWhiteSpace(string value, string parameterName)
+        private static void ValidateInteractiveDialogActionButton(InteractiveDialogActionButton? actionButton)
+        {
+            if (actionButton is null)
+            {
+                throw new ArgumentException(
+                    "Dialog action button configuration cannot be null.",
+                    nameof(InteractiveDialogElement.ActionButton));
+            }
+
+            ThrowIfWhiteSpace(actionButton.Url, nameof(InteractiveDialogActionButton.Url));
+        }
+
+        private static void ThrowIfWhiteSpace(string? value, string parameterName)
         {
             if (string.IsNullOrWhiteSpace(value))
             {

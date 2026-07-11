@@ -736,17 +736,26 @@ namespace Mattermost
         private Task SendRequestAsync(HttpMethod method, string requestUri, object? payload = null, CancellationToken cancellationToken = default) =>
             SendRequestAsync<object>(method, requestUri, payload, cancellationToken);
 
+        private Task SendUnauthenticatedRequestAsync(
+            HttpMethod method,
+            string requestUri,
+            object? payload = null,
+            CancellationToken cancellationToken = default) =>
+            SendRequestAsync<object>(method, requestUri, payload, cancellationToken, requiresAuthorization: false);
+
         private async Task<TResult> SendRequestAsync<TResult>(
             HttpMethod method,
             string requestUri,
             object? payload = null,
             CancellationToken cancellationToken = default,
-            Func<TResult>? nullResultFactory = null)
+            Func<TResult>? nullResultFactory = null,
+            bool requiresAuthorization = true)
         {
             using HttpResponseMessage response = await SendHttpRequestAsync(
                 method,
                 requestUri,
                 payload,
+                requiresAuthorization: requiresAuthorization,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
             string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
