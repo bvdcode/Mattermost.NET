@@ -1,6 +1,7 @@
 using Mattermost.Exceptions;
 using Mattermost.Models;
 using Mattermost.Models.Channels;
+using Mattermost.Models.Dialogs;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
@@ -402,6 +403,94 @@ namespace Mattermost.Tests
             Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/teams?page=3&per_page=4"), Is.True);
             Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/teams/name/core"), Is.True);
             Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/teams/team-1/channels?page=5&per_page=6"), Is.True);
+        }
+
+        [Test]
+        public async Task OpenInteractiveDialogAsync_UsesExpectedRouteAndPayload()
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
+            {
+                string? path = request.RequestUri?.AbsolutePath;
+                if (path == "/api/v4/users/me")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("dialog-user"));
+                }
+
+                if (request.Method == HttpMethod.Post && path == "/api/v4/actions/dialogs/open")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "{\"status\":\"OK\"}");
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            });
+            InteractiveDialog dialog = new InteractiveDialog
+            {
+                CallbackId = "create-ticket",
+                Title = "Create Ticket",
+                Elements = new List<InteractiveDialogElement>
+                {
+                    new InteractiveDialogElement
+                    {
+                        DisplayName = "Title",
+                        Name = "title",
+                        Type = InteractiveDialogElementType.Text
+                    }
+                }
+            };
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
+
+            await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialog);
+
+            RecordedRequest dialogRequest = handler.Requests.Single(request => request.RequestUri?.AbsolutePath == "/api/v4/actions/dialogs/open");
+            using JsonDocument body = JsonDocument.Parse(dialogRequest.ContentBody ?? "{}");
+            JsonElement root = body.RootElement;
+
+            Assert.That(dialogRequest.RequestUri, Is.EqualTo(new Uri("https://mattermost.example/api/v4/actions/dialogs/open")));
+            Assert.That(dialogRequest.Method, Is.EqualTo(HttpMethod.Post));
+            Assert.That(dialogRequest.Authorization?.Scheme, Is.EqualTo("Bearer"));
+            Assert.That(dialogRequest.Authorization?.Parameter, Is.EqualTo("api-key"));
+            Assert.That(root.GetProperty("trigger_id").GetString(), Is.EqualTo("trigger-1"));
+            Assert.That(root.GetProperty("url").GetString(), Is.EqualTo("https://example.com/dialog/submit"));
+            Assert.That(root.GetProperty("dialog").GetProperty("callback_id").GetString(), Is.EqualTo("create-ticket"));
+            Assert.That(root.GetProperty("dialog").GetProperty("elements")[0].GetProperty("type").GetString(), Is.EqualTo("text"));
+        }
+
+        [Test]
+        public void OpenInteractiveDialogAsync_InvalidRequiredFields_ThrowsArgumentException()
+        {
+            using MattermostClient client = new MattermostClient("https://mattermost.example");
+            InteractiveDialog dialog = new InteractiveDialog
+            {
+                Title = "Create Ticket",
+                Elements = new List<InteractiveDialogElement>
+                {
+                    new InteractiveDialogElement
+                    {
+                        DisplayName = "Title",
+                        Name = "title",
+                        Type = InteractiveDialogElementType.Text
+                    }
+                }
+            };
+            InteractiveDialog dialogWithInvalidElement = new InteractiveDialog
+            {
+                Title = "Create Ticket",
+                Elements = new List<InteractiveDialogElement>
+                {
+                    new InteractiveDialogElement
+                    {
+                        DisplayName = "Title",
+                        Name = "title"
+                    }
+                }
+            };
+
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("", "https://example.com/dialog/submit", dialog));
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "", dialog));
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", new InteractiveDialog()));
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithInvalidElement));
         }
 
         [Test]

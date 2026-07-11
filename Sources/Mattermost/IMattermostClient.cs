@@ -3,6 +3,7 @@ using Mattermost.Enums;
 using Mattermost.Events;
 using Mattermost.Models;
 using Mattermost.Models.Channels;
+using Mattermost.Models.Dialogs;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses;
 using Mattermost.Models.Teams;
@@ -188,6 +189,24 @@ namespace Mattermost
         /// <param name="fromPostId"> Post identifier to start from. </param>
         /// <returns> Collection of posts in thread format. </returns>
         public Task<ChannelPostsResponse> GetThreadPostsAsync(string postId, string? fromPostId = null);
+
+        #endregion
+
+        #region Interactive Dialogs
+
+        /// <summary>
+        /// Open an interactive dialog.
+        /// </summary>
+        /// <param name="triggerId"> Trigger identifier from a slash command or interactive action payload. </param>
+        /// <param name="url"> URL where Mattermost sends the submitted dialog payload. </param>
+        /// <param name="dialog"> Dialog definition. </param>
+        Task OpenInteractiveDialogAsync(string triggerId, string url, InteractiveDialog dialog);
+
+        /// <summary>
+        /// Open an interactive dialog.
+        /// </summary>
+        /// <param name="request"> Open dialog request. </param>
+        Task OpenInteractiveDialogAsync(OpenInteractiveDialogRequest request);
 
         #endregion
 

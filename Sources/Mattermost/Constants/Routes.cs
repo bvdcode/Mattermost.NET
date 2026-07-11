@@ -4,6 +4,7 @@
     {
         private const string version = "/api/v4";
         internal const string Plugins = "/plugins";
+        internal const string Dialogs = version + "/actions/dialogs";
         internal const string Users = version + "/users";
         internal const string Posts = version + "/posts";
         internal const string Reactions = version + "/reactions";
