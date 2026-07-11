@@ -164,7 +164,7 @@ namespace Mattermost.Tests
             using (stream)
             {
                 byte[] buffer = new byte[expected.Length];
-                int read = await stream.ReadAsync(buffer, 0, buffer.Length);
+                int read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length));
                 Assert.That(read, Is.EqualTo(expected.Length));
                 Assert.That(buffer, Is.EqualTo(expected));
             }
@@ -496,41 +496,7 @@ namespace Mattermost.Tests
         [Test]
         public async Task PostInteractions_UseExpectedRoutesAndPerRequestAuthorization()
         {
-            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
-            {
-                string? path = request.RequestUri?.AbsolutePath;
-                if (path == "/api/v4/users/me")
-                {
-                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("current-user"));
-                }
-
-                if (request.Method == HttpMethod.Post && path == "/api/v4/reactions")
-                {
-                    return CreateJsonResponse(HttpStatusCode.Created, CreateReactionJson("current-user", "post-1", "white_check_mark"));
-                }
-
-                if (request.Method == HttpMethod.Get && path == "/api/v4/posts/post-1/reactions")
-                {
-                    return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateReactionJson("current-user", "post-1", "white_check_mark") + "]");
-                }
-
-                if (request.Method == HttpMethod.Delete && path == "/api/v4/users/current-user/posts/post-1/reactions/white_check_mark")
-                {
-                    return CreateJsonResponse(HttpStatusCode.OK, "{}");
-                }
-
-                if (request.Method == HttpMethod.Post && path == "/api/v4/posts/post-1/pin")
-                {
-                    return CreateJsonResponse(HttpStatusCode.OK, "{}");
-                }
-
-                if (request.Method == HttpMethod.Post && path == "/api/v4/posts/post-1/unpin")
-                {
-                    return CreateJsonResponse(HttpStatusCode.OK, "{}");
-                }
-
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
-            });
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(CreatePostInteractionsResponse);
 
             using HttpClient externalHttpClient = new HttpClient(handler);
             using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
@@ -541,11 +507,41 @@ namespace Mattermost.Tests
             await client.PinPostAsync("post-1");
             await client.UnpinPostAsync("post-1");
 
+            RecordedRequest addReactionRequest = handler.Requests.Single(request => request.RequestUri?.AbsolutePath == "/api/v4/reactions");
+            AssertPostInteractionResults(reaction, reactions);
+            AssertAddReactionRequest(addReactionRequest);
+            AssertPostInteractionRoutes(handler.Requests);
+        }
+
+        private static HttpResponseMessage CreatePostInteractionsResponse(HttpRequestMessage request)
+        {
+            string requestKey = request.Method.Method + " " + request.RequestUri?.AbsolutePath;
+            switch (requestKey)
+            {
+                case "GET /api/v4/users/me":
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("current-user"));
+                case "POST /api/v4/reactions":
+                    return CreateJsonResponse(HttpStatusCode.Created, CreateReactionJson("current-user", "post-1", "white_check_mark"));
+                case "GET /api/v4/posts/post-1/reactions":
+                    return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateReactionJson("current-user", "post-1", "white_check_mark") + "]");
+                case "DELETE /api/v4/users/current-user/posts/post-1/reactions/white_check_mark":
+                case "POST /api/v4/posts/post-1/pin":
+                case "POST /api/v4/posts/post-1/unpin":
+                    return CreateJsonResponse(HttpStatusCode.OK, "{}");
+                default:
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
+        }
+
+        private static void AssertPostInteractionResults(Reaction reaction, IList<Reaction> reactions)
+        {
             Assert.That(reaction.UserId, Is.EqualTo("current-user"));
             Assert.That(reactions, Has.Count.EqualTo(1));
             Assert.That(reactions[0].EmojiName, Is.EqualTo("white_check_mark"));
+        }
 
-            RecordedRequest addReactionRequest = handler.Requests.Single(request => request.RequestUri?.AbsolutePath == "/api/v4/reactions");
+        private static void AssertAddReactionRequest(RecordedRequest addReactionRequest)
+        {
             using JsonDocument addReactionBody = JsonDocument.Parse(addReactionRequest.ContentBody ?? "{}");
             JsonElement bodyRoot = addReactionBody.RootElement;
 
@@ -555,11 +551,19 @@ namespace Mattermost.Tests
             Assert.That(bodyRoot.GetProperty("user_id").GetString(), Is.EqualTo("current-user"));
             Assert.That(bodyRoot.GetProperty("post_id").GetString(), Is.EqualTo("post-1"));
             Assert.That(bodyRoot.GetProperty("emoji_name").GetString(), Is.EqualTo("white_check_mark"));
+        }
 
-            Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Get && request.RequestUri?.AbsolutePath == "/api/v4/posts/post-1/reactions"), Is.True);
-            Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Delete && request.RequestUri?.AbsolutePath == "/api/v4/users/current-user/posts/post-1/reactions/white_check_mark"), Is.True);
-            Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Post && request.RequestUri?.AbsolutePath == "/api/v4/posts/post-1/pin"), Is.True);
-            Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Post && request.RequestUri?.AbsolutePath == "/api/v4/posts/post-1/unpin"), Is.True);
+        private static void AssertPostInteractionRoutes(IList<RecordedRequest> requests)
+        {
+            AssertRecordedRoute(requests, HttpMethod.Get, "/api/v4/posts/post-1/reactions");
+            AssertRecordedRoute(requests, HttpMethod.Delete, "/api/v4/users/current-user/posts/post-1/reactions/white_check_mark");
+            AssertRecordedRoute(requests, HttpMethod.Post, "/api/v4/posts/post-1/pin");
+            AssertRecordedRoute(requests, HttpMethod.Post, "/api/v4/posts/post-1/unpin");
+        }
+
+        private static void AssertRecordedRoute(IList<RecordedRequest> requests, HttpMethod method, string path)
+        {
+            Assert.That(requests.Any(request => request.Method == method && request.RequestUri?.AbsolutePath == path), Is.True);
         }
 
         [Test]
