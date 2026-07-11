@@ -456,6 +456,55 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
+        public async Task PostInteractions_CreatePost_ReactionAndPinRoundTrip()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+            const string emojiName = "white_check_mark";
+            Post? createdPost = null;
+
+            try
+            {
+                createdPost = await client.CreatePostAsync(channelId, "Post interaction test " + Guid.NewGuid().ToString("N"));
+                Reaction reaction = await client.AddReactionAsync(createdPost.Id, emojiName);
+                IList<Reaction> reactions = await client.GetReactionsAsync(createdPost.Id);
+
+                Assert.That(reaction.PostId, Is.EqualTo(createdPost.Id));
+                Assert.That(reaction.UserId, Is.EqualTo(client.CurrentUserInfo.Id));
+                Assert.That(reaction.EmojiName, Is.EqualTo(emojiName));
+                Assert.That(
+                    reactions.Any(item =>
+                        item.PostId == createdPost.Id
+                        && item.UserId == client.CurrentUserInfo.Id
+                        && item.EmojiName == emojiName),
+                    Is.True);
+
+                await client.RemoveReactionAsync(createdPost.Id, emojiName);
+                IList<Reaction> reactionsAfterDelete = await client.GetReactionsAsync(createdPost.Id);
+                Assert.That(
+                    reactionsAfterDelete.Any(item =>
+                        item.UserId == client.CurrentUserInfo.Id
+                        && item.EmojiName == emojiName),
+                    Is.False);
+
+                await client.PinPostAsync(createdPost.Id);
+                Post pinnedPost = await client.GetPostAsync(createdPost.Id);
+                Assert.That(pinnedPost.IsPinned, Is.True);
+
+                await client.UnpinPostAsync(createdPost.Id);
+                Post unpinnedPost = await client.GetPostAsync(createdPost.Id);
+                Assert.That(unpinnedPost.IsPinned, Is.False);
+            }
+            finally
+            {
+                if (createdPost is not null)
+                {
+                    await client.DeletePostAsync(createdPost.Id);
+                }
+            }
+        }
+
+        [Test]
+        [NonParallelizable]
         public async Task CreatePostWithActionStyle_GetPost_StyleIsPersisted()
         {
             const string channelId = "w5e788utqbfgickdfgsabp8wya";

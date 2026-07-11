@@ -104,6 +104,41 @@ namespace Mattermost
         Task<Post> GetPostAsync(string postId);
 
         /// <summary>
+        /// Add current user's reaction to a post.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        /// <param name="emojiName"> Emoji name without surrounding colons. </param>
+        /// <returns> Created reaction information. </returns>
+        Task<Reaction> AddReactionAsync(string postId, string emojiName);
+
+        /// <summary>
+        /// Remove a reaction from a post.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        /// <param name="emojiName"> Emoji name without surrounding colons. </param>
+        /// <param name="userId"> User identifier. Defaults to current user. </param>
+        Task RemoveReactionAsync(string postId, string emojiName, string? userId = null);
+
+        /// <summary>
+        /// Get reactions for a post.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        /// <returns> Reactions for the post. </returns>
+        Task<IList<Reaction>> GetReactionsAsync(string postId);
+
+        /// <summary>
+        /// Pin a post to its channel.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        Task PinPostAsync(string postId);
+
+        /// <summary>
+        /// Unpin a post from its channel.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        Task UnpinPostAsync(string postId);
+
+        /// <summary>
         /// Update message text for specified post identifier.
         /// </summary>
         /// <param name="postId"> Post identifier. </param>
