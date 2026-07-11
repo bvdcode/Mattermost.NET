@@ -6,7 +6,6 @@ using Mattermost.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Mattermost
@@ -262,15 +261,15 @@ namespace Mattermost
         /// </summary>
         /// <param name="postId"> Post identifier. </param>
         /// <returns> Reactions for the post. </returns>
-        public async Task<IList<Reaction>> GetReactionsAsync(string postId)
+        public Task<IList<Reaction>> GetReactionsAsync(string postId)
         {
             CheckDisposed();
             ValidatePostId(postId);
             string url = Routes.Posts + "/" + Uri.EscapeDataString(postId) + "/reactions";
-            using HttpResponseMessage response = await SendHttpRequestAsync(HttpMethod.Get, url).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<IList<Reaction>>(json) ?? new List<Reaction>();
+            return SendRequestAsync<IList<Reaction>>(
+                HttpMethod.Get,
+                url,
+                nullResultFactory: () => new List<Reaction>());
         }
 
         /// <summary>
@@ -305,6 +304,11 @@ namespace Mattermost
 
         private static string SanitizeEmojiName(string emojiName)
         {
+            if (string.IsNullOrWhiteSpace(emojiName))
+            {
+                throw new ArgumentException("Emoji name cannot be null or empty.", nameof(emojiName));
+            }
+
             string sanitizedEmojiName = emojiName.Trim().Trim(':');
             if (string.IsNullOrWhiteSpace(sanitizedEmojiName))
             {

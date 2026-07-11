@@ -736,7 +736,12 @@ namespace Mattermost
         private Task SendRequestAsync(HttpMethod method, string requestUri, object? payload = null, CancellationToken cancellationToken = default) =>
             SendRequestAsync<object>(method, requestUri, payload, cancellationToken);
 
-        private async Task<TResult> SendRequestAsync<TResult>(HttpMethod method, string requestUri, object? payload = null, CancellationToken cancellationToken = default)
+        private async Task<TResult> SendRequestAsync<TResult>(
+            HttpMethod method,
+            string requestUri,
+            object? payload = null,
+            CancellationToken cancellationToken = default,
+            Func<TResult>? nullResultFactory = null)
         {
             using HttpResponseMessage response = await SendHttpRequestAsync(
                 method,
@@ -766,7 +771,18 @@ namespace Mattermost
                 throw exception;
             }
 
-            return JsonSerializer.Deserialize<TResult>(json) ?? throw new JsonException("Failed to deserialize result: " + json);
+            object? result = JsonSerializer.Deserialize<TResult>(json);
+            if (result != null)
+            {
+                return (TResult)result;
+            }
+
+            if (nullResultFactory != null)
+            {
+                return nullResultFactory();
+            }
+
+            throw new JsonException("Failed to deserialize result: " + json);
         }
 
         private async Task<HttpResponseMessage> SendHttpRequestAsync(
