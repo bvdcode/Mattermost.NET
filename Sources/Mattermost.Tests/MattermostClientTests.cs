@@ -3,8 +3,10 @@ using Mattermost.Enums;
 using Mattermost.Events;
 using Mattermost.Exceptions;
 using Mattermost.Models;
+using Mattermost.Models.Channels;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses.Websocket.Posts;
+using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
 using System.Text.Json;
 
@@ -402,6 +404,25 @@ namespace Mattermost.Tests
                 Assert.That(result.Id, Is.EqualTo(channelId));
                 Assert.That(result.Name, Is.EqualTo("off-topic-pub"));
             }
+        }
+
+        [Test]
+        [NonParallelizable]
+        public async Task DiscoveryApis_FindUsersTeamsAndChannels()
+        {
+            Team coreTeam = await client.GetTeamByNameAsync("core");
+            IList<Team> teams = await client.GetTeamsAsync(perPage: 100);
+            IList<Channel> channels = await client.GetTeamChannelsAsync(coreTeam.Id, perPage: 100);
+            IList<User> teamUsers = await client.GetUsersAsync(perPage: 10, inTeamId: coreTeam.Id, active: true);
+            IList<User> searchResults = await client.SearchUsersAsync(client.CurrentUserInfo.Username, teamId: coreTeam.Id, limit: 10);
+
+            Assert.That(coreTeam.Id, Is.Not.Empty);
+            Assert.That(coreTeam.Name, Is.EqualTo("core"));
+            Assert.That(teams.Any(item => item.Id == coreTeam.Id), Is.True);
+            Assert.That(channels, Is.Not.Empty);
+            Assert.That(channels.All(item => item.TeamId == coreTeam.Id), Is.True);
+            Assert.That(teamUsers, Is.Not.Empty);
+            Assert.That(searchResults.Any(item => item.Id == client.CurrentUserInfo.Id), Is.True);
         }
 
         [Test]

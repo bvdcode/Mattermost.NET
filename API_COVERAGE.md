@@ -7,7 +7,7 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 - Mattermost API documentation: https://developers.mattermost.com/api-documentation/
 - Mattermost OpenAPI specification: https://developers.mattermost.com/mattermost-openapi-v4.yaml
 - Last reviewed: 2026-07-11
-- Implemented operations: 32/633
+- Implemented operations: 37/633
 - SDK-only implemented routes missing from the current OpenAPI specification: 2
 
 ## Legend
@@ -354,8 +354,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels - Get public channels
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetPublicChannelsForTeam) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetPublicChannelsForTeam) | `IMattermostClient.GetTeamChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels/autocomplete - Autocomplete channels
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/AutocompleteChannelsForTeam) | `—`
@@ -2060,8 +2060,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 # Teams
 
 ## GET /api/v4/teams - Get teams
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetAllTeams) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetAllTeams) | `IMattermostClient.GetTeamsAsync`
+✅ Implemented
 
 ## POST /api/v4/teams - Create a team
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/CreateTeam) | `—`
@@ -2080,8 +2080,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## GET /api/v4/teams/name/{team_name} - Get a team by name
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetTeamByName) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetTeamByName) | `IMattermostClient.GetTeamByNameAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/name/{team_name}/exists - Check if team exists
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/TeamExists) | `—`
@@ -2300,8 +2300,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## GET /api/v4/users - Get users
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetUsers) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetUsers) | `IMattermostClient.GetUsersAsync`
+✅ Implemented
 
 ## POST /api/v4/users - Create a user
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/CreateUser) | `—`
@@ -2396,8 +2396,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## POST /api/v4/users/search - Search users
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/SearchUsers) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/SearchUsers) | `IMattermostClient.SearchUsersAsync`
+✅ Implemented
 
 ## GET /api/v4/users/sessions/attributes/manifest - Get the session attributes manifest
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetSessionAttributesManifest) | `—`

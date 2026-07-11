@@ -1,5 +1,8 @@
 ﻿using Mattermost.Constants;
+using Mattermost.Helpers;
 using Mattermost.Models.Teams;
+using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -15,7 +18,41 @@ namespace Mattermost
         public Task<Team> GetTeamAsync(string teamId)
         {
             CheckDisposed();
-            return SendRequestAsync<Team>(HttpMethod.Get, Routes.Teams + "/" + teamId);
+            ValidateTeamIdentifier(teamId, nameof(teamId));
+            return SendRequestAsync<Team>(HttpMethod.Get, Routes.Teams + "/" + Uri.EscapeDataString(teamId.Trim()));
+        }
+
+        /// <summary>
+        /// Get a page of teams.
+        /// </summary>
+        /// <param name="page"> The page to select. </param>
+        /// <param name="perPage"> The number of teams per page. </param>
+        /// <returns> Teams visible to the current user. </returns>
+        public Task<IList<Team>> GetTeamsAsync(int page = 0, int perPage = 60)
+        {
+            CheckDisposed();
+            string query = QueryHelpers.BuildPagedQuery(page, perPage);
+            return SendRequestAsync<IList<Team>>(HttpMethod.Get, Routes.Teams + "?" + query);
+        }
+
+        /// <summary>
+        /// Get team by name.
+        /// </summary>
+        /// <param name="teamName"> Team name. </param>
+        /// <returns> Team information. </returns>
+        public Task<Team> GetTeamByNameAsync(string teamName)
+        {
+            CheckDisposed();
+            ValidateTeamIdentifier(teamName, nameof(teamName));
+            return SendRequestAsync<Team>(HttpMethod.Get, Routes.Teams + "/name/" + Uri.EscapeDataString(teamName.Trim()));
+        }
+
+        private static void ValidateTeamIdentifier(string value, string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("Team identifier cannot be null or empty.", parameterName);
+            }
         }
     }
 }
