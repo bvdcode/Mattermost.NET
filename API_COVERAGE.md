@@ -7,7 +7,7 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 - Mattermost API documentation: https://developers.mattermost.com/api-documentation/
 - Mattermost OpenAPI specification: https://developers.mattermost.com/mattermost-openapi-v4.yaml
 - Last reviewed: 2026-07-11
-- Implemented operations: 37/633
+- Implemented operations: 38/633
 - SDK-only implemented routes missing from the current OpenAPI specification: 2
 
 ## Legend
@@ -980,8 +980,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## POST /api/v4/actions/dialogs/open - Open a dialog
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/OpenInteractiveDialog) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/OpenInteractiveDialog) | `IMattermostClient.OpenInteractiveDialogAsync`
+✅ Implemented
 
 ## POST /api/v4/actions/dialogs/submit - Submit a dialog
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/SubmitInteractiveDialog) | `—`
