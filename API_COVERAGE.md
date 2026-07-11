@@ -6,8 +6,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 
 - Mattermost API documentation: https://developers.mattermost.com/api-documentation/
 - Mattermost OpenAPI specification: https://developers.mattermost.com/mattermost-openapi-v4.yaml
-- Last reviewed: 2026-07-09
-- Implemented operations: 27/631
+- Last reviewed: 2026-07-11
+- Implemented operations: 32/633
 - SDK-only implemented routes missing from the current OpenAPI specification: 2
 
 ## Legend
@@ -971,6 +971,10 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 
 # Integration Actions
 
+## POST /api/v4/actions/dialogs/execute - Execute a dialog action button
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/ExecuteDialogAction) | `—`
+❌ Not implemented
+
 ## POST /api/v4/actions/dialogs/lookup - Lookup dialog elements
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/LookupInteractiveDialog) | `—`
 ❌ Not implemented
@@ -1280,7 +1284,7 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## POST /plugins/playbooks/api/v0/runs/{id}/status - Update a playbook run's status
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/status) | `—`
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/updatePlaybookRunStatus) | `—`
 ❌ Not implemented
 
 # Playbooks
@@ -1446,8 +1450,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ✅ Implemented
 
 ## POST /api/v4/posts/{post_id}/pin - Pin a post to the channel
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/PinPost) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/PinPost) | `IMattermostClient.PinPostAsync`
+✅ Implemented
 
 ## POST /api/v4/posts/{post_id}/restore/{restore_version_id} - Restores a past version of a post
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/RestorePostVersion) | `—`
@@ -1462,8 +1466,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ✅ Implemented
 
 ## POST /api/v4/posts/{post_id}/unpin - Unpin a post to the channel
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/UnpinPost) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/UnpinPost) | `IMattermostClient.UnpinPostAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/posts/search - Search for team posts
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/SearchPosts) | `—`
@@ -1560,16 +1564,16 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## GET /api/v4/posts/{post_id}/reactions - Get a list of reactions to a post
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetReactions) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetReactions) | `IMattermostClient.GetReactionsAsync`
+✅ Implemented
 
 ## POST /api/v4/reactions - Create a reaction
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/SaveReaction) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/SaveReaction) | `IMattermostClient.AddReactionAsync`
+✅ Implemented
 
 ## DELETE /api/v4/users/{user_id}/posts/{post_id}/reactions/{emoji_name} - Remove a reaction from a post
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/DeleteReaction) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/DeleteReaction) | `IMattermostClient.RemoveReactionAsync`
+✅ Implemented
 
 # Recaps
 
@@ -2437,6 +2441,10 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 
 ## POST /api/v4/users/tokens/revoke - Revoke a user access token
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/RevokeUserAccessToken) | `—`
+❌ Not implemented
+
+## POST /api/v4/users/tokens/rotate - Rotate a personal access token
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/RotateUserAccessToken) | `—`
 ❌ Not implemented
 
 ## POST /api/v4/users/tokens/search - Search tokens

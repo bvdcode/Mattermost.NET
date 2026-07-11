@@ -6,6 +6,7 @@ using Mattermost.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Mattermost
@@ -205,6 +206,112 @@ namespace Mattermost
         {
             CheckDisposed();
             return SendRequestAsync<Post>(HttpMethod.Get, Routes.Posts + "/" + postId);
+        }
+
+        /// <summary>
+        /// Add current user's reaction to a post.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        /// <param name="emojiName"> Emoji name without surrounding colons. </param>
+        /// <returns> Created reaction information. </returns>
+        public async Task<Reaction> AddReactionAsync(string postId, string emojiName)
+        {
+            CheckDisposed();
+            ValidatePostId(postId);
+            string sanitizedEmojiName = SanitizeEmojiName(emojiName);
+            await CheckAuthorizedAsync().ConfigureAwait(false);
+            var body = new
+            {
+                user_id = CurrentUserInfo.Id,
+                post_id = postId,
+                emoji_name = sanitizedEmojiName
+            };
+
+            return await SendRequestAsync<Reaction>(HttpMethod.Post, Routes.Reactions, body).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Remove a reaction from a post.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        /// <param name="emojiName"> Emoji name without surrounding colons. </param>
+        /// <param name="userId"> User identifier. Defaults to current user. </param>
+        public async Task RemoveReactionAsync(string postId, string emojiName, string? userId = null)
+        {
+            CheckDisposed();
+            ValidatePostId(postId);
+            string sanitizedEmojiName = SanitizeEmojiName(emojiName);
+            await CheckAuthorizedAsync().ConfigureAwait(false);
+
+            string reactionUserId = userId ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(reactionUserId))
+            {
+                reactionUserId = CurrentUserInfo.Id;
+            }
+
+            string url = Routes.Users
+                + "/" + Uri.EscapeDataString(reactionUserId)
+                + "/posts/" + Uri.EscapeDataString(postId)
+                + "/reactions/" + Uri.EscapeDataString(sanitizedEmojiName);
+
+            await SendRequestAsync(HttpMethod.Delete, url).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Get reactions for a post.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        /// <returns> Reactions for the post. </returns>
+        public async Task<IList<Reaction>> GetReactionsAsync(string postId)
+        {
+            CheckDisposed();
+            ValidatePostId(postId);
+            string url = Routes.Posts + "/" + Uri.EscapeDataString(postId) + "/reactions";
+            using HttpResponseMessage response = await SendHttpRequestAsync(HttpMethod.Get, url).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            return JsonSerializer.Deserialize<IList<Reaction>>(json) ?? new List<Reaction>();
+        }
+
+        /// <summary>
+        /// Pin a post to its channel.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        public Task PinPostAsync(string postId)
+        {
+            CheckDisposed();
+            ValidatePostId(postId);
+            return SendRequestAsync(HttpMethod.Post, Routes.Posts + "/" + Uri.EscapeDataString(postId) + "/pin");
+        }
+
+        /// <summary>
+        /// Unpin a post from its channel.
+        /// </summary>
+        /// <param name="postId"> Post identifier. </param>
+        public Task UnpinPostAsync(string postId)
+        {
+            CheckDisposed();
+            ValidatePostId(postId);
+            return SendRequestAsync(HttpMethod.Post, Routes.Posts + "/" + Uri.EscapeDataString(postId) + "/unpin");
+        }
+
+        private static void ValidatePostId(string postId)
+        {
+            if (string.IsNullOrWhiteSpace(postId))
+            {
+                throw new ArgumentException("Post ID cannot be null or empty.", nameof(postId));
+            }
+        }
+
+        private static string SanitizeEmojiName(string emojiName)
+        {
+            string sanitizedEmojiName = emojiName.Trim().Trim(':');
+            if (string.IsNullOrWhiteSpace(sanitizedEmojiName))
+            {
+                throw new ArgumentException("Emoji name cannot be null or empty.", nameof(emojiName));
+            }
+
+            return sanitizedEmojiName;
         }
     }
 }

@@ -1,4 +1,5 @@
 using Mattermost.Models;
+using Mattermost.Models.Posts;
 using Mattermost.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 
 namespace Mattermost.Tests
 {
@@ -320,6 +322,75 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        public async Task PostInteractions_UseExpectedRoutesAndPerRequestAuthorization()
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
+            {
+                string? path = request.RequestUri?.AbsolutePath;
+                if (path == "/api/v4/users/me")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("current-user"));
+                }
+
+                if (request.Method == HttpMethod.Post && path == "/api/v4/reactions")
+                {
+                    return CreateJsonResponse(HttpStatusCode.Created, CreateReactionJson("current-user", "post-1", "white_check_mark"));
+                }
+
+                if (request.Method == HttpMethod.Get && path == "/api/v4/posts/post-1/reactions")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateReactionJson("current-user", "post-1", "white_check_mark") + "]");
+                }
+
+                if (request.Method == HttpMethod.Delete && path == "/api/v4/users/current-user/posts/post-1/reactions/white_check_mark")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "{}");
+                }
+
+                if (request.Method == HttpMethod.Post && path == "/api/v4/posts/post-1/pin")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "{}");
+                }
+
+                if (request.Method == HttpMethod.Post && path == "/api/v4/posts/post-1/unpin")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "{}");
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            });
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
+
+            Reaction reaction = await client.AddReactionAsync("post-1", ":white_check_mark:");
+            IList<Reaction> reactions = await client.GetReactionsAsync("post-1");
+            await client.RemoveReactionAsync("post-1", "white_check_mark");
+            await client.PinPostAsync("post-1");
+            await client.UnpinPostAsync("post-1");
+
+            Assert.That(reaction.UserId, Is.EqualTo("current-user"));
+            Assert.That(reactions, Has.Count.EqualTo(1));
+            Assert.That(reactions[0].EmojiName, Is.EqualTo("white_check_mark"));
+
+            RecordedRequest addReactionRequest = handler.Requests.Single(request => request.RequestUri?.AbsolutePath == "/api/v4/reactions");
+            using JsonDocument addReactionBody = JsonDocument.Parse(addReactionRequest.ContentBody ?? "{}");
+            JsonElement bodyRoot = addReactionBody.RootElement;
+
+            Assert.That(addReactionRequest.Method, Is.EqualTo(HttpMethod.Post));
+            Assert.That(addReactionRequest.Authorization?.Scheme, Is.EqualTo("Bearer"));
+            Assert.That(addReactionRequest.Authorization?.Parameter, Is.EqualTo("api-key"));
+            Assert.That(bodyRoot.GetProperty("user_id").GetString(), Is.EqualTo("current-user"));
+            Assert.That(bodyRoot.GetProperty("post_id").GetString(), Is.EqualTo("post-1"));
+            Assert.That(bodyRoot.GetProperty("emoji_name").GetString(), Is.EqualTo("white_check_mark"));
+
+            Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Get && request.RequestUri?.AbsolutePath == "/api/v4/posts/post-1/reactions"), Is.True);
+            Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Delete && request.RequestUri?.AbsolutePath == "/api/v4/users/current-user/posts/post-1/reactions/white_check_mark"), Is.True);
+            Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Post && request.RequestUri?.AbsolutePath == "/api/v4/posts/post-1/pin"), Is.True);
+            Assert.That(handler.Requests.Any(request => request.Method == HttpMethod.Post && request.RequestUri?.AbsolutePath == "/api/v4/posts/post-1/unpin"), Is.True);
+        }
+
+        [Test]
         public async Task Dispose_DoesNotDisposeExternalHttpClient()
         {
             RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(_ => CreateJsonResponse(HttpStatusCode.OK, "{}"));
@@ -402,6 +473,16 @@ namespace Mattermost.Tests
             "}";
         }
 
+        private static string CreateReactionJson(string userId, string postId, string emojiName)
+        {
+            return "{" +
+            "\"user_id\":\"" + userId + "\"," +
+            "\"post_id\":\"" + postId + "\"," +
+            "\"emoji_name\":\"" + emojiName + "\"," +
+            "\"create_at\":1" +
+            "}";
+        }
+
         private sealed class RecordingHttpMessageHandler : HttpMessageHandler
         {
             private readonly Func<HttpRequestMessage, HttpResponseMessage> _responseFactory;
@@ -415,11 +496,12 @@ namespace Mattermost.Tests
 
             public bool IsDisposed { get; private set; }
 
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
-                Requests.Add(RecordedRequest.Create(request));
+                RecordedRequest recordedRequest = await RecordedRequest.CreateAsync(request).ConfigureAwait(false);
+                Requests.Add(recordedRequest);
                 HttpResponseMessage response = _responseFactory(request);
-                return Task.FromResult(response);
+                return response;
             }
 
             protected override void Dispose(bool disposing)
@@ -451,12 +533,14 @@ namespace Mattermost.Tests
                 HttpMethod method,
                 Uri? requestUri,
                 AuthenticationHeaderValue? authorization,
-                string? contentType)
+                string? contentType,
+                string? contentBody)
             {
                 Method = method;
                 RequestUri = requestUri;
                 Authorization = authorization;
                 ContentType = contentType;
+                ContentBody = contentBody;
             }
 
             public HttpMethod Method { get; }
@@ -467,17 +551,23 @@ namespace Mattermost.Tests
 
             public string? ContentType { get; }
 
-            public static RecordedRequest Create(HttpRequestMessage request)
+            public string? ContentBody { get; }
+
+            public static async Task<RecordedRequest> CreateAsync(HttpRequestMessage request)
             {
                 AuthenticationHeaderValue? authorization = request.Headers.Authorization == null
                     ? null
                     : new AuthenticationHeaderValue(request.Headers.Authorization.Scheme, request.Headers.Authorization.Parameter);
+                string? contentBody = request.Content is null
+                    ? null
+                    : await request.Content.ReadAsStringAsync().ConfigureAwait(false);
 
                 return new RecordedRequest(
                     request.Method,
                     request.RequestUri,
                     authorization,
-                    request.Content?.Headers.ContentType?.MediaType);
+                    request.Content?.Headers.ContentType?.MediaType,
+                    contentBody);
             }
         }
     }
