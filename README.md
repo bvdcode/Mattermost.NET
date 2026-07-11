@@ -385,6 +385,20 @@ new PostPropsSelectAction
 };
 ```
 
+When a user clicks a button or selects a menu option, Mattermost sends an HTTP `POST` request to the action's `Integration.Url`. Host that URL in your application and deserialize the JSON body with `PostActionIntegrationRequest`.
+
+```csharp
+app.MapPost("/mattermost/actions", (PostActionIntegrationRequest request) =>
+{
+    string action = request.Context["action"].GetString() ?? string.Empty;
+
+    return Results.Ok(new
+    {
+        ephemeral_text = $"Received {action}"
+    });
+});
+```
+
 ---
 
 # Builders
