@@ -1,5 +1,7 @@
 using Mattermost.Models;
+using Mattermost.Models.Channels;
 using Mattermost.Models.Posts;
+using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -322,6 +324,86 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        public async Task DiscoveryApis_UseExpectedRoutesQueriesAndPayload()
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
+            {
+                string? path = request.RequestUri?.AbsolutePath;
+                string? query = request.RequestUri?.Query;
+
+                if (path == "/api/v4/users/me")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("current-user"));
+                }
+
+                if (request.Method == HttpMethod.Get
+                    && path == "/api/v4/users"
+                    && query == "?page=1&per_page=2&in_team=team-1&in_channel=channel-1&active=true")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateUserJson("listed-user") + "]");
+                }
+
+                if (request.Method == HttpMethod.Post && path == "/api/v4/users/search")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateUserJson("searched-user") + "]");
+                }
+
+                if (request.Method == HttpMethod.Get
+                    && path == "/api/v4/teams"
+                    && query == "?page=3&per_page=4")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateTeamJson("team-1", "core") + "]");
+                }
+
+                if (request.Method == HttpMethod.Get && path == "/api/v4/teams/name/core")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateTeamJson("team-1", "core"));
+                }
+
+                if (request.Method == HttpMethod.Get
+                    && path == "/api/v4/teams/team-1/channels"
+                    && query == "?page=5&per_page=6")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateChannelJson("channel-1", "team-1", "off-topic-pub") + "]");
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            });
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
+
+            IList<User> users = await client.GetUsersAsync(1, 2, inTeamId: "team-1", inChannelId: "channel-1", active: true);
+            IList<User> searchedUsers = await client.SearchUsersAsync(" user ", teamId: "team-1", inChannelId: "channel-1", allowInactive: true, limit: 5);
+            IList<Team> teams = await client.GetTeamsAsync(3, 4);
+            Team team = await client.GetTeamByNameAsync("core");
+            IList<Channel> channels = await client.GetTeamChannelsAsync("team-1", 5, 6);
+
+            Assert.That(users[0].Id, Is.EqualTo("listed-user"));
+            Assert.That(searchedUsers[0].Id, Is.EqualTo("searched-user"));
+            Assert.That(teams[0].Id, Is.EqualTo("team-1"));
+            Assert.That(team.Name, Is.EqualTo("core"));
+            Assert.That(channels[0].Name, Is.EqualTo("off-topic-pub"));
+
+            RecordedRequest searchRequest = handler.Requests.Single(request => request.RequestUri?.AbsolutePath == "/api/v4/users/search");
+            using JsonDocument searchBody = JsonDocument.Parse(searchRequest.ContentBody ?? "{}");
+            JsonElement bodyRoot = searchBody.RootElement;
+
+            Assert.That(searchRequest.Authorization?.Scheme, Is.EqualTo("Bearer"));
+            Assert.That(searchRequest.Authorization?.Parameter, Is.EqualTo("api-key"));
+            Assert.That(bodyRoot.GetProperty("term").GetString(), Is.EqualTo("user"));
+            Assert.That(bodyRoot.GetProperty("team_id").GetString(), Is.EqualTo("team-1"));
+            Assert.That(bodyRoot.GetProperty("in_channel_id").GetString(), Is.EqualTo("channel-1"));
+            Assert.That(bodyRoot.GetProperty("allow_inactive").GetBoolean(), Is.True);
+            Assert.That(bodyRoot.GetProperty("limit").GetInt32(), Is.EqualTo(5));
+
+            Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/users?page=1&per_page=2&in_team=team-1&in_channel=channel-1&active=true"), Is.True);
+            Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/teams?page=3&per_page=4"), Is.True);
+            Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/teams/name/core"), Is.True);
+            Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/teams/team-1/channels?page=5&per_page=6"), Is.True);
+        }
+
+        [Test]
         public async Task PostInteractions_UseExpectedRoutesAndPerRequestAuthorization()
         {
             RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
@@ -470,6 +552,44 @@ namespace Mattermost.Tests
             "\"last_password_update\":0," +
             "\"last_picture_update\":0," +
             "\"is_bot\":false" +
+            "}";
+        }
+
+        private static string CreateTeamJson(string id, string name)
+        {
+            return "{" +
+            "\"id\":\"" + id + "\"," +
+            "\"create_at\":0," +
+            "\"update_at\":0," +
+            "\"delete_at\":0," +
+            "\"display_name\":\"" + name + "\"," +
+            "\"name\":\"" + name + "\"," +
+            "\"description\":\"\"," +
+            "\"email\":\"\"," +
+            "\"type\":\"O\"," +
+            "\"allowed_domains\":\"\"," +
+            "\"invite_id\":\"\"," +
+            "\"allow_open_invite\":true," +
+            "\"policy_id\":\"\"" +
+            "}";
+        }
+
+        private static string CreateChannelJson(string id, string teamId, string name)
+        {
+            return "{" +
+            "\"id\":\"" + id + "\"," +
+            "\"create_at\":0," +
+            "\"update_at\":0," +
+            "\"delete_at\":0," +
+            "\"team_id\":\"" + teamId + "\"," +
+            "\"type\":\"O\"," +
+            "\"display_name\":\"" + name + "\"," +
+            "\"name\":\"" + name + "\"," +
+            "\"header\":\"\"," +
+            "\"purpose\":\"\"," +
+            "\"last_post_at\":0," +
+            "\"total_msg_count\":0," +
+            "\"creator_id\":\"current-user\"" +
             "}";
         }
 

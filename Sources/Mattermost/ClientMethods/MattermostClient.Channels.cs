@@ -1,8 +1,10 @@
 ﻿using Mattermost.Constants;
 using Mattermost.Enums;
 using Mattermost.Exceptions;
+using Mattermost.Helpers;
 using Mattermost.Models.Channels;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -19,6 +21,22 @@ namespace Mattermost
         {
             CheckDisposed();
             return SendRequestAsync<Channel>(HttpMethod.Get, Routes.Channels + "/" + channelId);
+        }
+
+        /// <summary>
+        /// Get a page of public channels for a team.
+        /// </summary>
+        /// <param name="teamId"> Team identifier. </param>
+        /// <param name="page"> The page to select. </param>
+        /// <param name="perPage"> The number of channels per page. </param>
+        /// <returns> Public channels for the team. </returns>
+        public Task<IList<Channel>> GetTeamChannelsAsync(string teamId, int page = 0, int perPage = 60)
+        {
+            CheckDisposed();
+            ValidateTeamIdentifier(teamId, nameof(teamId));
+            string query = QueryHelpers.BuildPagedQuery(page, perPage);
+            string url = Routes.Teams + "/" + Uri.EscapeDataString(teamId.Trim()) + "/channels?" + query;
+            return SendRequestAsync<IList<Channel>>(HttpMethod.Get, url);
         }
 
         /// <summary>

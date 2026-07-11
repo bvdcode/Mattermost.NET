@@ -5,6 +5,7 @@ using Mattermost.Models;
 using Mattermost.Models.Channels;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses;
+using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -190,6 +191,32 @@ namespace Mattermost
 
         #endregion
 
+        #region Teams
+
+        /// <summary>
+        /// Get team by specified identifier.
+        /// </summary>
+        /// <param name="teamId"> Team identifier. </param>
+        /// <returns> Team information. </returns>
+        Task<Team> GetTeamAsync(string teamId);
+
+        /// <summary>
+        /// Get a page of teams.
+        /// </summary>
+        /// <param name="page"> The page to select. </param>
+        /// <param name="perPage"> The number of teams per page. </param>
+        /// <returns> Teams visible to the current user. </returns>
+        Task<IList<Team>> GetTeamsAsync(int page = 0, int perPage = 60);
+
+        /// <summary>
+        /// Get team by name.
+        /// </summary>
+        /// <param name="teamName"> Team name. </param>
+        /// <returns> Team information. </returns>
+        Task<Team> GetTeamByNameAsync(string teamName);
+
+        #endregion
+
         #region Channels
 
         /// <summary>
@@ -198,6 +225,15 @@ namespace Mattermost
         /// <param name="channelId"> Channel identifier. </param>
         /// <returns> Channel information. </returns>
         Task<Channel> GetChannelAsync(string channelId);
+
+        /// <summary>
+        /// Get a page of public channels for a team.
+        /// </summary>
+        /// <param name="teamId"> Team identifier. </param>
+        /// <param name="page"> The page to select. </param>
+        /// <param name="perPage"> The number of channels per page. </param>
+        /// <returns> Public channels for the team. </returns>
+        Task<IList<Channel>> GetTeamChannelsAsync(string teamId, int page = 0, int perPage = 60);
 
         /// <summary>
         /// Create simple channel with specified users.
@@ -331,6 +367,52 @@ namespace Mattermost
         /// <param name="userId"> User identifier. </param>
         /// <returns> User information. </returns>
         Task<User> GetUserAsync(string userId);
+
+        /// <summary>
+        /// Get a page of users.
+        /// </summary>
+        /// <param name="page"> The page to select. </param>
+        /// <param name="perPage"> The number of users per page. </param>
+        /// <param name="inTeamId"> Only users in this team. </param>
+        /// <param name="notInTeamId"> Only users not in this team. </param>
+        /// <param name="inChannelId"> Only users in this channel. </param>
+        /// <param name="notInChannelId"> Only users not in this channel. </param>
+        /// <param name="active"> Only active users. </param>
+        /// <param name="inactive"> Only inactive users. </param>
+        /// <returns> Users matching the query. </returns>
+        Task<IList<User>> GetUsersAsync(
+            int page = 0,
+            int perPage = 60,
+            string? inTeamId = null,
+            string? notInTeamId = null,
+            string? inChannelId = null,
+            string? notInChannelId = null,
+            bool? active = null,
+            bool? inactive = null);
+
+        /// <summary>
+        /// Search users by term.
+        /// </summary>
+        /// <param name="term"> Search term matched against username, full name, nickname and email. </param>
+        /// <param name="teamId"> Only search users on this team. </param>
+        /// <param name="notInTeamId"> Only search users not on this team. </param>
+        /// <param name="inChannelId"> Only search users in this channel. </param>
+        /// <param name="notInChannelId"> Only search users not in this channel. Must specify teamId when using this option. </param>
+        /// <param name="groupConstrained"> Only users allowed to join based on group constraints. </param>
+        /// <param name="allowInactive"> Include deactivated users in the results. </param>
+        /// <param name="withoutTeam"> Search users that are not on a team. </param>
+        /// <param name="limit"> Maximum number of users to return. </param>
+        /// <returns> Users matching the search term. </returns>
+        Task<IList<User>> SearchUsersAsync(
+            string term,
+            string? teamId = null,
+            string? notInTeamId = null,
+            string? inChannelId = null,
+            string? notInChannelId = null,
+            bool groupConstrained = false,
+            bool allowInactive = false,
+            bool withoutTeam = false,
+            int? limit = null);
 
         /// <summary>
         /// Get user by username.
