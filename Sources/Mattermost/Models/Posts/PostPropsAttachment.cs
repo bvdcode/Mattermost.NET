@@ -72,6 +72,27 @@ namespace Mattermost.Models.Posts
         public string? ImageUrl { get; set; }
 
         /// <summary>
+        /// An optional URL to an image displayed as a thumbnail on the right side of the attachment.
+        /// </summary>
+        [JsonPropertyName("thumb_url")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ThumbUrl { get; set; }
+
+        /// <summary>
+        /// An optional line of text displayed at the bottom of the attachment.
+        /// </summary>
+        [JsonPropertyName("footer")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Footer { get; set; }
+
+        /// <summary>
+        /// An optional URL to an icon displayed before the footer text.
+        /// </summary>
+        [JsonPropertyName("footer_icon")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? FooterIcon { get; set; }
+
+        /// <summary>
         /// Fields can be included as an optional array within attachments, and are used to display information in a table format inside the attachment.
         /// </summary>
         [JsonPropertyName("fields")]
