@@ -469,6 +469,35 @@ For dynamic selects, set `InteractiveDialogElement.DataSource` to `InteractiveDi
 
 See Mattermost's [interactive dialogs documentation](https://developers.mattermost.com/integrate/plugins/interactive-dialogs/) for the full server-side flow and field behavior.
 
+## Custom slash commands
+
+Mattermost sends custom slash command parameters as a URL-encoded POST body or GET query string. Use `SlashCommandRequestParser` to decode the parameters without depending on a specific web framework, then return a `SlashCommandResponse` as JSON.
+
+```csharp
+using Mattermost.Helpers;
+using Mattermost.Models.SlashCommands;
+using System.IO;
+
+app.MapPost("/mattermost/commands/weather", async (HttpRequest httpRequest) =>
+{
+    using StreamReader reader = new StreamReader(httpRequest.Body);
+    string encodedParameters = await reader.ReadToEndAsync();
+    SlashCommandRequest command = SlashCommandRequestParser.Parse(encodedParameters);
+
+    // Validate the command token or Authorization header before processing the request.
+
+    return Results.Json(new SlashCommandResponse
+    {
+        ResponseType = SlashCommandResponseType.InChannel,
+        Text = $"Weather request: {command.Text}"
+    });
+});
+```
+
+For GET commands, pass the raw query string to the same parser. `SlashCommandRequest.RootId` identifies the parent post when a command is invoked in a thread, while `UserMentions` and `ChannelMentions` map names in the command text to Mattermost identifiers. Set `SlashCommandResponse.ExtraResponses` to return multiple immediate posts, or use the request's `ResponseUrl` for delayed responses.
+
+See Mattermost's [custom slash commands documentation](https://developers.mattermost.com/integrate/slash-commands/custom/) for request validation and response behavior.
+
 ---
 
 # Builders
