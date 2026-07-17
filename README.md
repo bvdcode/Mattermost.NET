@@ -471,7 +471,9 @@ See Mattermost's [interactive dialogs documentation](https://developers.mattermo
 
 ## Custom slash commands
 
-Mattermost sends custom slash command parameters as a URL-encoded POST body or GET query string. Use `SlashCommandRequestParser` to decode the parameters without depending on a specific web framework, then return a `SlashCommandResponse` as JSON.
+These types help you implement the HTTP endpoint for a custom slash command; they do not register the command in Mattermost. Configure the command's request URL and HTTP method in Mattermost, then use `SlashCommandRequestParser` to decode the URL-encoded POST body or GET query string and return a `SlashCommandResponse` as JSON.
+
+For a POST command in an ASP.NET Core minimal API:
 
 ```csharp
 using Mattermost.Helpers;
@@ -494,9 +496,51 @@ app.MapPost("/mattermost/commands/weather", async (HttpRequest httpRequest) =>
 });
 ```
 
-For GET commands, pass the raw query string to the same parser. `SlashCommandRequest.RootId` identifies the parent post when a command is invoked in a thread, while `UserMentions` and `ChannelMentions` map names in the command text to Mattermost identifiers. Set `SlashCommandResponse.ExtraResponses` to return multiple immediate posts, or use the request's `ResponseUrl` for delayed responses.
+For a GET command, pass the raw query string to the same parser:
 
-See Mattermost's [custom slash commands documentation](https://developers.mattermost.com/integrate/slash-commands/custom/) for request validation and response behavior.
+```csharp
+app.MapGet("/mattermost/commands/weather", (HttpRequest httpRequest) =>
+{
+    string encodedParameters = httpRequest.QueryString.Value ?? string.Empty;
+    SlashCommandRequest command = SlashCommandRequestParser.Parse(encodedParameters);
+
+    return Results.Json(new SlashCommandResponse
+    {
+        ResponseType = SlashCommandResponseType.Ephemeral,
+        Text = $"Weather request: {command.Text}"
+    });
+});
+```
+
+`SlashCommandRequest.RootId` identifies the parent post when a command is invoked in a thread, while `UserMentions` and `ChannelMentions` map names in the command text to Mattermost identifiers. To return multiple immediate posts, add `SlashCommandResponseItem` values to `ExtraResponses`:
+
+```csharp
+return Results.Json(new SlashCommandResponse
+{
+    ResponseType = SlashCommandResponseType.InChannel,
+    Text = "Weather report",
+    ExtraResponses = new List<SlashCommandResponseItem>
+    {
+        new SlashCommandResponseItem
+        {
+            ResponseType = SlashCommandResponseType.Ephemeral,
+            Text = "Only the command author can see this detail."
+        }
+    }
+});
+```
+
+For work that completes after the initial request, send a `SlashCommandResponse` to the request's `ResponseUrl` using an application-managed `HttpClient`:
+
+```csharp
+await httpClient.PostAsJsonAsync(command.ResponseUrl, new SlashCommandResponse
+{
+    ResponseType = SlashCommandResponseType.InChannel,
+    Text = "The delayed weather report is ready."
+});
+```
+
+Validate the command token or authorization header before processing either request method. See Mattermost's [custom slash commands documentation](https://developers.mattermost.com/integrate/slash-commands/custom/) for command registration, request validation, and response behavior.
 
 ---
 
