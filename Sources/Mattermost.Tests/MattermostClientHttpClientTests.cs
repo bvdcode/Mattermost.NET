@@ -76,6 +76,48 @@ namespace Mattermost.Tests
             Assert.That(handler.Requests.All(static request => request.Authorization?.Scheme == "Bearer" && request.Authorization.Parameter == "api-key"), Is.True);
         }
 
+        [TestCase("https://mattermost.example/mattermost", "https://mattermost.example/mattermost")]
+        [TestCase("https://mattermost.example/corp/mattermost/", "https://mattermost.example/corp/mattermost")]
+        public async Task ServerUrlWithSubpath_AuthorizedRequestsPreserveSubpath(string serverUrl, string expectedBaseUrl)
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
+            {
+                string? path = request.RequestUri?.AbsolutePath;
+                if (path is not null && path.EndsWith("/api/v4/users/me", StringComparison.Ordinal))
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("subpath-user"));
+                }
+
+                if (path is not null && path.EndsWith("/api/v4/users", StringComparison.Ordinal))
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateUserJson("listed-user") + "]");
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            });
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient(serverUrl, "api-key", externalHttpClient);
+
+            IList<User> users = await client.GetUsersAsync(1, 2);
+
+            Assert.That(users[0].Id, Is.EqualTo("listed-user"));
+            Assert.That(handler.Requests, Has.Count.EqualTo(2));
+            Assert.That(handler.Requests[0].RequestUri, Is.EqualTo(new Uri(expectedBaseUrl + "/api/v4/users/me")));
+            Assert.That(handler.Requests[1].RequestUri, Is.EqualTo(new Uri(expectedBaseUrl + "/api/v4/users?page=1&per_page=2")));
+            Assert.That(handler.Requests.All(static request => request.Authorization?.Scheme == "Bearer" && request.Authorization.Parameter == "api-key"), Is.True);
+        }
+
+        [TestCase("https://mattermost.example", "wss://mattermost.example/api/v4/websocket")]
+        [TestCase("https://mattermost.example/mattermost", "wss://mattermost.example/mattermost/api/v4/websocket")]
+        [TestCase("http://mattermost.example:8065/corp/mattermost/", "ws://mattermost.example:8065/corp/mattermost/api/v4/websocket")]
+        public void ServerUrlWithSubpath_WebsocketUriPreservesSubpath(string serverUrl, string expectedWebsocketUrl)
+        {
+            Uri websocketUri = MattermostClient.BuildWebsocketUri(new Uri(serverUrl));
+
+            Assert.That(websocketUri, Is.EqualTo(new Uri(expectedWebsocketUrl)));
+        }
+
         [Test]
         public async Task LoginAndLogout_UsePerRequestAuthorization_AndDoNotMutateDefaultAuthorizationHeader()
         {

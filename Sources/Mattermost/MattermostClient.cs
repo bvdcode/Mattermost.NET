@@ -202,7 +202,7 @@ namespace Mattermost
             _serverUri = initialization.ServerUri;
             _apiKey = initialization.ApiKey;
             _ws = new ClientWebSocket();
-            _websocketUri = GetWebsocketUri(initialization.ServerUri);
+            _websocketUri = BuildWebsocketUri(initialization.ServerUri);
 
             if (initialization.HttpClient == null)
             {
@@ -545,7 +545,7 @@ namespace Mattermost
                 throw new AuthorizationException("Authorization token is not set - call LoginAsync first");
             }
 
-            Uri uri = BuildRequestUri(_websocketUri, Routes.WebSocket);
+            Uri uri = _websocketUri;
             if (_ws.State != WebSocketState.None)
             {
                 try
@@ -587,7 +587,7 @@ namespace Mattermost
             }
         }
 
-        private static Uri GetWebsocketUri(Uri serverUri)
+        internal static Uri BuildWebsocketUri(Uri serverUri)
         {
             UriBuilder builder = new UriBuilder(serverUri)
             {
@@ -595,11 +595,10 @@ namespace Mattermost
                     ? "wss"
                     : "ws",
                 Port = serverUri.IsDefaultPort ? -1 : serverUri.Port,
-                Path = "/",
                 Query = string.Empty,
                 Fragment = string.Empty
             };
-            return builder.Uri;
+            return BuildRequestUri(builder.Uri, Routes.WebSocket);
         }
 
         private static Uri ParseServerUri(string serverUrl)
@@ -865,7 +864,13 @@ namespace Mattermost
                 return absoluteUri;
             }
 
-            return new Uri(baseUri, route);
+            UriBuilder builder = new UriBuilder(baseUri)
+            {
+                Path = baseUri.AbsolutePath.TrimEnd('/') + "/",
+                Query = string.Empty,
+                Fragment = string.Empty
+            };
+            return new Uri(builder.Uri, route.TrimStart('/'));
         }
     }
 }
