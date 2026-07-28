@@ -229,6 +229,21 @@ new MattermostClient(Uri serverUri, string apiKey, HttpClient httpClient);
 await client.CreatePostAsync(channelId, "Hello, World!");
 ```
 
+## Send a priority message
+
+```csharp
+using Mattermost.Enums;
+
+await client.CreatePostAsync(
+    channelId,
+    "@username Please acknowledge this incident.",
+    priority: MessagePriority.Urgent,
+    requestedAck: true,
+    persistentNotifications: true);
+```
+
+Acknowledgement requests require `Important` or `Urgent` priority. Persistent notifications require `Urgent` priority and may also depend on the Mattermost server license, configuration, and mention rules.
+
 ## Reply to a thread
 
 ```csharp
@@ -554,8 +569,11 @@ using Mattermost.Enums;
 
 await new PostBuilder()
     .ToChannel(channelId)
-    .AddText("Important message")
-    .SetPriority(MessagePriority.Important)
+    .AddText("@username Please acknowledge this incident.")
+    .SetPriority(
+        MessagePriority.Urgent,
+        requestedAck: true,
+        persistentNotifications: true)
     .SendMessageAsync(client);
 ```
 

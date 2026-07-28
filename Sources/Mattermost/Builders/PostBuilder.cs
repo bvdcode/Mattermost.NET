@@ -17,6 +17,8 @@ namespace Mattermost.Builders
         private string replyToPostId;
         private readonly List<string> files;
         private MessagePriority messagePriority;
+        private bool requestedAck;
+        private bool persistentNotifications;
 
         /// <summary>
         /// Create new post builder.
@@ -28,6 +30,8 @@ namespace Mattermost.Builders
             files = new List<string>();
             channelId = string.Empty;
             messagePriority = MessagePriority.Empty;
+            requestedAck = false;
+            persistentNotifications = false;
         }
 
         /// <summary>
@@ -82,10 +86,17 @@ namespace Mattermost.Builders
         /// Set post priority.
         /// </summary>
         /// <param name="messagePriority"> Post priority. </param>
+        /// <param name="requestedAck"> Request acknowledgement from recipients. </param>
+        /// <param name="persistentNotifications"> Send persistent notifications until acknowledgement. Urgent posts only. </param>
         /// <returns> Current buidler. </returns>
-        public PostBuilder SetPriority(MessagePriority messagePriority)
+        public PostBuilder SetPriority(
+            MessagePriority messagePriority,
+            bool requestedAck = false,
+            bool persistentNotifications = false)
         {
             this.messagePriority = messagePriority;
+            this.requestedAck = requestedAck;
+            this.persistentNotifications = persistentNotifications;
             return this;
         }
 
@@ -135,7 +146,14 @@ namespace Mattermost.Builders
             {
                 throw new ArgumentException("Post cannot be empty - no text and no files there.");
             }
-            return client.CreatePostAsync(channelId, text, replyToPostId, messagePriority, files.Count > 0 ? files : null);
+            return client.CreatePostAsync(
+                channelId,
+                text,
+                replyToPostId,
+                messagePriority,
+                files.Count > 0 ? files : null,
+                requestedAck: requestedAck,
+                persistentNotifications: persistentNotifications);
         }
     }
 }

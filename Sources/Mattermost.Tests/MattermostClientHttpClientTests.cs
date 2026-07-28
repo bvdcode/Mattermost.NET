@@ -1,3 +1,4 @@
+using Mattermost.Enums;
 using Mattermost.Exceptions;
 using Mattermost.Models;
 using Mattermost.Models.Channels;
@@ -35,6 +36,64 @@ namespace Mattermost.Tests
             Assert.Throws<ArgumentException>(() => _ = new MattermostClient("not-a-valid-uri"));
             Assert.Throws<ArgumentException>(() => _ = new MattermostClient(new Uri("/relative", UriKind.Relative)));
             Assert.Throws<ArgumentException>(() => _ = new MattermostClient(new Uri("ftp://mattermost.example")));
+        }
+
+        [Test]
+        public async Task CreatePost_PriorityOptions_AreSerialized()
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(CreatePostResponse);
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient(
+                "https://mattermost.example",
+                "api-key",
+                externalHttpClient);
+
+            await client.CreatePostAsync(
+                "channel-1",
+                "Urgent message",
+                priority: MessagePriority.Urgent,
+                requestedAck: true,
+                persistentNotifications: true);
+            await client.CreatePostWithRawPropsAsync(
+                "channel-1",
+                "Important message",
+                priority: MessagePriority.Important,
+                requestedAck: true);
+
+            IList<RecordedRequest> requests = handler.Requests
+                .Where(item => item.Method == HttpMethod.Post && item.RequestUri?.AbsolutePath == "/api/v4/posts")
+                .ToList();
+
+            using JsonDocument urgentDocument = JsonDocument.Parse(requests[0].ContentBody ?? "{}");
+            JsonElement urgentPriority = urgentDocument.RootElement.GetProperty("metadata").GetProperty("priority");
+            Assert.That(urgentPriority.GetProperty("priority").GetString(), Is.EqualTo("urgent"));
+            Assert.That(urgentPriority.GetProperty("requested_ack").GetBoolean(), Is.True);
+            Assert.That(urgentPriority.GetProperty("persistent_notifications").GetBoolean(), Is.True);
+
+            using JsonDocument importantDocument = JsonDocument.Parse(requests[1].ContentBody ?? "{}");
+            JsonElement importantPriority = importantDocument.RootElement.GetProperty("metadata").GetProperty("priority");
+            Assert.That(importantPriority.GetProperty("priority").GetString(), Is.EqualTo("important"));
+            Assert.That(importantPriority.GetProperty("requested_ack").GetBoolean(), Is.True);
+            Assert.That(importantPriority.TryGetProperty("persistent_notifications", out _), Is.False);
+        }
+
+        [TestCase(MessagePriority.Empty, true, false)]
+        [TestCase(MessagePriority.Important, false, true)]
+        public void CreatePost_IncompatiblePriorityOptions_ThrowsArgumentException(
+            MessagePriority priority,
+            bool requestedAck,
+            bool persistentNotifications)
+        {
+            using MattermostClient client = new MattermostClient("https://mattermost.example");
+
+            Assert.Throws<ArgumentException>(() =>
+                _ = client.CreatePostAsync(
+                    "channel-1",
+                    "Invalid priority message",
+                    priority: priority,
+                    requestedAck: requestedAck,
+                    persistentNotifications: persistentNotifications));
         }
 
         [Test]
@@ -689,6 +748,20 @@ namespace Mattermost.Tests
                 case "POST /api/v4/posts/post-1/pin":
                 case "POST /api/v4/posts/post-1/unpin":
                     return CreateJsonResponse(HttpStatusCode.OK, "{}");
+                default:
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
+        }
+
+        private static HttpResponseMessage CreatePostResponse(HttpRequestMessage request)
+        {
+            string requestKey = request.Method.Method + " " + request.RequestUri?.AbsolutePath;
+            switch (requestKey)
+            {
+                case "GET /api/v4/users/me":
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("current-user"));
+                case "POST /api/v4/posts":
+                    return CreateJsonResponse(HttpStatusCode.Created, "{}");
                 default:
                     return new HttpResponseMessage(HttpStatusCode.NotFound);
             }

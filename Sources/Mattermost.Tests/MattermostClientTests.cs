@@ -479,6 +479,38 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
+        public async Task CreatePostWithPersistentNotifications_LiveInstanceAcceptsPriorityMetadata()
+        {
+            const string channelId = "w5e788utqbfgickdfgsabp8wya";
+            Post? createdPost = null;
+
+            try
+            {
+                string message = "@"
+                    + client.CurrentUserInfo.Username
+                    + " Persistent notification smoke "
+                    + Guid.NewGuid().ToString("N");
+                createdPost = await client.CreatePostAsync(
+                    channelId,
+                    message,
+                    priority: MessagePriority.Urgent,
+                    requestedAck: true,
+                    persistentNotifications: true);
+
+                Assert.That(createdPost.ChannelId, Is.EqualTo(channelId));
+                await client.AddReactionAsync(createdPost.Id, "white_check_mark");
+            }
+            finally
+            {
+                if (createdPost is not null)
+                {
+                    await client.DeletePostAsync(createdPost.Id);
+                }
+            }
+        }
+
+        [Test]
+        [NonParallelizable]
         public async Task PostInteractions_CreatePost_ReactionAndPinRoundTrip()
         {
             const string channelId = "w5e788utqbfgickdfgsabp8wya";
