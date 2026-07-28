@@ -78,11 +78,14 @@ namespace Mattermost
         /// <param name="priority"> Set message priority </param>
         /// <param name="files"> Attach files to post. </param>
         /// <param name="rawProps"> A general JSON property bag to attach to the post. </param>
+        /// <param name="requestedAck"> Request acknowledgement from recipients. </param>
+        /// <param name="persistentNotifications"> Send persistent notifications until acknowledgement. Urgent posts only. </param>
         /// <returns> Created post. </returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         Task<Post> CreatePostWithRawPropsAsync(string channelId, string message = "", string replyToPostId = "",
             MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null,
-            IDictionary<string, object>? rawProps = null);
+            IDictionary<string, object>? rawProps = null, bool requestedAck = false,
+            bool persistentNotifications = false);
 
         /// <summary>
         /// Send message to specified channel using channel identifier.
@@ -93,10 +96,13 @@ namespace Mattermost
         /// <param name="priority"> Set message priority </param>
         /// <param name="files"> Attach files to post. </param>
         /// <param name="props"> Props object to attach to the post. </param>
+        /// <param name="requestedAck"> Request acknowledgement from recipients. </param>
+        /// <param name="persistentNotifications"> Send persistent notifications until acknowledgement. Urgent posts only. </param>
         /// <returns> Created post. </returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         Task<Post> CreatePostAsync(string channelId, string message = "", string replyToPostId = "",
-            MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null, PostProps? props = null);
+            MessagePriority priority = MessagePriority.Empty, IEnumerable<string>? files = null,
+            PostProps? props = null, bool requestedAck = false, bool persistentNotifications = false);
 
         /// <summary>
         /// Get post by identifier.

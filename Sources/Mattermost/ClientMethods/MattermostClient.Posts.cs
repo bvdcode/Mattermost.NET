@@ -21,11 +21,14 @@ namespace Mattermost
         /// <param name="priority"> Set message priority </param>
         /// <param name="files"> Attach files to post. </param>
         /// <param name="rawProps"> A general JSON property bag to attach to the post. </param>
+        /// <param name="requestedAck"> Request acknowledgement from recipients. </param>
+        /// <param name="persistentNotifications"> Send persistent notifications until acknowledgement. Urgent posts only. </param>
         /// <returns> Created post. </returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         public Task<Post> CreatePostWithRawPropsAsync(string channelId, string message = "",
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
-            IEnumerable<string>? files = null, IDictionary<string, object>? rawProps = null)
+            IEnumerable<string>? files = null, IDictionary<string, object>? rawProps = null,
+            bool requestedAck = false, bool persistentNotifications = false)
         {
             CheckDisposed();
             if (message.Length > MattermostApiLimits.MaxPostMessageLength)
@@ -34,17 +37,12 @@ namespace Mattermost
                     $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
 
-            Dictionary<string, object> metadata = new Dictionary<string, object>();
-            if (priority != MessagePriority.Empty)
-            {
-                metadata.Add("priority", new
-                {
-                    priority = priority.ToString().ToLower(),
-                    requested_ack = false
-                });
-            }
+            Dictionary<string, object> metadata = BuildPostMetadata(
+                priority,
+                requestedAck,
+                persistentNotifications);
 
-            var body = new
+            object body = new
             {
                 message,
                 channel_id = channelId,
@@ -65,11 +63,14 @@ namespace Mattermost
         /// <param name="priority"> Set message priority </param>
         /// <param name="files"> Attach files to post. </param>
         /// <param name="props"> Props object to attach to the post. </param>
+        /// <param name="requestedAck"> Request acknowledgement from recipients. </param>
+        /// <param name="persistentNotifications"> Send persistent notifications until acknowledgement. Urgent posts only. </param>
         /// <returns> Created post. </returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         public Task<Post> CreatePostAsync(string channelId, string message = "",
             string replyToPostId = "", MessagePriority priority = MessagePriority.Empty,
-            IEnumerable<string>? files = null, PostProps? props = null)
+            IEnumerable<string>? files = null, PostProps? props = null,
+            bool requestedAck = false, bool persistentNotifications = false)
         {
             CheckDisposed();
             if (message.Length > MattermostApiLimits.MaxPostMessageLength)
@@ -77,17 +78,13 @@ namespace Mattermost
                 throw new ArgumentOutOfRangeException(nameof(message),
                     $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
             }
-            Dictionary<string, object> metadata = new Dictionary<string, object>();
-            if (priority != MessagePriority.Empty)
-            {
-                metadata.Add("priority", new
-                {
-                    priority = priority.ToString().ToLower(),
-                    requested_ack = false
-                });
-            }
 
-            var body = new
+            Dictionary<string, object> metadata = BuildPostMetadata(
+                priority,
+                requestedAck,
+                persistentNotifications);
+
+            object body = new
             {
                 message,
                 channel_id = channelId,
@@ -97,6 +94,64 @@ namespace Mattermost
                 props
             };
             return SendRequestAsync<Post>(HttpMethod.Post, Routes.Posts, body);
+        }
+
+        private static Dictionary<string, object> BuildPostMetadata(
+            MessagePriority priority,
+            bool requestedAck,
+            bool persistentNotifications)
+        {
+            if (priority == MessagePriority.Empty)
+            {
+                if (requestedAck)
+                {
+                    throw new ArgumentException(
+                        "Acknowledgement can only be requested for important or urgent posts.",
+                        nameof(requestedAck));
+                }
+                if (persistentNotifications)
+                {
+                    throw new ArgumentException(
+                        "Persistent notifications can only be enabled for urgent posts.",
+                        nameof(persistentNotifications));
+                }
+                return new Dictionary<string, object>();
+            }
+
+            if (persistentNotifications && priority != MessagePriority.Urgent)
+            {
+                throw new ArgumentException(
+                    "Persistent notifications can only be enabled for urgent posts.",
+                    nameof(persistentNotifications));
+            }
+
+            string priorityValue;
+            switch (priority)
+            {
+                case MessagePriority.Important:
+                    priorityValue = "important";
+                    break;
+                case MessagePriority.Urgent:
+                    priorityValue = "urgent";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(priority), priority, "Unknown message priority.");
+            }
+
+            Dictionary<string, object> priorityMetadata = new Dictionary<string, object>
+            {
+                ["priority"] = priorityValue,
+                ["requested_ack"] = requestedAck
+            };
+            if (persistentNotifications)
+            {
+                priorityMetadata.Add("persistent_notifications", true);
+            }
+
+            return new Dictionary<string, object>
+            {
+                ["priority"] = priorityMetadata
+            };
         }
 
         /// <summary>
