@@ -234,6 +234,13 @@ namespace Mattermost
         Task<IList<Team>> GetTeamsAsync(int page = 0, int perPage = 60);
 
         /// <summary>
+        /// Get teams for a specified user.
+        /// </summary>
+        /// <param name="userId"> User identifier. </param>
+        /// <returns> Teams the user belongs to. </returns>
+        Task<IReadOnlyList<Team>> GetUserTeamsAsync(string userId);
+
+        /// <summary>
         /// Get team by name.
         /// </summary>
         /// <param name="teamName"> Team name. </param>

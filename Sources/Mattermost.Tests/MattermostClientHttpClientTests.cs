@@ -458,6 +458,11 @@ namespace Mattermost.Tests
                     return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateTeamJson("team-1", "core") + "]");
                 }
 
+                if (request.Method == HttpMethod.Get && path == "/api/v4/users/user%2F1/teams")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "[" + CreateTeamJson("team-1", "core") + "]");
+                }
+
                 if (request.Method == HttpMethod.Get && path == "/api/v4/teams/name/core")
                 {
                     return CreateJsonResponse(HttpStatusCode.OK, CreateTeamJson("team-1", "core"));
@@ -479,12 +484,14 @@ namespace Mattermost.Tests
             IList<User> users = await client.GetUsersAsync(1, 2, inTeamId: "team-1", inChannelId: "channel-1", active: true);
             IList<User> searchedUsers = await client.SearchUsersAsync(" user ", teamId: "team-1", inChannelId: "channel-1", allowInactive: true, limit: 5);
             IList<Team> teams = await client.GetTeamsAsync(3, 4);
+            IReadOnlyList<Team> userTeams = await client.GetUserTeamsAsync(" user/1 ");
             Team team = await client.GetTeamByNameAsync("core");
             IList<Channel> channels = await client.GetTeamChannelsAsync("team-1", 5, 6);
 
             Assert.That(users[0].Id, Is.EqualTo("listed-user"));
             Assert.That(searchedUsers[0].Id, Is.EqualTo("searched-user"));
             Assert.That(teams[0].Id, Is.EqualTo("team-1"));
+            Assert.That(userTeams[0].Id, Is.EqualTo("team-1"));
             Assert.That(team.Name, Is.EqualTo("core"));
             Assert.That(channels[0].Name, Is.EqualTo("off-topic-pub"));
 
@@ -502,8 +509,21 @@ namespace Mattermost.Tests
 
             Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/users?page=1&per_page=2&in_team=team-1&in_channel=channel-1&active=true"), Is.True);
             Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/teams?page=3&per_page=4"), Is.True);
+            Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/users/user%2F1/teams"), Is.True);
             Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/teams/name/core"), Is.True);
             Assert.That(handler.Requests.Any(request => request.RequestUri?.ToString() == "https://mattermost.example/api/v4/teams/team-1/channels?page=5&per_page=6"), Is.True);
+        }
+
+        [Test]
+        public void GetUserTeamsAsync_EmptyUserId_ThrowsArgumentException()
+        {
+            using MattermostClient client = new MattermostClient("https://mattermost.example");
+
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+                _ = client.GetUserTeamsAsync(" "));
+
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception!.ParamName, Is.EqualTo("userId"));
         }
 
         [Test]
