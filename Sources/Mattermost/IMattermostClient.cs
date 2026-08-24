@@ -479,10 +479,10 @@ namespace Mattermost
         Task<bool> GetCallActiveAsync(string channelId);
 
         /// <summary>
-        /// End the specified call for all participants - 'Calls' plugin required.
+        /// End the active call in the specified channel for all participants - 'Calls' plugin required.
         /// </summary>
-        /// <param name="callId"> Call identifier. </param>
-        Task EndCallAsync(string callId);
+        /// <param name="channelId"> Channel identifier. </param>
+        Task EndCallAsync(string channelId);
 
         #endregion
 

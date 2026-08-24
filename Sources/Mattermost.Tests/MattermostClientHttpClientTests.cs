@@ -545,7 +545,7 @@ namespace Mattermost.Tests
 
                 if (request.Method == HttpMethod.Post
                     && (path == "/plugins/com.mattermost.calls/channel-1"
-                        || path == "/plugins/com.mattermost.calls/calls/call%2F1/host/end"))
+                        || path == "/plugins/com.mattermost.calls/calls/channel%2F1/host/end"))
                 {
                     return CreateJsonResponse(
                         HttpStatusCode.OK,
@@ -560,12 +560,12 @@ namespace Mattermost.Tests
 
             await client.SetChannelCallStateAsync("channel-1", true);
             bool active = await client.GetCallActiveAsync(" channel/1 ");
-            await client.EndCallAsync(" call/1 ");
+            await client.EndCallAsync(" channel/1 ");
 
             Assert.That(active, Is.True);
             AssertRecordedRoute(handler.Requests, HttpMethod.Post, "/plugins/com.mattermost.calls/channel-1");
             AssertRecordedRoute(handler.Requests, HttpMethod.Get, "/plugins/com.mattermost.calls/calls/channel%2F1/active");
-            AssertRecordedRoute(handler.Requests, HttpMethod.Post, "/plugins/com.mattermost.calls/calls/call%2F1/host/end");
+            AssertRecordedRoute(handler.Requests, HttpMethod.Post, "/plugins/com.mattermost.calls/calls/channel%2F1/host/end");
 
             RecordedRequest stateRequest = handler.Requests.Single(request =>
                 request.RequestUri?.AbsolutePath == "/plugins/com.mattermost.calls/channel-1");
