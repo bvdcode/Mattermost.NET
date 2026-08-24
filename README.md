@@ -317,11 +317,11 @@ bool callActive = await client.GetCallActiveAsync(channelId);
 
 if (callActive)
 {
-    await client.EndCallAsync(callId);
+    await client.EndCallAsync(channelId);
 }
 ```
 
-These methods require the Mattermost Calls plugin. Ending a call also requires host permissions.
+These methods require the Mattermost Calls plugin. `EndCallAsync` expects a channel identifier, despite the route parameter being named `call_id` by the plugin. Ending a call also requires host permissions.
 
 ---
 

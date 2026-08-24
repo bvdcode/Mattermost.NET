@@ -41,14 +41,14 @@ namespace Mattermost
         }
 
         /// <summary>
-        /// End the specified call for all participants.
+        /// End the active call in the specified channel for all participants.
         /// </summary>
-        /// <param name="callId"> Call identifier. </param>
-        public async Task EndCallAsync(string callId)
+        /// <param name="channelId"> Channel identifier. </param>
+        public async Task EndCallAsync(string channelId)
         {
             CheckDisposed();
-            string escapedCallId = EscapeCallsIdentifier(callId, nameof(callId));
-            string url = Routes.CallsPlugin + "/calls/" + escapedCallId + "/host/end";
+            string escapedChannelId = EscapeCallsIdentifier(channelId, nameof(channelId));
+            string url = Routes.CallsPlugin + "/calls/" + escapedChannelId + "/host/end";
             await SendRequestAsync(HttpMethod.Post, url).ConfigureAwait(false);
         }
 
