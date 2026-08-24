@@ -36,6 +36,23 @@ namespace Mattermost
         }
 
         /// <summary>
+        /// Get teams for a specified user.
+        /// </summary>
+        /// <param name="userId"> User identifier. </param>
+        /// <returns> Teams the user belongs to. </returns>
+        public Task<IReadOnlyList<Team>> GetUserTeamsAsync(string userId)
+        {
+            CheckDisposed();
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException("User identifier cannot be null or empty.", nameof(userId));
+            }
+
+            string url = Routes.Users + "/" + Uri.EscapeDataString(userId.Trim()) + "/teams";
+            return SendRequestAsync<IReadOnlyList<Team>>(HttpMethod.Get, url);
+        }
+
+        /// <summary>
         /// Get team by name.
         /// </summary>
         /// <param name="teamName"> Team name. </param>
