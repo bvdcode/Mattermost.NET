@@ -462,13 +462,29 @@ namespace Mattermost
 
         #endregion
 
+        #region Calls
+
         /// <summary>
         /// Set call state for channel identifier - 'Calls' plugin required.
         /// </summary>
         /// <param name="isCallsEnabled"> New state. </param>
         /// <param name="channelId"> Channel identifier where calls must be in specified state. </param>
-        /// <returns> True if calls state setted, otherwise false. </returns>
         Task SetChannelCallStateAsync(string channelId, bool isCallsEnabled);
+
+        /// <summary>
+        /// Check whether a call is active in the specified channel - 'Calls' plugin required.
+        /// </summary>
+        /// <param name="channelId"> Channel identifier. </param>
+        /// <returns> True when the channel has an active call; otherwise false. </returns>
+        Task<bool> GetCallActiveAsync(string channelId);
+
+        /// <summary>
+        /// End the specified call for all participants - 'Calls' plugin required.
+        /// </summary>
+        /// <param name="callId"> Call identifier. </param>
+        Task EndCallAsync(string callId);
+
+        #endregion
 
         /// <summary>
         /// Login with specified login identifier and password.

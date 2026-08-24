@@ -310,6 +310,19 @@ var found = await client.FindChannelByNameAsync(teamId, "town-square");
 var direct = await client.CreateDirectChannelAsync(userId);
 ```
 
+## Work with calls
+
+```csharp
+bool callActive = await client.GetCallActiveAsync(channelId);
+
+if (callActive)
+{
+    await client.EndCallAsync(callId);
+}
+```
+
+These methods require the Mattermost Calls plugin. Ending a call also requires host permissions.
+
 ---
 
 # Post props and attachments
@@ -605,7 +618,7 @@ The public API is exposed through `IMattermostClient` and includes:
 - channel lookup, creation, archiving, and membership changes;
 - direct and group channels;
 - file upload, download, streaming, and metadata;
-- Calls plugin channel state;
+- Calls plugin channel state, active call checks, and host call termination;
 - WebSocket events for messages, status changes, connection changes, and raw events.
 
 See [`IMattermostClient`](https://github.com/bvdcode/Mattermost.NET/blob/main/Sources/Mattermost/IMattermostClient.cs) for the full list of implemented methods.
