@@ -527,6 +527,62 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        public async Task CallsApis_UseExpectedRoutesAndPayload()
+        {
+            RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>
+            {
+                string? path = request.RequestUri?.AbsolutePath;
+                if (path == "/api/v4/users/me")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, CreateUserJson("current-user"));
+                }
+
+                if (request.Method == HttpMethod.Get
+                    && path == "/plugins/com.mattermost.calls/calls/channel%2F1/active")
+                {
+                    return CreateJsonResponse(HttpStatusCode.OK, "{\"active\":true}");
+                }
+
+                if (request.Method == HttpMethod.Post
+                    && (path == "/plugins/com.mattermost.calls/channel-1"
+                        || path == "/plugins/com.mattermost.calls/calls/call%2F1/host/end"))
+                {
+                    return CreateJsonResponse(
+                        HttpStatusCode.OK,
+                        "{\"message\":\"success\",\"status_code\":200}");
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            });
+
+            using HttpClient externalHttpClient = new HttpClient(handler);
+            using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
+
+            await client.SetChannelCallStateAsync("channel-1", true);
+            bool active = await client.GetCallActiveAsync(" channel/1 ");
+            await client.EndCallAsync(" call/1 ");
+
+            Assert.That(active, Is.True);
+            AssertRecordedRoute(handler.Requests, HttpMethod.Post, "/plugins/com.mattermost.calls/channel-1");
+            AssertRecordedRoute(handler.Requests, HttpMethod.Get, "/plugins/com.mattermost.calls/calls/channel%2F1/active");
+            AssertRecordedRoute(handler.Requests, HttpMethod.Post, "/plugins/com.mattermost.calls/calls/call%2F1/host/end");
+
+            RecordedRequest stateRequest = handler.Requests.Single(request =>
+                request.RequestUri?.AbsolutePath == "/plugins/com.mattermost.calls/channel-1");
+            using JsonDocument stateBody = JsonDocument.Parse(stateRequest.ContentBody ?? "{}");
+            Assert.That(stateBody.RootElement.GetProperty("enabled").GetBoolean(), Is.True);
+        }
+
+        [Test]
+        public void CallsApis_EmptyIdentifiers_ThrowArgumentException()
+        {
+            using MattermostClient client = new MattermostClient("https://mattermost.example");
+
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.GetCallActiveAsync(" "));
+            Assert.ThrowsAsync<ArgumentException>(async () => await client.EndCallAsync(" "));
+        }
+
+        [Test]
         public async Task OpenInteractiveDialogAsync_UsesExpectedRoutePayloadAndNoAuthorization()
         {
             RecordingHttpMessageHandler handler = new RecordingHttpMessageHandler(request =>

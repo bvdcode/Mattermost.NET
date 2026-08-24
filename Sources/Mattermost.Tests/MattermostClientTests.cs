@@ -481,6 +481,15 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
+        public void GetCallActive_PublicChannel_RequestSucceeds()
+        {
+            const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
+
+            Assert.DoesNotThrowAsync(async () => _ = await client.GetCallActiveAsync(channelId));
+        }
+
+        [Test]
+        [NonParallelizable]
         public async Task CreatePostWithPersistentNotifications_LiveInstanceAcceptsPriorityMetadata()
         {
             const string channelId = "w5e788utqbfgickdfgsabp8wya";
