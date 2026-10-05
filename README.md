@@ -126,6 +126,19 @@ await client.StopReceivingAsync();
 
 The client automatically reconnects when the WebSocket connection is lost. You only need `StartReceivingAsync` when you want to receive WebSocket events; regular REST API calls work without it.
 
+## Typing notifications
+
+Notify a channel or thread that the authenticated user or bot is typing:
+
+```csharp
+await client.SendTypingAsync(channelId, cancellationToken: cancellationToken);
+await client.SendTypingAsync(channelId, parentId: rootPostId, cancellationToken: cancellationToken);
+```
+
+This uses Mattermost's [REST typing endpoint](https://api.mattermost.com/#tag/users/operation/PublishUserTyping), available in server version 5.26 and later. It works without `StartReceivingAsync` or a WebSocket connection. Omit `parentId` for a channel notification, or supply the thread's root post ID.
+
+Each call publishes one notification; repeat calls while typing continues. Completion means the server accepted the request, not that a recipient displayed the indicator. Server errors use the usual `MattermostClientException`, and cancellation also covers automatic token authentication.
+
 ---
 
 # Incoming message filtering

@@ -684,14 +684,14 @@ namespace Mattermost
             OnLogMessage?.Invoke(this, new LogEventArgs(message + $" (Exception: {ex.Message})"));
         }
 
-        private Task CheckAuthorizedAsync()
+        private Task CheckAuthorizedAsync(CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(_accessToken))
             {
                 string? apiKey = _apiKey;
                 if (!string.IsNullOrWhiteSpace(apiKey))
                 {
-                    return LoginWithApiKeyAsync(apiKey!);
+                    return LoginWithApiKeyAsync(apiKey!, cancellationToken);
                 }
 
                 throw new AuthorizationException("Authorization token is not set - call LoginAsync first or use constructor with API key (Personal Access Token)");
@@ -708,7 +708,7 @@ namespace Mattermost
             }
         }
 
-        private async Task<User> LoginWithApiKeyAsync(string apiKey)
+        private async Task<User> LoginWithApiKeyAsync(string apiKey, CancellationToken cancellationToken = default)
         {
             CheckDisposed();
             if (string.IsNullOrWhiteSpace(apiKey))
@@ -720,7 +720,8 @@ namespace Mattermost
                 HttpMethod.Get,
                 Routes.Users + "/me",
                 requiresAuthorization: false,
-                authorizationTokenOverride: apiKey).ConfigureAwait(false);
+                authorizationTokenOverride: apiKey,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!result.IsSuccessStatusCode)
             {
@@ -806,7 +807,7 @@ namespace Mattermost
 
             if (requiresAuthorization)
             {
-                await CheckAuthorizedAsync().ConfigureAwait(false);
+                await CheckAuthorizedAsync(cancellationToken).ConfigureAwait(false);
             }
 
             using HttpRequestMessage request = new HttpRequestMessage(method, BuildRequestUri(route));

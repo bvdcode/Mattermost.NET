@@ -388,6 +388,17 @@ namespace Mattermost
         #region Users
 
         /// <summary>
+        /// Notifies a channel that the current user is typing. Requires Mattermost 5.26 or later.
+        /// </summary>
+        /// <param name="channelId">Channel to notify.</param>
+        /// <param name="parentId">Root post ID for a thread, or null or empty for the channel.</param>
+        /// <param name="cancellationToken">Cancels authentication and the notification request.</param>
+        /// <returns>A task that completes when the server accepts the notification.</returns>
+        /// <remarks>Uses the REST API and does not require StartReceivingAsync. Repeat while the user is typing.</remarks>
+        /// <exception cref="ArgumentException">The channel ID is null, empty, or whitespace.</exception>
+        Task SendTypingAsync(string channelId, string? parentId = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Get current authorized user information.
         /// </summary>
         /// <returns> Authorized user information. </returns>

@@ -4,12 +4,31 @@ using Mattermost.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mattermost
 {
     public partial class MattermostClient
     {
+        /// <inheritdoc />
+        public Task SendTypingAsync(string channelId, string? parentId = null, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            if (string.IsNullOrWhiteSpace(channelId))
+            {
+                throw new ArgumentException("Channel ID cannot be null or empty.", nameof(channelId));
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var body = new
+            {
+                channel_id = channelId.Trim(),
+                parent_id = parentId?.Trim() ?? string.Empty
+            };
+            return SendRequestAsync(HttpMethod.Post, Routes.Users + "/me/typing", body, cancellationToken);
+        }
+
         /// <summary>
         /// Get current authorized user information and force update of <see cref="CurrentUserInfo"/>.
         /// </summary>
