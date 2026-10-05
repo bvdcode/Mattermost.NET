@@ -124,7 +124,31 @@ Console.ReadLine();
 await client.StopReceivingAsync();
 ```
 
-The client automatically reconnects when the WebSocket connection is lost. You only need `StartReceivingAsync` when you want to receive WebSocket events; regular REST API calls work without it.
+The client automatically reconnects when the WebSocket connection is lost.
+Call `StartReceivingAsync` to receive events or send native typing pulses.
+Regular REST API calls work without a WebSocket connection.
+
+## Send a native typing pulse
+
+Wait for `OnConnected` before you call `SendTypingAsync`.
+An empty `parentId` targets the channel.
+A root post ID targets its thread.
+
+```csharp
+var connected = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+client.OnConnected += (_, _) => connected.TrySetResult(true);
+await client.StartReceivingAsync(cancellationToken);
+await connected.Task;
+
+await client.SendTypingAsync(channelId, cancellationToken: cancellationToken);
+await client.SendTypingAsync(channelId, parentId: rootPostId, cancellationToken: cancellationToken);
+```
+
+Each call sends one pulse through the existing authenticated socket.
+The caller must repeat the pulse while activity continues.
+The task completes after the socket sends the frame.
+It does not wait for server acknowledgement or prove that another client displays the indicator.
+The method rejects a disconnected client and does not create another connection.
 
 ---
 

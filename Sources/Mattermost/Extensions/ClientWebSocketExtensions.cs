@@ -12,9 +12,11 @@ namespace Mattermost.Extensions
 {
     internal static class ClientWebSocketExtensions
     {
-        private static int seq = 1;
+        private static int seq;
 
-        internal static Task SendAsync<TObj>(this ClientWebSocket webSocket, TObj obj)
+        internal static int NextSequence() => Interlocked.Increment(ref seq);
+
+        internal static Task SendAsync<TObj>(this ClientWebSocket webSocket, TObj obj, CancellationToken cancellationToken = default)
         {
             string json = JsonSerializer.Serialize(obj);
             byte[] data = Encoding.UTF8.GetBytes(json);
@@ -23,7 +25,7 @@ namespace Mattermost.Extensions
                 new ArraySegment<byte>(data),
                 WebSocketMessageType.Text,
                 true,
-                CancellationToken.None);
+                cancellationToken);
         }
 
         internal static async Task<WebsocketMessage> ReceiveAsync(this ClientWebSocket webSocket, CancellationToken cancellationToken)
@@ -48,21 +50,21 @@ namespace Mattermost.Extensions
             return result;
         }
 
-        internal static async Task<WebsocketMessage> RequestAsync(this ClientWebSocket webSocket, string action, object data)
+        internal static async Task<WebsocketMessage> RequestAsync(this ClientWebSocket webSocket, string action, object data, CancellationToken cancellationToken = default)
         {
             const int tryCount = 100;
             var body = new ActionRequest()
             {
-                Seq = seq++,
+                Seq = NextSequence(),
                 Action = action,
                 Data = data
             };
 
-            await webSocket.SendAsync(body).ConfigureAwait(false);
+            await webSocket.SendAsync(body, cancellationToken).ConfigureAwait(false);
 
             for (int i = 0; i < tryCount; i++)
             {
-                var result = await webSocket.ReceiveAsync(CancellationToken.None).ConfigureAwait(false);
+                var result = await webSocket.ReceiveAsync(cancellationToken).ConfigureAwait(false);
                 if (result.Seq == body.Seq)
                 {
                     return result;

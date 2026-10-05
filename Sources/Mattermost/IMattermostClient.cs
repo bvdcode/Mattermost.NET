@@ -67,6 +67,16 @@ namespace Mattermost
         /// </summary>
         Task StopReceivingAsync();
 
+        /// <summary>
+        /// Sends one native typing pulse through the authenticated WebSocket.
+        /// </summary>
+        /// <param name="channelId">The channel identifier.</param>
+        /// <param name="parentId">The thread root identifier, or an empty string for the channel.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task that completes after the socket sends the pulse, without server acknowledgement.</returns>
+        /// <exception cref="InvalidOperationException">The WebSocket is not authenticated and connected.</exception>
+        Task SendTypingAsync(string channelId, string parentId = "", CancellationToken cancellationToken = default);
+
         #region Posts
 
         /// <summary>

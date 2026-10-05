@@ -277,6 +277,7 @@ namespace Mattermost
         {
             CheckDisposed();
 
+            _authenticatedWebSocket = null;
             _receivingTokenSource.Cancel();
             _linkedReceivingTokenSource?.Cancel();
 
@@ -545,6 +546,7 @@ namespace Mattermost
                 throw new AuthorizationException("Authorization token is not set - call LoginAsync first");
             }
 
+            _authenticatedWebSocket = null;
             Uri uri = _websocketUri;
             if (_ws.State != WebSocketState.None)
             {
@@ -571,12 +573,13 @@ namespace Mattermost
                     throw new AuthorizationException("Authorization token is not set - call LoginAsync first");
                 }
 
-                var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token = _accessToken }).ConfigureAwait(false);
+                var result = await _ws.RequestAsync(WebsocketMethods.Authentication, new { token = _accessToken }, cancellationToken).ConfigureAwait(false);
                 if (result.Status != MattermostStatus.Ok)
                 {
                     throw new AuthorizationException("Authentication error, server response: " + result.Status);
                 }
 
+                _authenticatedWebSocket = _ws;
                 Log("WebSocket connection established with state " + _ws.State);
                 OnConnected?.Invoke(this, new ConnectionEventArgs(uri, DateTime.UtcNow));
             }
