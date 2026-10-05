@@ -7,7 +7,7 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 - Mattermost API documentation: https://developers.mattermost.com/api-documentation/
 - Mattermost OpenAPI specification: https://developers.mattermost.com/mattermost-openapi-v4.yaml
 - Last reviewed: 2026-07-11
-- Implemented operations: 38/633
+- Implemented operations: 41/633
 - SDK-only implemented routes missing from the current OpenAPI specification: 2
 
 ## Legend
@@ -326,8 +326,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## GET /api/v4/channels/{channel_id}/pinned - Get a channel's pinned posts
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetPinnedPosts) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetPinnedPosts) | `IMattermostClient.GetPinnedPostsAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id}/privacy - Update channel's privacy
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/UpdateChannelPrivacy) | `—`
@@ -1398,8 +1398,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## POST /api/v4/posts/ids - Get posts by a list of ids
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/getPostsByIds) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/getPostsByIds) | `IMattermostClient.GetPostsByIdsAsync`
+✅ Implemented
 
 ## POST /api/v4/posts/rewrite - Rewrite a message using AI
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/RewriteMessage) | `—`
@@ -1434,8 +1434,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## GET /api/v4/posts/{post_id}/files/info - Get file info for post
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetFileInfosForPost) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetFileInfosForPost) | `IMattermostClient.GetPostFilesAsync`
+✅ Implemented
 
 ## GET /api/v4/posts/{post_id}/info - Get post info
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetPostInfo) | `—`

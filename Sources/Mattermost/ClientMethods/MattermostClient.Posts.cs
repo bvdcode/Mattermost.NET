@@ -1,11 +1,13 @@
 ﻿using Mattermost.Constants;
 using Mattermost.Enums;
 using Mattermost.Helpers;
+using Mattermost.Models;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mattermost
@@ -260,6 +262,70 @@ namespace Mattermost
         {
             CheckDisposed();
             return SendRequestAsync<Post>(HttpMethod.Get, Routes.Posts + "/" + postId);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<Post>> GetPostsByIdsAsync(IEnumerable<string> postIds, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            if (postIds is null)
+            {
+                throw new ArgumentNullException(nameof(postIds));
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            List<string> ids = new List<string>();
+            foreach (string postId in postIds)
+            {
+                if (string.IsNullOrWhiteSpace(postId))
+                {
+                    throw new ArgumentException("Post IDs cannot contain null, empty, or whitespace values.", nameof(postIds));
+                }
+                ids.Add(postId.Trim());
+                if (ids.Count > MattermostApiLimits.MaxPostIdsPerRequest)
+                {
+                    throw new ArgumentException($"At most {MattermostApiLimits.MaxPostIdsPerRequest} post IDs can be requested at once.", nameof(postIds));
+                }
+            }
+            if (ids.Count == 0)
+            {
+                throw new ArgumentException("At least one post ID is required.", nameof(postIds));
+            }
+
+            return SendRequestAsync<IList<Post>>(HttpMethod.Post, Routes.Posts + "/ids", ids, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<ChannelPostsResponse> GetPinnedPostsAsync(string channelId, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            if (string.IsNullOrWhiteSpace(channelId))
+            {
+                throw new ArgumentException("Channel ID cannot be null or empty.", nameof(channelId));
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            string url = Routes.Channels + "/" + Uri.EscapeDataString(channelId.Trim()) + "/pinned";
+            return SendRequestAsync<ChannelPostsResponse>(HttpMethod.Get, url, cancellationToken: cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<FileDetails>> GetPostFilesAsync(string postId, bool includeDeleted = false, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            ValidatePostId(postId);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            string url = Routes.Posts + "/" + Uri.EscapeDataString(postId.Trim()) + "/files/info";
+            if (includeDeleted)
+            {
+                url += "?include_deleted=true";
+            }
+            return SendRequestAsync<IList<FileDetails>>(
+                HttpMethod.Get,
+                url,
+                cancellationToken: cancellationToken,
+                nullResultFactory: () => new List<FileDetails>());
         }
 
         /// <summary>

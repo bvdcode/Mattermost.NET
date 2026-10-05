@@ -10,5 +10,10 @@
         /// https://mattermost.com/blog/mattermost-5-0-intercept-and-modify-posts-advanced-permissions-longer-posts-and-more/#:~:text=Increased%20character%20limits%20on%20posts,better%20Markdown%20formatting%2C%20including%20tables.
         /// </summary>
         public const int MaxPostMessageLength = 16383;
+
+        /// <summary>
+        /// Maximum number of post IDs accepted by a single bulk lookup.
+        /// </summary>
+        public const int MaxPostIdsPerRequest = 1000;
     }
 }

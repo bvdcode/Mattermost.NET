@@ -59,7 +59,7 @@ namespace Mattermost.Models
         /// The size of the file in bytes.
         /// </summary>
         [JsonPropertyName("size")]
-        public int Size { get; set; }
+        public long Size { get; set; }
 
         /// <summary>
         /// The MIME type of the file.

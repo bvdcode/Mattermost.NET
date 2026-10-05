@@ -300,6 +300,18 @@ foreach (var post in posts.Posts.Values)
 }
 ```
 
+## Read selected posts and attachments
+
+```csharp
+var selected = await client.GetPostsByIdsAsync(new[] { firstPostId, secondPostId }, cancellationToken);
+var pinned = await client.GetPinnedPostsAsync(channelId, cancellationToken);
+var files = await client.GetPostFilesAsync(postId, cancellationToken: cancellationToken);
+```
+
+Bulk lookup accepts 1–1000 post IDs. Results may omit missing or inaccessible posts and do not preserve the input order; match them by `Post.Id`. Pinned posts use the same `Order` and `Posts` structure as `GetChannelPostsAsync`.
+
+`GetPostFilesAsync` returns file metadata, not file contents. Use `GetFileAsync(file.Id)` or `GetFileStreamAsync(file.Id)` to download an attachment. Its optional `includeDeleted: true` flag requires system administrator permissions.
+
 ## Get current user
 
 ```csharp

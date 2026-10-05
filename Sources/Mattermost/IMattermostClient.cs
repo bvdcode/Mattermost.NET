@@ -112,6 +112,35 @@ namespace Mattermost
         Task<Post> GetPostAsync(string postId);
 
         /// <summary>
+        /// Get multiple posts in one request.
+        /// </summary>
+        /// <param name="postIds">Between one and <see cref="MattermostApiLimits.MaxPostIdsPerRequest"/> post identifiers.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Posts visible to the current user. Missing or inaccessible posts may be omitted; input order is not preserved.</returns>
+        /// <exception cref="ArgumentNullException">The collection is null.</exception>
+        /// <exception cref="ArgumentException">The collection is empty, exceeds the limit, or contains blank identifiers.</exception>
+        Task<IList<Post>> GetPostsByIdsAsync(IEnumerable<string> postIds, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get a channel's pinned posts.
+        /// </summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Pinned post identifiers and their corresponding posts.</returns>
+        /// <exception cref="ArgumentException">The channel identifier is null, empty, or whitespace.</exception>
+        Task<ChannelPostsResponse> GetPinnedPostsAsync(string channelId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get metadata for the files attached to a post, without downloading their contents.
+        /// </summary>
+        /// <param name="postId">Post identifier.</param>
+        /// <param name="includeDeleted">Include deleted post data. Requires system administrator permissions.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Metadata for the attached files.</returns>
+        /// <exception cref="ArgumentException">The post identifier is null, empty, or whitespace.</exception>
+        Task<IList<FileDetails>> GetPostFilesAsync(string postId, bool includeDeleted = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Add current user's reaction to a post.
         /// </summary>
         /// <param name="postId"> Post identifier. </param>
