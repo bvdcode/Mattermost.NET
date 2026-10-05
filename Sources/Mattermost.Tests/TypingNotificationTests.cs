@@ -98,7 +98,7 @@ namespace Mattermost.Tests
             await started.Task.WaitAsync(deadline.Token);
             cancellation.Cancel();
 
-            Assert.CatchAsync<OperationCanceledException>(async () => await pending.WaitAsync(deadline.Token));
+            Assert.CatchAsync<OperationCanceledException>(async () => await pending.WaitAsync(TimeSpan.FromSeconds(5)));
         }
 
         [Test]
