@@ -150,6 +150,15 @@ The task completes after the socket sends the frame.
 It does not wait for server acknowledgement or prove that another client displays the indicator.
 The method rejects a disconnected client and does not create another connection.
 
+The NUnit tests in `TypingTests` use the existing `secrets.json` format.
+Set `customInstance` to the test server URL and `token` to the sender's access token.
+Set `username` and `password` to a different account on the same server.
+The tests create a direct channel between these accounts and verify the native events that the observer receives.
+
+```bash
+dotnet test Sources/Mattermost.Tests/Mattermost.Tests.csproj --filter FullyQualifiedName~TypingTests
+```
+
 ---
 
 # Incoming message filtering
