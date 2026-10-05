@@ -130,6 +130,8 @@ Regular REST API calls work without a WebSocket connection.
 
 ## Send a native typing pulse
 
+This method uses the documented Mattermost [WebSocket API](https://docs.mattermost.com/api/reference/mattermost-api#websocket-api) action `user_typing`.
+
 Wait for `OnConnected` before you call `SendTypingAsync`.
 An empty `parentId` targets the channel.
 A root post ID targets its thread.
