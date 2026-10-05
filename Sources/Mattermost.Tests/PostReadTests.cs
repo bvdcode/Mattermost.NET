@@ -184,14 +184,14 @@ namespace Mattermost.Tests
         }
 
         [Test]
-        public void HttpFailures_ArePropagated(
+        public async Task HttpFailures_ArePropagated(
             [Values("batch", "pinned", "files")] string operation,
             [Values(HttpStatusCode.BadRequest, HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden, HttpStatusCode.NotFound, HttpStatusCode.ServiceUnavailable)] HttpStatusCode status)
         {
             using HttpClient http = CreateHttpClient((_, _) => Task.FromResult(JsonResponse(status, "{\"message\":\"Access denied\"}")));
             using MattermostClient client = CreateClient(http);
 
-            MattermostClientException exception = Assert.ThrowsAsync<MattermostClientException>(() => InvokeAsync(client, operation))!;
+            MattermostClientException exception = (await Assert.ThrowsAsync<MattermostClientException>(() => InvokeAsync(client, operation)))!;
 
             Assert.That(exception.StatusCode, Is.EqualTo(status));
             Assert.That(exception.Message, Is.EqualTo("Access denied"));
@@ -234,7 +234,7 @@ namespace Mattermost.Tests
             await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
             cancellation.Cancel();
 
-            Assert.CatchAsync<OperationCanceledException>(async () => await pending.WaitAsync(TimeSpan.FromSeconds(5)));
+            await Assert.CatchAsync<OperationCanceledException>(async () => await pending.WaitAsync(TimeSpan.FromSeconds(5)));
         }
 
         private static Task InvokeAsync(IMattermostClient client, string operation, CancellationToken token = default)

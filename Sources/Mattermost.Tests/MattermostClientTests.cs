@@ -78,15 +78,15 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
-        public void AutologinTest_InvalidToken_ThrowsException()
+        public async Task AutologinTest_InvalidToken_ThrowsException()
         {
             MattermostClient mmClient = new("https://community.mattermost.com", "invalid_token");
-            Assert.ThrowsAsync<ApiKeyException>(mmClient.GetMeAsync);
+            await Assert.ThrowsAsync<ApiKeyException>(mmClient.GetMeAsync);
         }
 
         [Test]
         [NonParallelizable]
-        public void LoginTest_ProvidedToken_LoginThrowsException()
+        public async Task LoginTest_ProvidedToken_LoginThrowsException()
         {
             using (Assert.EnterMultipleScope())
             {
@@ -94,7 +94,7 @@ namespace Mattermost.Tests
                 Assert.That(password, Is.Not.Empty);
             }
             MattermostClient mmClient = new("https://community.mattermost.com", "abcabcabc");
-            Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.LoginAsync(email, password));
+            await Assert.ThrowsAsync<AuthorizationException>(async () => await mmClient.LoginAsync(email, password));
         }
 
         [Test]
@@ -124,10 +124,10 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
-        public void LoginTest_InvalidCredentials_ThrowsException()
+        public async Task LoginTest_InvalidCredentials_ThrowsException()
         {
             Assert.That(email, Is.Not.Empty);
-            Assert.ThrowsAsync<AuthorizationException>(async () => await client.LoginAsync(email, "invalid"));
+            await Assert.ThrowsAsync<AuthorizationException>(async () => await client.LoginAsync(email, "invalid"));
         }
 
         [Test]
@@ -347,20 +347,20 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
-        public void SendMessage_BigText_ThrowsException()
+        public async Task SendMessage_BigText_ThrowsException()
         {
             const string channelId = "w5e788utqbfgickdfgsabp8wya";
             string message = "A".PadRight(MattermostApiLimits.MaxPostMessageLength + 1, 'A');
-            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await client.CreatePostAsync(channelId, message));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await client.CreatePostAsync(channelId, message));
         }
 
         [Test]
         [NonParallelizable]
-        public void EditMessage_BigText_ThrowsException()
+        public async Task EditMessage_BigText_ThrowsException()
         {
             const string channelId = "w5e788utqbfgickdfgsabp8wya";
             string message = "A".PadRight(MattermostApiLimits.MaxPostMessageLength + 1, 'A');
-            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await client.UpdatePostAsync(channelId, message));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await client.UpdatePostAsync(channelId, message));
         }
 
         [Test]
@@ -481,11 +481,11 @@ namespace Mattermost.Tests
 
         [Test]
         [NonParallelizable]
-        public void GetCallActive_PublicChannel_RequestSucceeds()
+        public async Task GetCallActive_PublicChannel_RequestSucceeds()
         {
             const string channelId = "k71ypb7hxpb7jx7ygs9b4rf6gy"; // https://community.mattermost.com/core/channels/off-topic-pub
 
-            Assert.DoesNotThrowAsync(async () => _ = await client.GetCallActiveAsync(channelId));
+            await Assert.DoesNotThrowAsync(async () => _ = await client.GetCallActiveAsync(channelId));
         }
 
         [Test]
@@ -733,7 +733,7 @@ namespace Mattermost.Tests
         public async Task Z_Logout_Successful()
         {
             await client.LogoutAsync();
-            Assert.ThrowsAsync<AuthorizationException>(client.GetMeAsync);
+            await Assert.ThrowsAsync<AuthorizationException>(client.GetMeAsync);
         }
 
         private async Task<string> LoginForApiTokenAsync(HttpClient httpClient)

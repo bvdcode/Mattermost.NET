@@ -42,13 +42,13 @@ namespace Mattermost.Tests
         [TestCase(HttpStatusCode.Forbidden)]
         [TestCase(HttpStatusCode.NotFound)]
         [TestCase(HttpStatusCode.ServiceUnavailable)]
-        public void SendTyping_ServerRejectsRequest_ReportsFailure(HttpStatusCode status)
+        public async Task SendTyping_ServerRejectsRequest_ReportsFailure(HttpStatusCode status)
         {
             using HttpClient http = CreateHttpClient((_, _) => Task.FromResult(JsonResponse(status,
                 "{\"message\":\"Typing request rejected\",\"id\":\"typing.rejected\"}")));
             using MattermostClient client = new MattermostClient("https://mattermost.example/chat/", "test-token", http);
 
-            MattermostClientException exception = Assert.ThrowsAsync<MattermostClientException>(() => client.SendTypingAsync("channel-id"))!;
+            MattermostClientException exception = (await Assert.ThrowsAsync<MattermostClientException>(() => client.SendTypingAsync("channel-id")))!;
             Assert.That(exception.StatusCode, Is.EqualTo(status));
             Assert.That(exception.RequestMethod, Is.EqualTo(HttpMethod.Post.Method));
             Assert.That(exception.Message, Is.EqualTo("Typing request rejected"));
@@ -98,7 +98,7 @@ namespace Mattermost.Tests
             await started.Task.WaitAsync(deadline.Token);
             cancellation.Cancel();
 
-            Assert.CatchAsync<OperationCanceledException>(async () => await pending.WaitAsync(TimeSpan.FromSeconds(5)));
+            await Assert.CatchAsync<OperationCanceledException>(async () => await pending.WaitAsync(TimeSpan.FromSeconds(5)));
         }
 
         [Test]

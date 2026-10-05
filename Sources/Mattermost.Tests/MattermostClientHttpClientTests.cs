@@ -574,12 +574,12 @@ namespace Mattermost.Tests
         }
 
         [Test]
-        public void CallsApis_EmptyIdentifiers_ThrowArgumentException()
+        public async Task CallsApis_EmptyIdentifiers_ThrowArgumentException()
         {
             using MattermostClient client = new MattermostClient("https://mattermost.example");
 
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.GetCallActiveAsync(" "));
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.EndCallAsync(" "));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.GetCallActiveAsync(" "));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.EndCallAsync(" "));
         }
 
         [Test]
@@ -660,7 +660,7 @@ namespace Mattermost.Tests
             using HttpClient externalHttpClient = new HttpClient(handler);
             using MattermostClient client = new MattermostClient("https://mattermost.example", externalHttpClient);
 
-            MattermostClientException? exception = Assert.ThrowsAsync<MattermostClientException>(
+            MattermostClientException? exception = await Assert.ThrowsAsync<MattermostClientException>(
                 async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialog));
 
             Assert.That(exception, Is.Not.Null);
@@ -672,7 +672,7 @@ namespace Mattermost.Tests
         }
 
         [Test]
-        public void OpenInteractiveDialogAsync_InvalidRequiredFields_ThrowsArgumentException()
+        public async Task OpenInteractiveDialogAsync_InvalidRequiredFields_ThrowsArgumentException()
         {
             using MattermostClient client = new MattermostClient("https://mattermost.example");
             InteractiveDialog dialog = new InteractiveDialog
@@ -728,16 +728,16 @@ namespace Mattermost.Tests
                 }
             };
 
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("", "https://example.com/dialog/submit", dialog));
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "", dialog));
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", new InteractiveDialog()));
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithInvalidElement));
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithActionButtonWithoutConfiguration));
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithActionButtonWithoutUrl));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("", "https://example.com/dialog/submit", dialog));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "", dialog));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", new InteractiveDialog()));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithInvalidElement));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithActionButtonWithoutConfiguration));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialogWithActionButtonWithoutUrl));
         }
 
         [Test]
-        public void OpenInteractiveDialogAsync_DynamicSelectWithoutDataSourceUrl_ThrowsArgumentException()
+        public async Task OpenInteractiveDialogAsync_DynamicSelectWithoutDataSourceUrl_ThrowsArgumentException()
         {
             using MattermostClient client = new MattermostClient("https://mattermost.example");
             InteractiveDialog dialog = new InteractiveDialog
@@ -755,7 +755,7 @@ namespace Mattermost.Tests
                 }
             };
 
-            ArgumentException? exception = Assert.ThrowsAsync<ArgumentException>(
+            ArgumentException? exception = await Assert.ThrowsAsync<ArgumentException>(
                 async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialog));
 
             Assert.That(exception, Is.Not.Null);
@@ -763,7 +763,7 @@ namespace Mattermost.Tests
         }
 
         [Test]
-        public void OpenInteractiveDialogAsync_RefreshWithoutSourceUrl_ThrowsArgumentException()
+        public async Task OpenInteractiveDialogAsync_RefreshWithoutSourceUrl_ThrowsArgumentException()
         {
             using MattermostClient client = new MattermostClient("https://mattermost.example");
             InteractiveDialog dialog = new InteractiveDialog
@@ -782,7 +782,7 @@ namespace Mattermost.Tests
                 }
             };
 
-            ArgumentException? exception = Assert.ThrowsAsync<ArgumentException>(
+            ArgumentException? exception = await Assert.ThrowsAsync<ArgumentException>(
                 async () => await client.OpenInteractiveDialogAsync("trigger-1", "https://example.com/dialog/submit", dialog));
 
             Assert.That(exception, Is.Not.Null);
@@ -900,7 +900,7 @@ namespace Mattermost.Tests
             using HttpClient externalHttpClient = new HttpClient(handler);
             using MattermostClient client = new MattermostClient("https://mattermost.example", "api-key", externalHttpClient);
 
-            MattermostClientException? exception = Assert.ThrowsAsync<MattermostClientException>(async () => await client.GetReactionsAsync("missing-post"));
+            MattermostClientException? exception = await Assert.ThrowsAsync<MattermostClientException>(async () => await client.GetReactionsAsync("missing-post"));
 
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception!.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -939,12 +939,12 @@ namespace Mattermost.Tests
         }
 
         [Test]
-        public void ReactionEmojiName_Null_ThrowsArgumentException()
+        public async Task ReactionEmojiName_Null_ThrowsArgumentException()
         {
             using MattermostClient client = new MattermostClient("https://mattermost.example");
 
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.AddReactionAsync("post-1", null!));
-            Assert.ThrowsAsync<ArgumentException>(async () => await client.RemoveReactionAsync("post-1", null!));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.AddReactionAsync("post-1", null!));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await client.RemoveReactionAsync("post-1", null!));
         }
 
         [Test]
@@ -969,7 +969,7 @@ namespace Mattermost.Tests
 
             client.Dispose();
 
-            Assert.ThrowsAsync<ObjectDisposedException>(async () => await internalHttpClient.GetAsync("https://mattermost.example/ping"));
+            await Assert.ThrowsAsync<ObjectDisposedException>(async () => await internalHttpClient.GetAsync("https://mattermost.example/ping"));
         }
 
         [Test]
