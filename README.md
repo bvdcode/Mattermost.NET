@@ -335,6 +335,20 @@ var found = await client.FindChannelByNameAsync(teamId, "town-square");
 var direct = await client.CreateDirectChannelAsync(userId);
 ```
 
+## Read channels and memberships
+
+```csharp
+var channels = await client.GetUserChannelsAsync("me", cancellationToken: cancellationToken);
+var members = await client.GetChannelMembersAsync(channelId, page: 0, perPage: 60, cancellationToken: cancellationToken);
+var membership = await client.GetChannelMemberAsync(channelId, userId, cancellationToken);
+```
+
+`GetUserChannelsAsync` requires Mattermost 6.1 or later and returns the user's channels across all teams, including direct and group chats. Reading another user's channels requires `edit_other_users` permission. Archived channels are excluded by default; set `includeDeleted: true` to include them. The optional `lastDeleteAt` Unix timestamp in milliseconds filters archived channels only when that flag is enabled.
+
+Membership reads require `read_channel` permission. Pages are zero-based and the page size must be 1–200. These methods return `ChannelUserInfo` (membership roles, counters, and notification settings), not user profiles; use `GetUserAsync(membership.UserId)` for the profile. A missing membership is reported as an API error, not `null`.
+
+`ChannelUserInfo.LastViewedAt`, `MessageCount`, and `MentionCount` are 64-bit (`long`) values. The server may return `-1` for another member's `LastViewedAt` and `UpdatedAt` when those timestamps are hidden.
+
 ## Work with calls
 
 ```csharp

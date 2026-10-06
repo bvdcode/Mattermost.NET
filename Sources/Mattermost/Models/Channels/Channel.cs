@@ -40,7 +40,7 @@ namespace Mattermost.Models.Channels
         public string TeamId { get; set; } = string.Empty;
 
         /// <summary>
-        /// Channel type: O (open), P (private), or D (direct).
+        /// Channel type: O (open), P (private), D (direct), or G (group).
         /// </summary>
         [JsonPropertyName("type")]
         public string Type { get; set; } = string.Empty;
@@ -56,6 +56,7 @@ namespace Mattermost.Models.Channels
                 "O" => ChannelType.Public,
                 "P" => ChannelType.Private,
                 "D" => ChannelType.Direct,
+                "G" => ChannelType.Group,
                 _ => throw new ArgumentOutOfRangeException(nameof(Type), Type, null)
             };
             set => Type = value.ToChannelChar()

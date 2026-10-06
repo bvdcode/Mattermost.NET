@@ -297,6 +297,44 @@ namespace Mattermost
         Task<IList<Channel>> GetTeamChannelsAsync(string teamId, int page = 0, int perPage = 60);
 
         /// <summary>
+        /// Get all channels the user belongs to across all teams. Requires Mattermost 6.1 or later.
+        /// </summary>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="includeDeleted">Whether to include archived channels.</param>
+        /// <param name="lastDeleteAt">Unix timestamp in milliseconds used to filter archived channels. Ignored unless includeDeleted is true.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Channels the user belongs to, including direct and group channels.</returns>
+        /// <remarks>Requires the current user's own identifier or permission to edit other users.</remarks>
+        /// <exception cref="ArgumentException">The user identifier is blank.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The deletion timestamp is negative.</exception>
+        Task<IList<Channel>> GetUserChannelsAsync(string userId, bool includeDeleted = false,
+            long lastDeleteAt = 0, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get one page of channel memberships. Requires permission to read the channel.
+        /// </summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="page">Zero-based page number.</param>
+        /// <param name="perPage">Number of members per page, from 1 to <see cref="MattermostApiLimits.MaxChannelMembersPerPage"/>.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Channel memberships, not user profiles.</returns>
+        /// <exception cref="ArgumentException">The channel identifier is blank.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page is negative or the page size is outside the allowed range.</exception>
+        Task<IList<ChannelUserInfo>> GetChannelMembersAsync(string channelId, int page = 0,
+            int perPage = 60, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get a user's membership in a channel. Requires permission to read the channel.
+        /// </summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The channel membership, not the user's profile.</returns>
+        /// <exception cref="ArgumentException">A channel or user identifier is blank.</exception>
+        Task<ChannelUserInfo> GetChannelMemberAsync(string channelId, string userId,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Create simple channel with specified users.
         /// </summary>
         /// <param name="teamId"> Team identifier. </param>

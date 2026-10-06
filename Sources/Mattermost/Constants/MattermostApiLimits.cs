@@ -15,5 +15,10 @@
         /// Maximum number of post IDs accepted by a single bulk lookup.
         /// </summary>
         public const int MaxPostIdsPerRequest = 1000;
+
+        /// <summary>
+        /// Maximum number of channel memberships returned on a single page.
+        /// </summary>
+        public const int MaxChannelMembersPerPage = 200;
     }
 }

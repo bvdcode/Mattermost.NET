@@ -7,7 +7,7 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 - Mattermost API documentation: https://developers.mattermost.com/api-documentation/
 - Mattermost OpenAPI specification: https://developers.mattermost.com/mattermost-openapi-v4.yaml
 - Last reviewed: 2026-07-11
-- Implemented operations: 41/633
+- Implemented operations: 44/633
 - SDK-only implemented routes missing from the current OpenAPI specification: 2
 
 ## Legend
@@ -266,8 +266,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## GET /api/v4/channels/{channel_id}/members - Get channel members
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetChannelMembers) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetChannelMembers) | `IMattermostClient.GetChannelMembersAsync`
+✅ Implemented
 
 ## POST /api/v4/channels/{channel_id}/members - Add user(s) to channel
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/AddChannelMember) | `IMattermostClient.AddUserToChannelAsync`
@@ -286,8 +286,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ✅ Implemented
 
 ## GET /api/v4/channels/{channel_id}/members/{user_id} - Get channel member
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetChannelMember) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetChannelMember) | `IMattermostClient.GetChannelMemberAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id}/members/{user_id}/autotranslation - Update channel member autotranslation setting
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/UpdateChannelMemberAutotranslation) | `—`
@@ -394,8 +394,8 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## GET /api/v4/users/{user_id}/channels - Get all channels from all teams
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetChannelsForUser) | `—`
-❌ Not implemented
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetChannelsForUser) | `IMattermostClient.GetUserChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/channels/{channel_id}/unread - Get unread messages
 [Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/GetChannelUnread) | `—`

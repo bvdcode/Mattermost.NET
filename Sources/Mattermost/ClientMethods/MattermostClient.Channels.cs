@@ -5,7 +5,9 @@ using Mattermost.Helpers;
 using Mattermost.Models.Channels;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mattermost
@@ -37,6 +39,67 @@ namespace Mattermost
             string query = QueryHelpers.BuildPagedQuery(page, perPage);
             string url = Routes.Teams + "/" + Uri.EscapeDataString(teamId.Trim()) + "/channels?" + query;
             return SendRequestAsync<IList<Channel>>(HttpMethod.Get, url);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<Channel>> GetUserChannelsAsync(string userId, bool includeDeleted = false,
+            long lastDeleteAt = 0, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException("User identifier cannot be null or empty.", nameof(userId));
+            }
+            if (lastDeleteAt < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(lastDeleteAt), "Deletion timestamp cannot be negative.");
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            string url = Routes.Users + "/" + Uri.EscapeDataString(userId.Trim()) + "/channels"
+                + "?include_deleted=" + includeDeleted.ToString().ToLowerInvariant()
+                + "&last_delete_at=" + lastDeleteAt.ToString(CultureInfo.InvariantCulture);
+            return SendRequestAsync<IList<Channel>>(HttpMethod.Get, url, cancellationToken: cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<ChannelUserInfo>> GetChannelMembersAsync(string channelId, int page = 0,
+            int perPage = 60, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            if (string.IsNullOrWhiteSpace(channelId))
+            {
+                throw new ArgumentException("Channel identifier cannot be null or empty.", nameof(channelId));
+            }
+            if (perPage > MattermostApiLimits.MaxChannelMembersPerPage)
+            {
+                throw new ArgumentOutOfRangeException(nameof(perPage), $"At most {MattermostApiLimits.MaxChannelMembersPerPage} members can be requested per page.");
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            string query = QueryHelpers.BuildPagedQuery(page, perPage);
+            string url = Routes.Channels + "/" + Uri.EscapeDataString(channelId.Trim()) + "/members?" + query;
+            return SendRequestAsync<IList<ChannelUserInfo>>(HttpMethod.Get, url, cancellationToken: cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<ChannelUserInfo> GetChannelMemberAsync(string channelId, string userId,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            if (string.IsNullOrWhiteSpace(channelId))
+            {
+                throw new ArgumentException("Channel identifier cannot be null or empty.", nameof(channelId));
+            }
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException("User identifier cannot be null or empty.", nameof(userId));
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            string url = Routes.Channels + "/" + Uri.EscapeDataString(channelId.Trim())
+                + "/members/" + Uri.EscapeDataString(userId.Trim());
+            return SendRequestAsync<ChannelUserInfo>(HttpMethod.Get, url, cancellationToken: cancellationToken);
         }
 
         /// <summary>

@@ -18,20 +18,11 @@
         /// <summary>
         /// Direct channel - private channel with only two participants.
         /// </summary>
-        Direct
-    }
+        Direct,
 
-    internal static class ChannelTypeExtensions
-    {
-        internal static string? ToChannelChar(this ChannelType type)
-        {
-            return type switch
-            {
-                ChannelType.Public => "O",
-                ChannelType.Private => "P",
-                ChannelType.Direct => "D",
-                _ => null,
-            };
-        }
+        /// <summary>
+        /// Group message channel with multiple participants.
+        /// </summary>
+        Group
     }
 }
