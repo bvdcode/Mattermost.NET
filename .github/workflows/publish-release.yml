@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - Sources/**
+      - .github/workflows/publish-release.yml
       
 jobs:
   build:
@@ -15,7 +16,7 @@ jobs:
       CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }} 
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7.0.1
       with:
         fetch-depth: 0 #fetch-depth is needed for GitVersion
         
@@ -34,7 +35,7 @@ jobs:
     
     #Build/pack the project
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v6.0.0
       with:
         dotnet-version: 10.0.x
     - name: Build and Pack NuGet package
@@ -59,28 +60,23 @@ jobs:
       uses: actions/download-artifact@v4.0.0
       with:
         name: nupkg
+        path: nupkg
     - name: Prep packages
       run: dotnet nuget add source --username bvdcode --password ${{ secrets.DEPLOY_GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/bvdcode/index.json"
     - name: Push package to GitHub packages 
       if: needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change  
       run: |
-        dotnet nuget push *.nupkg --skip-duplicate --api-key ${{ secrets.DEPLOY_GITHUB_TOKEN }} --source "github"
-        dotnet nuget push *.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push "nupkg/*.nupkg" --skip-duplicate --api-key ${{ secrets.DEPLOY_GITHUB_TOKEN }} --source "github"
+        dotnet nuget push "nupkg/*.nupkg" --skip-duplicate --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json
     
     #Create release
-    - name: Create Release
-      if: 1 == 0 #needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_TOKEN }} 
-      with:
-        tag_name: ${{ needs.build.outputs.Version }}
-        release_name: Release ${{ needs.build.outputs.Version }}
     - name: Create Release
       if: needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change
       uses: ncipollo/release-action@v1
       with:
         tag: ${{ needs.build.outputs.Version }}
         name: Release ${{ needs.build.outputs.Version }}
-        artifacts: "nupkg/*"
+        commit: ${{ github.sha }}
+        body: ${{ github.event.head_commit.message }}
+        artifacts: "nupkg/*.nupkg,nupkg/*.snupkg"
         token: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
