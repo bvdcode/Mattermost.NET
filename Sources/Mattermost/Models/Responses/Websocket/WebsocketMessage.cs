@@ -62,13 +62,13 @@ namespace Mattermost.Models.Responses.Websocket
         {
             string eventText = (EventText ?? string.Empty)
                 .Replace("_", string.Empty);
-            bool parsed = Enum.TryParse<MattermostEvent>(eventText, true, out var result);
+            bool parsed = Enum.TryParse<MattermostEvent>(eventText, true, out MattermostEvent result);
             return parsed ? result : MattermostEvent.Unknown;
         }
 
         private MattermostStatus GetStatus()
         {
-            bool parsed = Enum.TryParse<MattermostStatus>(StatusText, true, out var result);
+            bool parsed = Enum.TryParse<MattermostStatus>(StatusText, true, out MattermostStatus result);
             return parsed ? result : MattermostStatus.Unknown;
         }
     }

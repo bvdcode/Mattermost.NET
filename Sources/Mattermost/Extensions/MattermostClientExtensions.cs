@@ -1,4 +1,5 @@
 ﻿using Mattermost.Models.Posts;
+using Mattermost.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,12 +25,12 @@ namespace Mattermost.Extensions
             int page = 0;
             while (true)
             {
-                var postsResponse = await client.GetChannelPostsAsync(channelId, page++, includeDeleted: true);
+                ChannelPostsResponse postsResponse = await client.GetChannelPostsAsync(channelId, page++, includeDeleted: true);
                 if (postsResponse.Posts.Count == 0)
                 {
                     break;
                 }
-                foreach (var item in postsResponse.Posts.Values)
+                foreach (Post item in postsResponse.Posts.Values)
                 {
                     if (allPosts.Any(x => x.Id == item.Id))
                     {
@@ -44,7 +45,7 @@ namespace Mattermost.Extensions
             }
 
             List<Post> result = new List<Post>();
-            foreach (var rootPost in allPosts.Where(x => string.IsNullOrWhiteSpace(x.RootId)).OrderBy(x => x.CreatedAt))
+            foreach (Post rootPost in allPosts.Where(x => string.IsNullOrWhiteSpace(x.RootId)).OrderBy(x => x.CreatedAt))
             {
                 result.Add(rootPost);
                 result.AddRange(allPosts.Where(x => x.RootId == rootPost.Id).OrderBy(x => x.CreatedAt));

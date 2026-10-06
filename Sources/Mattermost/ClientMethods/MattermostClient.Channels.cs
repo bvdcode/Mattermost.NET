@@ -249,7 +249,7 @@ namespace Mattermost
             {
                 throw new ArgumentException("User ID #2 cannot be null or empty.", nameof(userId2));
             }
-            var body = new[] { userId1, userId2 };
+            string[] body = new[] { userId1, userId2 };
             return SendRequestAsync<Channel>(HttpMethod.Post, Routes.Channels + "/direct", body);
         }
     }

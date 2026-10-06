@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Mattermost
 {
-    internal sealed class ResponseContentStream : Stream
+    internal class ResponseContentStream : Stream
     {
         private readonly Stream _innerStream;
         private readonly HttpResponseMessage _response;

@@ -11,8 +11,8 @@ namespace Mattermost.Extensions
     {
         internal static async Task<HttpResponseMessage> PostAsJsonAsync(this HttpClient client, string requestUri, object request)
         {
-            var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(requestUri, content);
+            StringContent content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(requestUri, content);
             return response;
         }
 
@@ -27,7 +27,7 @@ namespace Mattermost.Extensions
                 throw new AuthorizationException("Access denied");
             }
             response.EnsureSuccessStatusCode();
-            var responseContent = await response.Content.ReadAsStringAsync();
+            string responseContent = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<TResult>(responseContent) ?? throw new InvalidOperationException("Response is null");
         }
     }

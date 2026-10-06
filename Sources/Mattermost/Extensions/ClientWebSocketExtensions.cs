@@ -36,7 +36,7 @@ namespace Mattermost.Extensions
 
             Array.Resize(ref buffer, response.Count);
 
-            var result = JsonSerializer.Deserialize<WebsocketMessage>(buffer)!;
+            WebsocketMessage result = JsonSerializer.Deserialize<WebsocketMessage>(buffer)!;
             result.Raw = Encoding.UTF8.GetString(buffer);
             result.MessageType = response.MessageType;
 
@@ -51,7 +51,7 @@ namespace Mattermost.Extensions
         internal static async Task<WebsocketMessage> RequestAsync(this ClientWebSocket webSocket, string action, object data)
         {
             const int tryCount = 100;
-            var body = new ActionRequest()
+            ActionRequest body = new ActionRequest()
             {
                 Seq = seq++,
                 Action = action,
@@ -62,7 +62,7 @@ namespace Mattermost.Extensions
 
             for (int i = 0; i < tryCount; i++)
             {
-                var result = await webSocket.ReceiveAsync(CancellationToken.None).ConfigureAwait(false);
+                WebsocketMessage result = await webSocket.ReceiveAsync(CancellationToken.None).ConfigureAwait(false);
                 if (result.Seq == body.Seq)
                 {
                     return result;

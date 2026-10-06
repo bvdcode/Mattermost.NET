@@ -43,7 +43,7 @@ namespace Mattermost.Builders
             {
                 throw new ArgumentNullException(nameof(headers), "Headers count must be equal to columns count.");
             }
-            foreach (var header in headers)
+            foreach (string header in headers)
             {
                 _table.Append('|');
                 _table.Append(header);
@@ -90,7 +90,7 @@ namespace Mattermost.Builders
                 throw new InvalidOperationException("Table header is not added.");
             }
 
-            foreach (var cell in cells)
+            foreach (string cell in cells)
             {
                 _table.Append('|');
                 _table.Append(cell);

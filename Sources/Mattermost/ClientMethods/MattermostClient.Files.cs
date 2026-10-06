@@ -70,7 +70,7 @@ namespace Mattermost
         public async Task<FileDetails> UploadFileAsync(string channelId, string filePath, Action<int>? progressChanged = null)
         {
             FileInfo fileInfo = new FileInfo(filePath);
-            using var fs = fileInfo.OpenRead();
+            using FileStream fs = fileInfo.OpenRead();
             return await UploadFileAsync(channelId, fileInfo.Name, fs, progressChanged).ConfigureAwait(false);
         }
 
@@ -99,9 +99,35 @@ namespace Mattermost
             result.EnsureSuccessStatusCode();
             cts.Cancel();
             string json = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var response = JsonSerializer.Deserialize<FileResponse>(json)
+            FileResponse response = JsonSerializer.Deserialize<FileResponse>(json)
                 ?? throw new JsonException("Failed to deserialize file response: " + json);
             return response.Files.Single();
+        }
+
+        private void StartProgressTracker(Stream fs, CancellationToken token, Action<int> progressChanged)
+        {
+            _ = Task.Run(async () =>
+            {
+                int progress = 0;
+
+                while (!token.IsCancellationRequested)
+                {
+                    long current = fs.Position;
+                    long total = fs.Length;
+                    int result = (int)((double)current * 100 / total);
+                    if (result != progress)
+                    {
+                        progress = result;
+                        progressChanged?.Invoke(result);
+                    }
+
+                    await Task.Delay(100).ConfigureAwait(false);
+                    if (token.IsCancellationRequested || result >= 100)
+                    {
+                        break;
+                    }
+                }
+            }, token);
         }
     }
 }

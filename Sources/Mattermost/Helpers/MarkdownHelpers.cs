@@ -205,7 +205,7 @@ namespace Mattermost.Helpers
         public static string UnorderedList(params (string, int)[] values)
         {
             string result = string.Empty;
-            foreach (var item in values)
+            foreach ((string, int) item in values)
             {
                 if (item.Item2 < 0)
                 {
@@ -237,7 +237,7 @@ namespace Mattermost.Helpers
         public static string TaskList(params (string, bool)[] items)
         {
             string result = string.Empty;
-            foreach (var item in items)
+            foreach ((string, bool) item in items)
             {
                 ExceptionHelpers.ThrowIfEmpty(item.Item1, nameof(item.Item1));
                 result += $"- [{(item.Item2 ? "x" : " ")}] {item.Item1}\n";
