@@ -272,6 +272,24 @@ await client.CreatePostAsync(
 await client.UpdatePostAsync(postId, "Updated message text");
 ```
 
+## Partially update a post
+
+```csharp
+await client.PatchPostAsync(postId, isPinned: false);
+await client.PatchPostAsync(postId, text: "Updated text", cancellationToken: cancellationToken);
+await client.PatchPostAsync(postId, fileIds: Array.Empty<string>());
+await client.PatchPostAsync(postId, props: new Dictionary<string, object>
+{
+    ["custom_key"] = "replacement value"
+});
+```
+
+Only supplied, non-null parameters are sent; omitted fields remain unchanged. `null` means leave the field unchanged, not clear it. Empty text, an empty file list, an empty props dictionary, and `false` are sent as explicit values. Server validation and editing restrictions still apply.
+
+Supplied `props` replace the property bag rather than merging individual keys. Include any existing properties you need to preserve. `hasReactions` changes the post's reaction flag, not individual reactions; use `AddReactionAsync` and `RemoveReactionAsync` to manage reactions.
+
+See Mattermost's [patch post documentation](https://docs.mattermost.com/api/reference/patch-post) for the endpoint contract and permissions.
+
 ## Delete a post
 
 ```csharp

@@ -196,6 +196,24 @@ namespace Mattermost
         Task<Post> UpdatePostAsync(string postId, string newText, PostProps? props = null);
 
         /// <summary>
+        /// Partially update a post. Null parameters are omitted, leaving the corresponding fields unchanged.
+        /// </summary>
+        /// <param name="postId">Post identifier.</param>
+        /// <param name="text">Replacement message text (Markdown supported). An empty string sends empty text.</param>
+        /// <param name="props">Replacement JSON property bag, not a per-key merge. An empty dictionary sends empty props.</param>
+        /// <param name="fileIds">Replacement attached file identifiers. An empty list removes attachments.</param>
+        /// <param name="isPinned">Whether the post is pinned. False removes the pin.</param>
+        /// <param name="hasReactions">Replacement reaction flag. This does not add or remove individual reactions.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Updated post.</returns>
+        /// <remarks>Requires edit_post permission for the author's post, or edit_others_posts for another user's post. Server validation and editing restrictions apply.</remarks>
+        /// <exception cref="ArgumentException">The post identifier is null, empty, or whitespace.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The supplied text exceeds <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
+        Task<Post> PatchPostAsync(string postId, string? text = null, IDictionary<string, object>? props = null,
+            IList<string>? fileIds = null, bool? isPinned = null, bool? hasReactions = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Delete post with specified post identifier.
         /// </summary>
         /// <param name="postId"> Post identifier. </param>

@@ -204,6 +204,46 @@ namespace Mattermost
             return SendRequestAsync<Post>(HttpMethod.Put, Routes.Posts + "/" + postId + "/patch", body);
         }
 
+        /// <inheritdoc />
+        public Task<Post> PatchPostAsync(string postId, string? text = null, IDictionary<string, object>? props = null,
+            IList<string>? fileIds = null, bool? isPinned = null, bool? hasReactions = null,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            ValidatePostId(postId);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            Dictionary<string, object> body = new Dictionary<string, object>();
+            if (text is string message)
+            {
+                if (message.Length > MattermostApiLimits.MaxPostMessageLength)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(text),
+                        $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
+                }
+                body["message"] = message;
+            }
+            if (props is IDictionary<string, object> properties)
+            {
+                body["props"] = properties;
+            }
+            if (fileIds is IList<string> files)
+            {
+                body["file_ids"] = files;
+            }
+            if (isPinned is bool pinned)
+            {
+                body["is_pinned"] = pinned;
+            }
+            if (hasReactions is bool reactions)
+            {
+                body["has_reactions"] = reactions;
+            }
+
+            string url = Routes.Posts + "/" + Uri.EscapeDataString(postId.Trim()) + "/patch";
+            return SendRequestAsync<Post>(HttpMethod.Put, url, body, cancellationToken);
+        }
+
         /// <summary>
         /// Delete post with specified post identifier.
         /// </summary>

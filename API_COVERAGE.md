@@ -1446,7 +1446,7 @@ Routes implemented by the SDK but missing from the current Mattermost OpenAPI sp
 ❌ Not implemented
 
 ## PUT /api/v4/posts/{post_id}/patch - Patch a post
-[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/PatchPost) | `IMattermostClient.UpdatePostAsync`, `IMattermostClient.UpdatePostWithRawPropsAsync`
+[Mattermost API](https://developers.mattermost.com/api-documentation/#/operations/PatchPost) | `IMattermostClient.PatchPostAsync`, `IMattermostClient.UpdatePostAsync`, `IMattermostClient.UpdatePostWithRawPropsAsync`
 ✅ Implemented
 
 ## POST /api/v4/posts/{post_id}/pin - Pin a post to the channel
