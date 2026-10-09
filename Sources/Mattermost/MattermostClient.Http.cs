@@ -40,23 +40,7 @@ namespace Mattermost
             string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
-                MattermostClientException exception;
-                try
-                {
-                    MattermostApiErrorDetails details = JsonSerializer.Deserialize<MattermostApiErrorDetails>(json)
-                        ?? throw new JsonException("Failed to deserialize error result: " + json);
-                    exception = new MattermostClientException(details.Message);
-                }
-                catch (Exception)
-                {
-                    exception = new MattermostClientException("Unknown error, server response: " + response.StatusCode);
-                }
-
-                exception.StatusCode = response.StatusCode;
-                exception.ResponseJson = json;
-                exception.RequestUri = BuildRequestUri(requestUri).ToString();
-                exception.RequestMethod = method.Method;
-                throw exception;
+                throw CreateRequestException(response, json, method, requestUri);
             }
 
             object? result = JsonSerializer.Deserialize<TResult>(json);
@@ -71,6 +55,39 @@ namespace Mattermost
             }
 
             throw new JsonException("Failed to deserialize result: " + json);
+        }
+
+        private MattermostClientException CreateRequestException(HttpResponseMessage response, string json,
+            HttpMethod method, string route)
+        {
+            MattermostClientException exception;
+            try
+            {
+                MattermostApiErrorDetails details = JsonSerializer.Deserialize<MattermostApiErrorDetails>(json)
+                    ?? throw new JsonException("Failed to deserialize error result: " + json);
+                exception = new MattermostClientException(details.Message);
+            }
+            catch (Exception)
+            {
+                exception = new MattermostClientException("Unknown error, server response: " + response.StatusCode);
+            }
+            exception.StatusCode = response.StatusCode;
+            exception.ResponseJson = json;
+            exception.RequestUri = BuildRequestUri(route).ToString();
+            exception.RequestMethod = method.Method;
+            return exception;
+        }
+
+        private async Task<byte[]> GetBinaryContentAsync(string route, CancellationToken cancellationToken)
+        {
+            using HttpResponseMessage response = await SendHttpRequestAsync(HttpMethod.Get, route,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                throw CreateRequestException(response, json, HttpMethod.Get, route);
+            }
+            return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
         private async Task<HttpResponseMessage> SendHttpRequestAsync(

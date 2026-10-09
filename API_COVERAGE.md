@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-09
-- Implemented specification operations: 93/608 (15.3%)
+- Implemented specification operations: 98/608 (16.1%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -18,7 +18,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 |---|---|
 | Channels | 28 / 61 |
 | Emoji | 6 / 9 |
-| Files | 3 / 12 |
+| Files | 6 / 12 |
 | Integration Actions | 1 / 4 |
 | Posts | 14 / 28 |
 | Preferences | 5 / 5 |
@@ -27,7 +27,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Status | 2 / 7 |
 | System | 1 / 51 |
 | Teams | 16 / 38 |
-| Users | 10 / 77 |
+| Users | 12 / 77 |
 
 ## Legend
 
@@ -867,16 +867,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/files/{file_id}/link - Get a public file link
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L279) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L279) | `IMattermostClient.GetPublicFileLinkAsync`
+✅ Implemented
 
 ## GET /api/v4/files/{file_id}/preview - Get a file's preview
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L217) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L217) | `IMattermostClient.GetFilePreviewAsync`
+✅ Implemented
 
 ## GET /api/v4/files/{file_id}/thumbnail - Get a file's thumbnail
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L155) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L155) | `IMattermostClient.GetFileThumbnailAsync`
+✅ Implemented
 
 ## GET /files/{file_id}/public - Get a public file
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L371) | `—`
@@ -2257,12 +2257,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/users/{user_id}/image - Get user's profile image
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1352) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1352) | `IMattermostClient.GetUserImageAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/image/default - Return user's default (generated) profile image
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1473) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1473) | `IMattermostClient.GetDefaultUserImageAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/sessions - Get user's sessions
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1964) | `—`

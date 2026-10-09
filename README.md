@@ -678,6 +678,20 @@ For dynamic selects, set `InteractiveDialogElement.DataSource` to `InteractiveDi
 
 See Mattermost's [interactive dialogs documentation](https://developers.mattermost.com/integrate/plugins/interactive-dialogs/) for the full server-side flow and field behavior.
 
+## File previews and profile images
+
+```csharp
+byte[] preview = await client.GetFilePreviewAsync(fileId, cancellationToken);
+byte[] thumbnail = await client.GetFileThumbnailAsync(fileId, cancellationToken);
+byte[] profileImage = await client.GetUserImageAsync("me", cancellationToken);
+byte[] defaultImage = await client.GetDefaultUserImageAsync("me", cancellationToken);
+string publicLink = await client.GetPublicFileLinkAsync(fileId, cancellationToken);
+```
+
+Image methods return the complete image as bytes. File reads require permission to read the channel or ownership of the upload. A missing preview or thumbnail produces the server's error, without substituting the original file. User-image reads require authentication and permission to view the user; the default-image endpoint requires Mattermost 5.5 or later.
+
+Public file links must be enabled on the server. Anyone who has the returned URL can download the file without authentication; share it only when public access is intended. HTTP errors from these methods use `MattermostClientException`, including the status, response body, URL, and method.
+
 ## Post search and saved posts
 
 ```csharp

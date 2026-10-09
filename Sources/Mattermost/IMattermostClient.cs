@@ -674,6 +674,27 @@ namespace Mattermost
 
         #region Files
 
+        /// <summary>Download a file's preview image.</summary>
+        /// <param name="fileId">File identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the download.</param>
+        /// <returns>The complete preview image as bytes.</returns>
+        /// <remarks>Requires channel-read permission or file ownership. Missing previews produce a server error; the original file is not substituted.</remarks>
+        Task<byte[]> GetFilePreviewAsync(string fileId, CancellationToken cancellationToken = default);
+
+        /// <summary>Download a file's thumbnail image.</summary>
+        /// <param name="fileId">File identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the download.</param>
+        /// <returns>The complete thumbnail image as bytes.</returns>
+        /// <remarks>Requires channel-read permission or file ownership. Missing thumbnails produce a server error.</remarks>
+        Task<byte[]> GetFileThumbnailAsync(string fileId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a file link that can be opened without authentication.</summary>
+        /// <param name="fileId">File identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The public file URL.</returns>
+        /// <remarks>Requires channel-read permission or file ownership, and public file links enabled on the server. Anyone with the returned link can access the file.</remarks>
+        Task<string> GetPublicFileLinkAsync(string fileId, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get file by identifier.
         /// </summary>
@@ -717,6 +738,20 @@ namespace Mattermost
         #endregion
 
         #region Users
+
+        /// <summary>Download a user's current profile image.</summary>
+        /// <param name="userId">User identifier or me.</param>
+        /// <param name="cancellationToken">Cancels authentication and the download.</param>
+        /// <returns>The complete profile image as bytes.</returns>
+        /// <remarks>Requires authentication and permission to view the user. The server returns its generated image when no custom image is set.</remarks>
+        Task<byte[]> GetUserImageAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Download a user's generated default profile image, even when a custom image is set. Requires Mattermost 5.5 or later.</summary>
+        /// <param name="userId">User identifier or me.</param>
+        /// <param name="cancellationToken">Cancels authentication and the download.</param>
+        /// <returns>The complete default image as bytes.</returns>
+        /// <remarks>Requires authentication and permission to view the user.</remarks>
+        Task<byte[]> GetDefaultUserImageAsync(string userId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Notifies a channel that the current user is typing. Requires Mattermost 5.26 or later.
