@@ -556,6 +556,48 @@ namespace Mattermost
         /// <returns> User information. </returns>
         Task<User> GetUserByEmailAsync(string email);
 
+        /// <summary>
+        /// Get multiple user profiles in one request.
+        /// </summary>
+        /// <param name="userIds">A nonempty collection of user identifiers. Surrounding whitespace is removed.</param>
+        /// <param name="since">Only profiles updated after this Unix timestamp in milliseconds. Zero disables filtering. Requires Mattermost 5.14 or later when used.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Visible user profiles. Missing or inaccessible users may be omitted; input order is not preserved.</returns>
+        /// <exception cref="ArgumentNullException">The collection is null.</exception>
+        /// <exception cref="ArgumentException">The collection is empty or contains blank identifiers.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The timestamp is negative.</exception>
+        Task<IList<User>> GetUsersByIdsAsync(IEnumerable<string> userIds, long since = 0,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get multiple user profiles by username in one request.
+        /// </summary>
+        /// <param name="usernames">A nonempty collection of usernames. Surrounding whitespace and leading @ characters are removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Visible user profiles. Missing or inaccessible users may be omitted; input order is not preserved.</returns>
+        /// <exception cref="ArgumentNullException">The collection is null.</exception>
+        /// <exception cref="ArgumentException">The collection is empty or contains blank usernames.</exception>
+        Task<IList<User>> GetUsersByUsernamesAsync(IEnumerable<string> usernames, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get a user's presence status.
+        /// </summary>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Presence status and activity metadata.</returns>
+        /// <exception cref="ArgumentException">The user identifier is null, empty, or whitespace.</exception>
+        Task<UserPresence> GetUserStatusAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get multiple users' presence statuses in one request.
+        /// </summary>
+        /// <param name="userIds">A nonempty collection of actual user identifiers, not "me". Surrounding whitespace is removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Presence statuses returned by the server; input order is not preserved.</returns>
+        /// <exception cref="ArgumentNullException">The collection is null.</exception>
+        /// <exception cref="ArgumentException">The collection is empty or contains blank identifiers.</exception>
+        Task<IList<UserPresence>> GetUsersStatusesByIdsAsync(IEnumerable<string> userIds, CancellationToken cancellationToken = default);
+
         #endregion
 
         #region Calls

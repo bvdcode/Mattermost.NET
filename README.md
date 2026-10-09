@@ -345,6 +345,25 @@ var byUsername = await client.GetUserByUsernameAsync("username");
 var byEmail = await client.GetUserByEmailAsync("user@example.com");
 ```
 
+For bulk profile lookup, send IDs or usernames in one request:
+
+```csharp
+var users = await client.GetUsersByIdsAsync(userIds, cancellationToken: cancellationToken);
+var namedUsers = await client.GetUsersByUsernamesAsync(new[] { "alice", "@bob" }, cancellationToken);
+```
+
+Collections must be nonempty and contain no blank entries. Results may omit missing or inaccessible users and do not preserve the input order; match profiles by `User.Id`. The optional `since` parameter of `GetUsersByIdsAsync` filters profiles updated after a Unix timestamp in milliseconds (requires Mattermost 5.14 or later). Zero disables filtering.
+
+## Read user presence
+
+```csharp
+var presence = await client.GetUserStatusAsync("me", cancellationToken);
+var statuses = await client.GetUsersStatusesByIdsAsync(userIds, cancellationToken);
+Console.WriteLine(presence.Status);
+```
+
+These methods return `UserPresence` with a typed `UserStatus` (`Online`, `Offline`, `Away`, `DoNotDisturb`, or `OutOfOffice`), `IsManual`, `LastActivityAt` (Unix milliseconds), and `DoNotDisturbEndTime` (Unix seconds; zero means no expiry). Bulk status lookup requires actual user IDs, not `"me"`; match responses by `UserId`, not list position. Server errors are propagated, including a missing single-user status.
+
 ## Work with channels
 
 ```csharp
@@ -670,6 +689,7 @@ The public API is exposed through `IMattermostClient` and includes:
 
 - authentication and logout;
 - current user, users by id, username, or email;
+- bulk user profiles and single or bulk presence statuses;
 - create, update, delete, read, and list posts;
 - thread posts;
 - channel lookup, creation, archiving, and membership changes;

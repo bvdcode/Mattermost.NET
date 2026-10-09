@@ -3,6 +3,7 @@ using Mattermost.Helpers;
 using Mattermost.Models.Users;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -162,6 +163,90 @@ namespace Mattermost
             CheckDisposed();
             string url = Routes.Users + "/email/" + email.Trim();
             return SendRequestAsync<User>(HttpMethod.Get, url);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<User>> GetUsersByIdsAsync(IEnumerable<string> userIds, long since = 0,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            if (since < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(since), "The timestamp cannot be negative.");
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            List<string> ids = PrepareUserBatch(userIds, nameof(userIds));
+            string url = Routes.Users + "/ids";
+            if (since > 0)
+            {
+                url += "?since=" + since.ToString(CultureInfo.InvariantCulture);
+            }
+            return SendRequestAsync<IList<User>>(HttpMethod.Post, url, ids, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<User>> GetUsersByUsernamesAsync(IEnumerable<string> usernames,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+            List<string> names = PrepareUserBatch(usernames, nameof(usernames), trimUsernamePrefix: true);
+            return SendRequestAsync<IList<User>>(HttpMethod.Post, Routes.Users + "/usernames", names, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<UserPresence> GetUserStatusAsync(string userId, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            string url = Routes.Users + "/" + Uri.EscapeDataString(userId.Trim()) + "/status";
+            return SendRequestAsync<UserPresence>(HttpMethod.Get, url, cancellationToken: cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<UserPresence>> GetUsersStatusesByIdsAsync(IEnumerable<string> userIds,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+            List<string> ids = PrepareUserBatch(userIds, nameof(userIds));
+            return SendRequestAsync<IList<UserPresence>>(HttpMethod.Post, Routes.Users + "/status/ids", ids, cancellationToken);
+        }
+
+        private static List<string> PrepareUserBatch(IEnumerable<string> values, string parameterName,
+            bool trimUsernamePrefix = false)
+        {
+            if (values is null)
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+            List<string> result = new List<string>();
+            foreach (string value in values)
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentException("The collection cannot contain blank values.", parameterName);
+                }
+                string trimmed = value.Trim();
+                if (trimUsernamePrefix)
+                {
+                    trimmed = trimmed.TrimStart('@');
+                }
+                if (trimmed.Length == 0)
+                {
+                    throw new ArgumentException("The collection cannot contain blank values.", parameterName);
+                }
+                result.Add(trimmed);
+            }
+            if (result.Count == 0)
+            {
+                throw new ArgumentException("The collection cannot be empty.", parameterName);
+            }
+            return result;
         }
 
         private static void AddIfNotEmpty(IDictionary<string, object> body, string name, string? value)
