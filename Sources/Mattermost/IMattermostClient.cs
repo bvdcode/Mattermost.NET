@@ -757,6 +757,63 @@ namespace Mattermost
 
         #endregion
 
+        #region Channel management and discovery
+
+        /// <summary>Update channel name, display name, header, and purpose from a channel object.</summary>
+        /// <param name="channel">Channel with an actual Id. Header and purpose replace the stored values, including empty strings.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Channel> UpdateChannelAsync(Channel channel, CancellationToken cancellationToken = default);
+
+        /// <summary>Update selected channel metadata. Null omits a field; an empty string is sent to the server.</summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="name">New URL name.</param>
+        /// <param name="displayName">New display name.</param>
+        /// <param name="header">New header; an empty string clears it.</param>
+        /// <param name="purpose">New purpose; an empty string clears it.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Channel> PatchChannelAsync(string channelId, string? name = null, string? displayName = null,
+            string? header = null, string? purpose = null, CancellationToken cancellationToken = default);
+
+        /// <summary>Convert a channel to public or private. Requires the corresponding conversion permission. Requires Mattermost 5.16 or later.</summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="privacy">Public or Private. Direct, Group, and invalid enum values are rejected.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Channel> UpdateChannelPrivacyAsync(string channelId, ChannelType privacy, CancellationToken cancellationToken = default);
+
+        /// <summary>Restore an archived channel. Requires permission to manage its team.</summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Channel> RestoreChannelAsync(string channelId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of archived channels visible to the current user. Requires list_team_channels.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="page">Zero-based page number.</param>
+        /// <param name="perPage">Items per page, from 1 to 200.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<Channel>> GetDeletedChannelsAsync(string teamId, int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of private team channels. Requires manage_system and Mattermost 5.26 or later.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="page">Zero-based page number.</param>
+        /// <param name="perPage">Items per page, from 1 to 200.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<Channel>> GetPrivateChannelsAsync(string teamId, int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
+        /// <summary>Read public channels in a team by ID. Requires view_team.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="channelIds">Nonempty collection of channel identifiers.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Matching public channels. Order is not preserved; no matches produces a server error.</returns>
+        Task<IList<Channel>> GetPublicChannelsByIdsAsync(string teamId, IEnumerable<string> channelIds, CancellationToken cancellationToken = default);
+
+        /// <summary>Search public team channels by name or display name. Membership restrictions apply.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="term">Search term; surrounding whitespace is removed. Empty terms are allowed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<Channel>> SearchTeamChannelsAsync(string teamId, string term, CancellationToken cancellationToken = default);
+
+        #endregion
+
         #region Preferences
 
         /// <summary>Get a user's stored preferences. Requires access to that user.</summary>

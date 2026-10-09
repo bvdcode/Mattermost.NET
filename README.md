@@ -425,6 +425,28 @@ Membership reads require `read_channel` permission. Pages are zero-based and the
 
 `GetChannelTimezonesAsync` requires Mattermost 5.6 or later and `read_channel` permission. It returns timezone names as reported by the server, or an empty list when members have no timezone configured.
 
+## Edit and find channels
+
+```csharp
+Channel channel = await client.GetChannelAsync(channelId);
+channel.Header = "New header";
+channel = await client.UpdateChannelAsync(channel, cancellationToken);
+channel = await client.PatchChannelAsync(channelId, purpose: "", cancellationToken: cancellationToken);
+channel = await client.UpdateChannelPrivacyAsync(channelId, ChannelType.Private, cancellationToken);
+channel = await client.RestoreChannelAsync(channelId, cancellationToken);
+
+IList<Channel> selected = await client.GetPublicChannelsByIdsAsync(teamId, channelIds, cancellationToken);
+IList<Channel> matches = await client.SearchTeamChannelsAsync(teamId, "channel-name", cancellationToken);
+IList<Channel> archived = await client.GetDeletedChannelsAsync(teamId, perPage: 100, cancellationToken: cancellationToken);
+IList<Channel> privateChannels = await client.GetPrivateChannelsAsync(teamId, perPage: 100, cancellationToken: cancellationToken);
+```
+
+`UpdateChannelAsync` sends the channel's ID, name, display name, header, and purpose; other properties are not sent. Header and purpose replace the stored values. For a partial change, use `PatchChannelAsync`: `null` omits a field, while `""` clears header or purpose. Channel name and display-name validity are enforced by the server. Metadata edits require the appropriate public/private channel-management permission; direct and group channels have additional restrictions.
+
+Privacy conversion accepts only `Public` and `Private`, requires Mattermost 5.16 or later and the corresponding conversion permission. Restoration requires permission to manage the channel's team. Archived-channel pages require `list_team_channels`; private-channel pages require `manage_system` and Mattermost 5.26 or later. Page sizes are 1–200.
+
+Bulk lookup returns only active public channels in the requested team and requires `view_team`. Missing IDs may be omitted; a batch with no matches produces an API error. Team search matches channel name or display name; users without `list_team_channels` are limited to their memberships on Mattermost 5.16 or later. HTTP errors are propagated.
+
 ## User preferences
 
 ```csharp

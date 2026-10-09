@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-09
-- Implemented specification operations: 77/608 (12.7%)
+- Implemented specification operations: 85/608 (14.0%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -16,7 +16,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 
 | Category | Implemented / total |
 |---|---|
-| Channels | 20 / 61 |
+| Channels | 28 / 61 |
 | Emoji | 6 / 9 |
 | Files | 3 / 12 |
 | Integration Actions | 1 / 4 |
@@ -297,8 +297,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/teams/{team_id}/channels/deleted - Get deleted channels
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1055) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1055) | `IMattermostClient.GetDeletedChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels/managed_categories - Get managed category mappings
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1197) | `—`
@@ -309,8 +309,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels/private - Get private channels
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L958) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L958) | `IMattermostClient.GetPrivateChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels/recommended - Get recommended public channels for the current user
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1008) | `—`
@@ -373,8 +373,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/channels/{channel_id}/restore - Restore a channel
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L769) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L769) | `IMattermostClient.RestoreChannelAsync`
+✅ Implemented
 
 ## POST /api/v4/channels/direct - Create a direct message channel
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L137) | `IMattermostClient.CreateDirectChannelAsync`
@@ -405,20 +405,20 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/teams/{team_id}/channels/ids - Get a list of channels by ids
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L404) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L404) | `IMattermostClient.GetPublicChannelsByIdsAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/channels/search - Search channels
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1239) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1239) | `IMattermostClient.SearchTeamChannelsAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/teams/{team_id}/channels/categories - Create user's sidebar category
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2622) | `—`
 ❌ Not implemented
 
 ## PUT /api/v4/channels/{channel_id} - Update a channel
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L509) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L509) | `IMattermostClient.UpdateChannelAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id}/members - Set channel members
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1467) | `—`
@@ -445,12 +445,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## PUT /api/v4/channels/{channel_id}/patch - Patch a channel
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L612) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L612) | `IMattermostClient.PatchChannelAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id}/privacy - Update channel's privacy
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L715) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L715) | `IMattermostClient.UpdateChannelPrivacyAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id}/scheme - Set a channel's scheme
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2355) | `—`
