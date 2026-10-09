@@ -40,5 +40,8 @@
         /// Maximum number of distinct role names accepted by a bulk lookup.
         /// </summary>
         public const int MaxRoleNamesPerRequest = 100;
+
+        /// <summary>Maximum number of preferences saved or deleted in one request.</summary>
+        public const int MaxPreferencesPerRequest = 100;
     }
 }

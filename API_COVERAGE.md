@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-09
-- Implemented specification operations: 72/608 (11.8%)
+- Implemented specification operations: 77/608 (12.7%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -21,6 +21,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Files | 3 / 12 |
 | Integration Actions | 1 / 4 |
 | Posts | 10 / 28 |
+| Preferences | 5 / 5 |
 | Reactions | 3 / 3 |
 | Roles | 4 / 5 |
 | Status | 2 / 7 |
@@ -1404,24 +1405,24 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Preferences
 
 ## GET /api/v4/users/{user_id}/preferences - Get the user's preferences
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L2) | `IMattermostClient.GetPreferencesAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/preferences/{category} - List a user's preferences by category
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L123) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L123) | `IMattermostClient.GetPreferencesByCategoryAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/preferences/{category}/name/{preference_name} - Get a specific user preference
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L163) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L163) | `IMattermostClient.GetPreferenceAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/preferences/delete - Delete user's preferences
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L80) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L80) | `IMattermostClient.DeletePreferencesAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/preferences - Save the user's preferences
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L35) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/preferences.yaml#L35) | `IMattermostClient.UpdatePreferencesAsync`
+✅ Implemented
 
 # Properties
 

@@ -425,6 +425,19 @@ Membership reads require `read_channel` permission. Pages are zero-based and the
 
 `GetChannelTimezonesAsync` requires Mattermost 5.6 or later and `read_channel` permission. It returns timezone names as reported by the server, or an empty list when members have no timezone configured.
 
+## User preferences
+
+```csharp
+IList<Preference> preferences = await client.GetPreferencesAsync("me", cancellationToken);
+IList<Preference> category = await client.GetPreferencesByCategoryAsync("me", "display_settings", cancellationToken);
+Preference preference = await client.GetPreferenceAsync("me", "display_settings", "use_military_time", cancellationToken);
+preference.Value = "true";
+await client.UpdatePreferencesAsync("me", new[] { preference }, cancellationToken);
+await client.DeletePreferencesAsync("me", new[] { preference }, cancellationToken);
+```
+
+`Preference` is in `Mattermost.Models.Users`. Updating or deleting preferences accepts 1–100 objects with the target user's actual `UserId`, even when the route uses `"me"`. Updates change only the supplied preference keys. Names and values are preserved, including empty names and whitespace in values; use category lookup for preferences with empty names. Deletion identifies preferences by user, category, and name and ignores their values. Reading another user's preferences or changing them requires `edit_other_users`. Missing category and single-preference errors are propagated.
+
 ## Read roles
 
 ```csharp

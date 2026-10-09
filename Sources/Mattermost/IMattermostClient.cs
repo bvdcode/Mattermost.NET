@@ -757,6 +757,40 @@ namespace Mattermost
 
         #endregion
 
+        #region Preferences
+
+        /// <summary>Get a user's stored preferences. Requires access to that user.</summary>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<Preference>> GetPreferencesAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get preferences in one category. A missing category produces an API error.</summary>
+        /// <param name="userId">User identifier, or "me".</param>
+        /// <param name="category">Exact category key, without trimming. Server route restrictions apply.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<Preference>> GetPreferencesByCategoryAsync(string userId, string category, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a preference by category and name. A missing preference produces an API error.</summary>
+        /// <param name="userId">User identifier, or "me".</param>
+        /// <param name="category">Exact category key, without trimming. Server route restrictions apply.</param>
+        /// <param name="name">Exact nonempty preference key, without trimming. Use category lookup for preferences with empty names.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Preference> GetPreferenceAsync(string userId, string category, string name, CancellationToken cancellationToken = default);
+
+        /// <summary>Save 1–100 preferences. Unspecified preferences are not changed.</summary>
+        /// <param name="userId">User identifier, or "me".</param>
+        /// <param name="preferences">Preferences with the target user's actual UserId. Names and values may be empty and are not trimmed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task UpdatePreferencesAsync(string userId, IEnumerable<Preference> preferences, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete 1–100 preferences by user, category, and name.</summary>
+        /// <param name="userId">User identifier, or "me".</param>
+        /// <param name="preferences">Preference keys with the target user's actual UserId. Value is ignored by the server.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task DeletePreferencesAsync(string userId, IEnumerable<Preference> preferences, CancellationToken cancellationToken = default);
+
+        #endregion
+
         #region Roles
 
         /// <summary>Get all roles. Requires Mattermost 5.33 or later and manage_system permission.</summary>
