@@ -25,5 +25,15 @@
         /// Maximum number of team memberships returned on a single page.
         /// </summary>
         public const int MaxTeamMembersPerPage = 200;
+
+        /// <summary>
+        /// Maximum number of custom emojis returned on a single page.
+        /// </summary>
+        public const int MaxEmojisPerPage = 200;
+
+        /// <summary>
+        /// Maximum number of distinct emoji names accepted by a single bulk lookup.
+        /// </summary>
+        public const int MaxEmojiNamesPerRequest = 200;
     }
 }

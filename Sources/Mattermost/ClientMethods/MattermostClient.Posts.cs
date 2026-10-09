@@ -378,7 +378,7 @@ namespace Mattermost
         {
             CheckDisposed();
             ValidatePostId(postId);
-            string sanitizedEmojiName = SanitizeEmojiName(emojiName);
+            string sanitizedEmojiName = SanitizeEmojiName(emojiName, nameof(emojiName));
             await CheckAuthorizedAsync().ConfigureAwait(false);
             var body = new
             {
@@ -400,7 +400,7 @@ namespace Mattermost
         {
             CheckDisposed();
             ValidatePostId(postId);
-            string sanitizedEmojiName = SanitizeEmojiName(emojiName);
+            string sanitizedEmojiName = SanitizeEmojiName(emojiName, nameof(emojiName));
             await CheckAuthorizedAsync().ConfigureAwait(false);
 
             string reactionUserId = userId ?? string.Empty;
@@ -463,17 +463,17 @@ namespace Mattermost
             }
         }
 
-        private static string SanitizeEmojiName(string emojiName)
+        private static string SanitizeEmojiName(string emojiName, string parameterName)
         {
             if (string.IsNullOrWhiteSpace(emojiName))
             {
-                throw new ArgumentException("Emoji name cannot be null or empty.", nameof(emojiName));
+                throw new ArgumentException("Emoji name cannot be null or empty.", parameterName);
             }
 
             string sanitizedEmojiName = emojiName.Trim().Trim(':');
             if (string.IsNullOrWhiteSpace(sanitizedEmojiName))
             {
-                throw new ArgumentException("Emoji name cannot be null or empty.", nameof(emojiName));
+                throw new ArgumentException("Emoji name cannot be null or empty.", parameterName);
             }
 
             return sanitizedEmojiName;

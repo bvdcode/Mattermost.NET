@@ -9,6 +9,7 @@
         internal const string Users = version + "/users";
         internal const string Posts = version + "/posts";
         internal const string Reactions = version + "/reactions";
+        internal const string Emojis = version + "/emoji";
         internal const string Teams = version + "/teams";
         internal const string Files = version + "/files";
         internal const string Channels = version + "/channels";
