@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-09
-- Implemented specification operations: 56/608 (9.2%)
+- Implemented specification operations: 62/608 (10.2%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -16,7 +16,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 
 | Category | Implemented / total |
 |---|---|
-| Channels | 14 / 61 |
+| Channels | 20 / 61 |
 | Files | 3 / 12 |
 | Integration Actions | 1 / 4 |
 | Posts | 10 / 28 |
@@ -278,12 +278,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/channels/{channel_id}/stats - Get channel statistics
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L852) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L852) | `IMattermostClient.GetChannelStatsAsync`
+✅ Implemented
 
 ## GET /api/v4/channels/{channel_id}/timezones - Get timezones in a channel
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L445) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L445) | `IMattermostClient.GetChannelTimezonesAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels - Get public channels
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L909) | `IMattermostClient.GetTeamChannelsAsync`
@@ -326,12 +326,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/users/{user_id}/channels/{channel_id}/unread - Get unread messages
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2315) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2315) | `IMattermostClient.GetChannelUnreadAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/channels - Get channels for user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2211) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2211) | `IMattermostClient.GetUserTeamChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/channels/categories - Get user's sidebar categories
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2578) | `—`
@@ -346,8 +346,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/channels/members - Get channel memberships and roles for a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2170) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2170) | `IMattermostClient.GetUserTeamChannelMembersAsync`
+✅ Implemented
 
 ## POST /api/v4/channels - Create a channel
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L70) | `IMattermostClient.CreateChannelAsync`
@@ -362,8 +362,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/channels/{channel_id}/members/ids - Get channel members by ids
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1653) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1653) | `IMattermostClient.GetChannelMembersByIdsAsync`
+✅ Implemented
 
 ## POST /api/v4/channels/{channel_id}/move - Move a channel
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L802) | `—`

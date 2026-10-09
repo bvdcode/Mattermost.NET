@@ -326,6 +326,15 @@ namespace Mattermost
             OnLogMessage?.Invoke(this, new LogEventArgs(message + $" (Exception: {ex.Message})"));
         }
 
+        private static string EscapeReadIdentifier(string value, string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("Identifier cannot be null or empty.", parameterName);
+            }
+            return Uri.EscapeDataString(value.Trim());
+        }
+
         private void CheckDisposed()
         {
             if (_disposed)

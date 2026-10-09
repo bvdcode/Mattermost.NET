@@ -439,6 +439,75 @@ namespace Mattermost
             CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Get channel memberships by user identifiers in one request. Requires permission to read the channel.
+        /// </summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="userIds">A nonempty collection of actual user identifiers, not "me".</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Visible memberships, not user profiles. Missing members may be omitted; input order is not preserved.</returns>
+        /// <exception cref="ArgumentNullException">The collection is null.</exception>
+        /// <exception cref="ArgumentException">The channel identifier is blank, or the collection is empty or contains blank identifiers.</exception>
+        Task<IList<ChannelUserInfo>> GetChannelMembersByIdsAsync(string channelId, IEnumerable<string> userIds,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get statistics for a channel. Requires permission to read the channel.
+        /// </summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="excludeFilesCount">Skip counting files; supporting servers return -1 for the file count.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Member, guest, pinned post and file counts.</returns>
+        /// <exception cref="ArgumentException">The channel identifier is blank.</exception>
+        Task<ChannelStats> GetChannelStatsAsync(string channelId, bool excludeFilesCount = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get a user's unread counts for a channel. Requires permission to access the user and read the channel.
+        /// </summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Unread message and mention counts. This does not mark messages as read.</returns>
+        /// <exception cref="ArgumentException">A channel or user identifier is blank.</exception>
+        Task<ChannelUnread> GetChannelUnreadAsync(string channelId, string userId,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get a user's channels in one team. Requires permission to access the user and view the team.
+        /// </summary>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="includeDeleted">Include archived channels.</param>
+        /// <param name="lastDeleteAt">Unix timestamp in milliseconds filtering archived channels when includeDeleted is true.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The user's channels in the team, including direct and group message channels.</returns>
+        /// <exception cref="ArgumentException">A user or team identifier is blank.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The deletion timestamp is negative.</exception>
+        Task<IList<Channel>> GetUserTeamChannelsAsync(string userId, string teamId, bool includeDeleted = false,
+            long lastDeleteAt = 0, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get a user's channel memberships in one team. Requires permission to view the team.
+        /// Reading another user's memberships requires system administrator permissions.
+        /// </summary>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Membership roles, counters and notification settings, including direct and group message memberships.</returns>
+        /// <exception cref="ArgumentException">A user or team identifier is blank.</exception>
+        Task<IList<ChannelUserInfo>> GetUserTeamChannelMembersAsync(string userId, string teamId,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get timezones used by channel members. Requires permission to read the channel and Mattermost 5.6 or later.
+        /// </summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Timezone names reported by the server, or an empty list when members have no timezone configured.</returns>
+        /// <exception cref="ArgumentException">The channel identifier is blank.</exception>
+        Task<IList<string>> GetChannelTimezonesAsync(string channelId, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Create simple channel with specified users.
         /// </summary>
         /// <param name="teamId"> Team identifier. </param>

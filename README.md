@@ -401,6 +401,14 @@ var direct = await client.CreateDirectChannelAsync(userId);
 var channels = await client.GetUserChannelsAsync("me", cancellationToken: cancellationToken);
 var members = await client.GetChannelMembersAsync(channelId, page: 0, perPage: 60, cancellationToken: cancellationToken);
 var membership = await client.GetChannelMemberAsync(channelId, userId, cancellationToken);
+
+IList<ChannelUserInfo> selectedMembers = await client.GetChannelMembersByIdsAsync(channelId, userIds, cancellationToken);
+IList<Channel> teamChannels = await client.GetUserTeamChannelsAsync("me", teamId,
+    includeDeleted: true, lastDeleteAt: 0, cancellationToken: cancellationToken);
+IList<ChannelUserInfo> teamMemberships = await client.GetUserTeamChannelMembersAsync("me", teamId, cancellationToken);
+ChannelStats stats = await client.GetChannelStatsAsync(channelId, cancellationToken: cancellationToken);
+ChannelUnread unread = await client.GetChannelUnreadAsync(channelId, "me", cancellationToken);
+IList<string> timezones = await client.GetChannelTimezonesAsync(channelId, cancellationToken);
 ```
 
 `GetUserChannelsAsync` requires Mattermost 6.1 or later and returns the user's channels across all teams, including direct and group chats. Reading another user's channels requires `edit_other_users` permission. Archived channels are excluded by default; set `includeDeleted: true` to include them. The optional `lastDeleteAt` Unix timestamp in milliseconds filters archived channels only when that flag is enabled.
@@ -408,6 +416,14 @@ var membership = await client.GetChannelMemberAsync(channelId, userId, cancellat
 Membership reads require `read_channel` permission. Pages are zero-based and the page size must be 1–200. These methods return `ChannelUserInfo` (membership roles, counters, and notification settings), not user profiles; use `GetUserAsync(membership.UserId)` for the profile. A missing membership is reported as an API error, not `null`.
 
 `ChannelUserInfo.LastViewedAt`, `MessageCount`, and `MentionCount` are 64-bit (`long`) values. The server may return `-1` for another member's `LastViewedAt` and `UpdatedAt` when those timestamps are hidden.
+
+`GetChannelMembersByIdsAsync` takes a nonempty collection of actual user IDs, not `"me"`. Missing members may be omitted and input order is not preserved; match results by `UserId`.
+
+`GetUserTeamChannelsAsync` returns the user's channels in one team, plus direct and group chats that have no team. It accepts the same archived-channel filters as `GetUserChannelsAsync`. `GetUserTeamChannelMembersAsync` returns membership records for those channels; reading another user's memberships requires system administrator permissions and permission to view the team.
+
+`ChannelStats` contains active member and guest counts, pinned post count, and file count. Set `excludeFilesCount: true` to skip counting files; supporting servers return `-1` for `FilesCount`. `ChannelUnread` contains message, mention, root-post and urgent-mention counters. These counters are 64-bit (`long`). Reading unread counts does not mark messages as read and requires permission to access the user and read the channel.
+
+`GetChannelTimezonesAsync` requires Mattermost 5.6 or later and `read_channel` permission. It returns timezone names as reported by the server, or an empty list when members have no timezone configured.
 
 ## Work with calls
 
@@ -716,7 +732,7 @@ The public API is exposed through `IMattermostClient` and includes:
 - team lookup, membership reads, statistics, and unread counts;
 - create, update, delete, read, and list posts;
 - thread posts;
-- channel lookup, creation, archiving, and membership changes;
+- channel lookup, creation, archiving, membership reads and changes, statistics, unread counts, and member timezones;
 - direct and group channels;
 - file upload, download, streaming, and metadata;
 - Calls plugin channel state, active call checks, and host call termination;

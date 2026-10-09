@@ -70,7 +70,7 @@ namespace Mattermost
             bool sortByUsername = false, bool excludeDeletedUsers = false, CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            string escapedTeamId = EscapeTeamReadIdentifier(teamId, nameof(teamId));
+            string escapedTeamId = EscapeReadIdentifier(teamId, nameof(teamId));
             if (perPage > MattermostApiLimits.MaxTeamMembersPerPage)
             {
                 throw new ArgumentOutOfRangeException(nameof(perPage), $"At most {MattermostApiLimits.MaxTeamMembersPerPage} members can be requested per page.");
@@ -93,8 +93,8 @@ namespace Mattermost
         public Task<TeamMember> GetTeamMemberAsync(string teamId, string userId, CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            string escapedTeamId = EscapeTeamReadIdentifier(teamId, nameof(teamId));
-            string escapedUserId = EscapeTeamReadIdentifier(userId, nameof(userId));
+            string escapedTeamId = EscapeReadIdentifier(teamId, nameof(teamId));
+            string escapedUserId = EscapeReadIdentifier(userId, nameof(userId));
             cancellationToken.ThrowIfCancellationRequested();
             string url = Routes.Teams + "/" + escapedTeamId + "/members/" + escapedUserId;
             return SendRequestAsync<TeamMember>(HttpMethod.Get, url, cancellationToken: cancellationToken);
@@ -105,7 +105,7 @@ namespace Mattermost
             CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            string escapedTeamId = EscapeTeamReadIdentifier(teamId, nameof(teamId));
+            string escapedTeamId = EscapeReadIdentifier(teamId, nameof(teamId));
             cancellationToken.ThrowIfCancellationRequested();
             List<string> ids = PrepareUserBatch(userIds, nameof(userIds));
             string url = Routes.Teams + "/" + escapedTeamId + "/members/ids";
@@ -116,7 +116,7 @@ namespace Mattermost
         public Task<IList<TeamMember>> GetUserTeamMembersAsync(string userId, CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            string escapedUserId = EscapeTeamReadIdentifier(userId, nameof(userId));
+            string escapedUserId = EscapeReadIdentifier(userId, nameof(userId));
             cancellationToken.ThrowIfCancellationRequested();
             string url = Routes.Users + "/" + escapedUserId + "/teams/members";
             return SendRequestAsync<IList<TeamMember>>(HttpMethod.Get, url, cancellationToken: cancellationToken);
@@ -126,7 +126,7 @@ namespace Mattermost
         public Task<TeamStats> GetTeamStatsAsync(string teamId, CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            string escapedTeamId = EscapeTeamReadIdentifier(teamId, nameof(teamId));
+            string escapedTeamId = EscapeReadIdentifier(teamId, nameof(teamId));
             cancellationToken.ThrowIfCancellationRequested();
             return SendRequestAsync<TeamStats>(HttpMethod.Get, Routes.Teams + "/" + escapedTeamId + "/stats",
                 cancellationToken: cancellationToken);
@@ -136,7 +136,7 @@ namespace Mattermost
         public async Task<bool> TeamExistsAsync(string teamName, CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            string escapedTeamName = EscapeTeamReadIdentifier(teamName, nameof(teamName));
+            string escapedTeamName = EscapeReadIdentifier(teamName, nameof(teamName));
             cancellationToken.ThrowIfCancellationRequested();
             string url = Routes.Teams + "/name/" + escapedTeamName + "/exists";
             Dictionary<string, bool> response = await SendRequestAsync<Dictionary<string, bool>>(HttpMethod.Get, url,
@@ -148,8 +148,8 @@ namespace Mattermost
         public Task<TeamUnread> GetTeamUnreadAsync(string teamId, string userId, CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            string escapedTeamId = EscapeTeamReadIdentifier(teamId, nameof(teamId));
-            string escapedUserId = EscapeTeamReadIdentifier(userId, nameof(userId));
+            string escapedTeamId = EscapeReadIdentifier(teamId, nameof(teamId));
+            string escapedUserId = EscapeReadIdentifier(userId, nameof(userId));
             cancellationToken.ThrowIfCancellationRequested();
             string url = Routes.Users + "/" + escapedUserId + "/teams/" + escapedTeamId + "/unread";
             return SendRequestAsync<TeamUnread>(HttpMethod.Get, url, cancellationToken: cancellationToken);
@@ -160,7 +160,7 @@ namespace Mattermost
             bool includeCollapsedThreads = false, CancellationToken cancellationToken = default)
         {
             CheckDisposed();
-            string escapedUserId = EscapeTeamReadIdentifier(userId, nameof(userId));
+            string escapedUserId = EscapeReadIdentifier(userId, nameof(userId));
             string url = Routes.Users + "/" + escapedUserId + "/teams/unread"
                 + "?include_collapsed_threads=" + includeCollapsedThreads.ToString().ToLowerInvariant();
             if (excludeTeamId is string excludedTeamId && !string.IsNullOrWhiteSpace(excludedTeamId))
@@ -169,15 +169,6 @@ namespace Mattermost
             }
             cancellationToken.ThrowIfCancellationRequested();
             return SendRequestAsync<IList<TeamUnread>>(HttpMethod.Get, url, cancellationToken: cancellationToken);
-        }
-
-        private static string EscapeTeamReadIdentifier(string value, string parameterName)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new ArgumentException("Identifier cannot be null or empty.", parameterName);
-            }
-            return Uri.EscapeDataString(value.Trim());
         }
 
         private static void ValidateTeamIdentifier(string value, string parameterName)

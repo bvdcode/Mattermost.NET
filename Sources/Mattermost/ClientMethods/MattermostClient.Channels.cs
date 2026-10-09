@@ -102,6 +102,85 @@ namespace Mattermost
             return SendRequestAsync<ChannelUserInfo>(HttpMethod.Get, url, cancellationToken: cancellationToken);
         }
 
+        /// <inheritdoc />
+        public Task<IList<ChannelUserInfo>> GetChannelMembersByIdsAsync(string channelId, IEnumerable<string> userIds,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            string escapedChannelId = EscapeReadIdentifier(channelId, nameof(channelId));
+            cancellationToken.ThrowIfCancellationRequested();
+            List<string> ids = PrepareUserBatch(userIds, nameof(userIds));
+            string url = Routes.Channels + "/" + escapedChannelId + "/members/ids";
+            return SendRequestAsync<IList<ChannelUserInfo>>(HttpMethod.Post, url, ids, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<ChannelStats> GetChannelStatsAsync(string channelId, bool excludeFilesCount = false,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            string escapedChannelId = EscapeReadIdentifier(channelId, nameof(channelId));
+            cancellationToken.ThrowIfCancellationRequested();
+            string url = Routes.Channels + "/" + escapedChannelId + "/stats";
+            if (excludeFilesCount)
+            {
+                url += "?exclude_files_count=true";
+            }
+            return SendRequestAsync<ChannelStats>(HttpMethod.Get, url, cancellationToken: cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<ChannelUnread> GetChannelUnreadAsync(string channelId, string userId,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            string escapedChannelId = EscapeReadIdentifier(channelId, nameof(channelId));
+            string escapedUserId = EscapeReadIdentifier(userId, nameof(userId));
+            cancellationToken.ThrowIfCancellationRequested();
+            string url = Routes.Users + "/" + escapedUserId + "/channels/" + escapedChannelId + "/unread";
+            return SendRequestAsync<ChannelUnread>(HttpMethod.Get, url, cancellationToken: cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<Channel>> GetUserTeamChannelsAsync(string userId, string teamId, bool includeDeleted = false,
+            long lastDeleteAt = 0, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            string escapedUserId = EscapeReadIdentifier(userId, nameof(userId));
+            string escapedTeamId = EscapeReadIdentifier(teamId, nameof(teamId));
+            if (lastDeleteAt < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(lastDeleteAt), "Deletion timestamp cannot be negative.");
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            string url = Routes.Users + "/" + escapedUserId + "/teams/" + escapedTeamId + "/channels"
+                + "?include_deleted=" + includeDeleted.ToString().ToLowerInvariant()
+                + "&last_delete_at=" + lastDeleteAt.ToString(CultureInfo.InvariantCulture);
+            return SendRequestAsync<IList<Channel>>(HttpMethod.Get, url, cancellationToken: cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<ChannelUserInfo>> GetUserTeamChannelMembersAsync(string userId, string teamId,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            string escapedUserId = EscapeReadIdentifier(userId, nameof(userId));
+            string escapedTeamId = EscapeReadIdentifier(teamId, nameof(teamId));
+            cancellationToken.ThrowIfCancellationRequested();
+            string url = Routes.Users + "/" + escapedUserId + "/teams/" + escapedTeamId + "/channels/members";
+            return SendRequestAsync<IList<ChannelUserInfo>>(HttpMethod.Get, url, cancellationToken: cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IList<string>> GetChannelTimezonesAsync(string channelId, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            string escapedChannelId = EscapeReadIdentifier(channelId, nameof(channelId));
+            cancellationToken.ThrowIfCancellationRequested();
+            return SendRequestAsync<IList<string>>(HttpMethod.Get, Routes.Channels + "/" + escapedChannelId + "/timezones",
+                cancellationToken: cancellationToken, nullResultFactory: () => new List<string>());
+        }
+
         /// <summary>
         /// Find channel by channel name and team name or identifier.
         /// </summary>
