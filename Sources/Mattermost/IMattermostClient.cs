@@ -71,6 +71,58 @@ namespace Mattermost
 
         #region Posts
 
+        /// <summary>Search posts in a team visible to the current user. Requires view_team permission.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="terms">Nonblank search terms, including Mattermost operators such as from: and in:.</param>
+        /// <param name="isOrSearch">Use OR instead of AND between search terms.</param>
+        /// <param name="page">Zero-based page. Pagination depends on the server's search backend.</param>
+        /// <param name="perPage">Positive page size. Pagination depends on the server's search backend.</param>
+        /// <param name="timeZoneOffset">Offset from UTC in seconds for date searches.</param>
+        /// <param name="includeDeletedChannels">Include archived channels in the search.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Post identifiers, posts, and matched terms when provided by the search backend.</returns>
+        Task<PostSearchResponse> SearchTeamPostsAsync(string teamId, string terms, bool isOrSearch = false,
+            int page = 0, int perPage = 60, int timeZoneOffset = 0, bool includeDeletedChannels = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Search posts visible to the current user across all teams.</summary>
+        /// <param name="terms">Nonblank Mattermost search terms.</param>
+        /// <param name="isOrSearch">Use OR instead of AND between search terms.</param>
+        /// <param name="page">Zero-based page. Pagination depends on the server's search backend.</param>
+        /// <param name="perPage">Positive page size. Pagination depends on the server's search backend.</param>
+        /// <param name="timeZoneOffset">Offset from UTC in seconds for date searches.</param>
+        /// <param name="includeDeletedChannels">Include archived channels in the search.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Post identifiers, posts, and matched terms when provided by the search backend.</returns>
+        Task<PostSearchResponse> SearchPostsAsync(string terms, bool isOrSearch = false,
+            int page = 0, int perPage = 60, int timeZoneOffset = 0, bool includeDeletedChannels = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get a user's saved posts.</summary>
+        /// <param name="userId">User identifier or me. Another user's saved posts require edit_other_users permission.</param>
+        /// <param name="teamId">Optional team filter.</param>
+        /// <param name="channelId">Optional channel filter. Takes precedence over the team filter when both are supplied.</param>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Saved post identifiers and visible posts.</returns>
+        Task<ChannelPostsResponse> GetFlaggedPostsAsync(string userId, string? teamId = null,
+            string? channelId = null, int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
+        /// <summary>Get posts around a user's oldest unread post in a channel. Requires Mattermost 5.14 or later.</summary>
+        /// <param name="userId">User identifier or me. Another user's unread state requires edit_other_users permission.</param>
+        /// <param name="channelId">Channel identifier. Requires permission to read the channel.</param>
+        /// <param name="limitBefore">Posts before the unread boundary, from zero to 200.</param>
+        /// <param name="limitAfter">Posts at and after the unread boundary, from one to 200.</param>
+        /// <param name="skipFetchThreads">Skip fetching thread replies.</param>
+        /// <param name="collapsedThreads">Use collapsed reply threads.</param>
+        /// <param name="collapsedThreadsExtended">Include thread participant details.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Posts around the unread boundary, or recent posts when none are unread. Reading does not mark them read.</returns>
+        Task<ChannelPostsResponse> GetUnreadPostsAsync(string userId, string channelId,
+            int limitBefore = 60, int limitAfter = 60, bool skipFetchThreads = false, bool collapsedThreads = false,
+            bool collapsedThreadsExtended = false, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Send message to specified channel using channel identifier.
         /// </summary>

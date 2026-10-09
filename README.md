@@ -678,6 +678,19 @@ For dynamic selects, set `InteractiveDialogElement.DataSource` to `InteractiveDi
 
 See Mattermost's [interactive dialogs documentation](https://developers.mattermost.com/integrate/plugins/interactive-dialogs/) for the full server-side flow and field behavior.
 
+## Post search and saved posts
+
+```csharp
+PostSearchResponse teamPosts = await client.SearchTeamPostsAsync(teamId, "incident in:town-square", cancellationToken: cancellationToken);
+PostSearchResponse allPosts = await client.SearchPostsAsync("incident", isOrSearch: true, cancellationToken: cancellationToken);
+ChannelPostsResponse saved = await client.GetFlaggedPostsAsync("me", channelId: channelId, cancellationToken: cancellationToken);
+ChannelPostsResponse unread = await client.GetUnreadPostsAsync("me", channelId, limitBefore: 10, limitAfter: 50, cancellationToken: cancellationToken);
+```
+
+Use `Mattermost.Models.Responses` for these response types. Access posts through `Order` and `Posts`; search results also expose `Matches`, which may be null when the backend does not provide matched terms. Search supports Mattermost operators, AND/OR logic, archived channels, and a UTC offset in **seconds** for date searches. Pagination support depends on the server's search backend.
+
+`GetFlaggedPostsAsync` reads the user's saved posts; when both filters are supplied, the channel filter takes precedence. Reading another user's saved or unread posts requires `edit_other_users`. `GetUnreadPostsAsync` requires Mattermost 5.14 or later and returns posts around the oldest unread post, or recent posts when none are unread. It does not mark them read. Limits are 0–200 before and 1–200 at/after the unread boundary.
+
 ## Team management
 
 ```csharp

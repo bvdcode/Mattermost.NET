@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-09
-- Implemented specification operations: 89/608 (14.6%)
+- Implemented specification operations: 93/608 (15.3%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -20,7 +20,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Emoji | 6 / 9 |
 | Files | 3 / 12 |
 | Integration Actions | 1 / 4 |
-| Posts | 10 / 28 |
+| Posts | 14 / 28 |
 | Preferences | 5 / 5 |
 | Reactions | 3 / 3 |
 | Roles | 4 / 5 |
@@ -1331,12 +1331,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/users/{user_id}/channels/{channel_id}/posts/unread - Get posts around oldest unread
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L808) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L808) | `IMattermostClient.GetUnreadPostsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/posts/flagged - Get a list of flagged posts
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L534) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L534) | `IMattermostClient.GetFlaggedPostsAsync`
+✅ Implemented
 
 ## POST /api/v4/posts - Create a post
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L2) | `IMattermostClient.CreatePostAsync`, `IMattermostClient.CreatePostWithRawPropsAsync`
@@ -1375,12 +1375,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/posts/search - Search posts across all teams
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L143) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L143) | `IMattermostClient.SearchPostsAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/posts/search - Search for team posts
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L898) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L898) | `IMattermostClient.SearchTeamPostsAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/posts/{post_id}/ack - Acknowledge a post
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L1189) | `—`

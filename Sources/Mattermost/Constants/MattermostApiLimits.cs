@@ -46,5 +46,8 @@
 
         /// <summary>Maximum number of channels returned on a page.</summary>
         public const int MaxChannelsPerPage = 200;
+
+        /// <summary>Maximum number of posts on either side of the unread boundary.</summary>
+        public const int MaxPostsAroundUnread = 200;
     }
 }
