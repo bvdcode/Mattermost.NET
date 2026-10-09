@@ -109,7 +109,7 @@ namespace Mattermost
             CheckDisposed();
             string escapedChannelId = EscapeReadIdentifier(channelId, nameof(channelId));
             cancellationToken.ThrowIfCancellationRequested();
-            List<string> ids = PrepareUserBatch(userIds, nameof(userIds));
+            List<string> ids = PrepareStringBatch(userIds, nameof(userIds));
             string url = Routes.Channels + "/" + escapedChannelId + "/members/ids";
             return SendRequestAsync<IList<ChannelUserInfo>>(HttpMethod.Post, url, ids, cancellationToken);
         }

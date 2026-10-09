@@ -107,7 +107,7 @@ namespace Mattermost
             CheckDisposed();
             string escapedTeamId = EscapeReadIdentifier(teamId, nameof(teamId));
             cancellationToken.ThrowIfCancellationRequested();
-            List<string> ids = PrepareUserBatch(userIds, nameof(userIds));
+            List<string> ids = PrepareStringBatch(userIds, nameof(userIds));
             string url = Routes.Teams + "/" + escapedTeamId + "/members/ids";
             return SendRequestAsync<IList<TeamMember>>(HttpMethod.Post, url, ids, cancellationToken);
         }

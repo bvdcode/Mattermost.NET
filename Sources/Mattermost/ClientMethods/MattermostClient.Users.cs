@@ -175,7 +175,7 @@ namespace Mattermost
                 throw new ArgumentOutOfRangeException(nameof(since), "The timestamp cannot be negative.");
             }
             cancellationToken.ThrowIfCancellationRequested();
-            List<string> ids = PrepareUserBatch(userIds, nameof(userIds));
+            List<string> ids = PrepareStringBatch(userIds, nameof(userIds));
             string url = Routes.Users + "/ids";
             if (since > 0)
             {
@@ -190,7 +190,7 @@ namespace Mattermost
         {
             CheckDisposed();
             cancellationToken.ThrowIfCancellationRequested();
-            List<string> names = PrepareUserBatch(usernames, nameof(usernames), trimUsernamePrefix: true);
+            List<string> names = PrepareStringBatch(usernames, nameof(usernames), trimUsernamePrefix: true);
             return SendRequestAsync<IList<User>>(HttpMethod.Post, Routes.Users + "/usernames", names, cancellationToken);
         }
 
@@ -213,11 +213,11 @@ namespace Mattermost
         {
             CheckDisposed();
             cancellationToken.ThrowIfCancellationRequested();
-            List<string> ids = PrepareUserBatch(userIds, nameof(userIds));
+            List<string> ids = PrepareStringBatch(userIds, nameof(userIds));
             return SendRequestAsync<IList<UserPresence>>(HttpMethod.Post, Routes.Users + "/status/ids", ids, cancellationToken);
         }
 
-        private static List<string> PrepareUserBatch(IEnumerable<string> values, string parameterName,
+        private static List<string> PrepareStringBatch(IEnumerable<string> values, string parameterName,
             bool trimUsernamePrefix = false)
         {
             if (values is null)

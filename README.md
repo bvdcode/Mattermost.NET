@@ -425,6 +425,17 @@ Membership reads require `read_channel` permission. Pages are zero-based and the
 
 `GetChannelTimezonesAsync` requires Mattermost 5.6 or later and `read_channel` permission. It returns timezone names as reported by the server, or an empty list when members have no timezone configured.
 
+## Read roles
+
+```csharp
+Role role = await client.GetRoleByNameAsync("channel_user", cancellationToken);
+Role byId = await client.GetRoleAsync(role.Id, cancellationToken);
+IList<Role> selectedRoles = await client.GetRolesByNamesAsync(new[] { "system_user", "channel_user" }, cancellationToken);
+IList<Role> allRoles = await client.GetRolesAsync(cancellationToken);
+```
+
+Use `Mattermost.Models.Roles` for `Role`. It contains permission identifiers, built-in and scheme-management flags, an optional scheme ID, and 64-bit Unix-millisecond timestamps. Single and bulk lookups require authentication and Mattermost 4.9 or later. Reading all roles requires `manage_system` and Mattermost 5.33 or later. Bulk lookup accepts up to 100 distinct names; whitespace and duplicates are removed. Match responses by `Id` or `Name`, not input position. HTTP errors are propagated.
+
 ## Read custom emojis
 
 ```csharp

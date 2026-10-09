@@ -35,5 +35,10 @@
         /// Maximum number of distinct emoji names accepted by a single bulk lookup.
         /// </summary>
         public const int MaxEmojiNamesPerRequest = 200;
+
+        /// <summary>
+        /// Maximum number of distinct role names accepted by a bulk lookup.
+        /// </summary>
+        public const int MaxRoleNamesPerRequest = 100;
     }
 }

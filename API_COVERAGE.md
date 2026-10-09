@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-09
-- Implemented specification operations: 68/608 (11.2%)
+- Implemented specification operations: 72/608 (11.8%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -22,6 +22,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Integration Actions | 1 / 4 |
 | Posts | 10 / 28 |
 | Reactions | 3 / 3 |
+| Roles | 4 / 5 |
 | Status | 2 / 7 |
 | System | 1 / 51 |
 | Teams | 12 / 38 |
@@ -1579,20 +1580,20 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Roles
 
 ## GET /api/v4/roles - Get a list of all the roles
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L2) | `IMattermostClient.GetRolesAsync`
+✅ Implemented
 
 ## GET /api/v4/roles/{role_id} - Get a role
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L29) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L29) | `IMattermostClient.GetRoleAsync`
+✅ Implemented
 
 ## GET /api/v4/roles/name/{role_name} - Get a role
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L60) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L60) | `IMattermostClient.GetRoleByNameAsync`
+✅ Implemented
 
 ## POST /api/v4/roles/names - Get a list of roles by name
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L145) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L145) | `IMattermostClient.GetRolesByNamesAsync`
+✅ Implemented
 
 ## PUT /api/v4/roles/{role_id}/patch - Patch a role
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L91) | `—`

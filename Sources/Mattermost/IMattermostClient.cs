@@ -7,6 +7,7 @@ using Mattermost.Models.Dialogs;
 using Mattermost.Models.Emojis;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses;
+using Mattermost.Models.Roles;
 using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
 using System;
@@ -753,6 +754,30 @@ namespace Mattermost
         /// <exception cref="ArgumentNullException">The collection is null.</exception>
         /// <exception cref="ArgumentException">The collection is empty or contains blank identifiers.</exception>
         Task<IList<UserPresence>> GetUsersStatusesByIdsAsync(IEnumerable<string> userIds, CancellationToken cancellationToken = default);
+
+        #endregion
+
+        #region Roles
+
+        /// <summary>Get all roles. Requires Mattermost 5.33 or later and manage_system permission.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<Role>> GetRolesAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Get a role by identifier. Requires Mattermost 4.9 or later and authentication.</summary>
+        /// <param name="roleId">Role identifier; surrounding whitespace is removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Role> GetRoleAsync(string roleId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a role by name. Requires Mattermost 4.9 or later and authentication.</summary>
+        /// <param name="roleName">Role name; surrounding whitespace is removed and case is preserved.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Role> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken = default);
+
+        /// <summary>Get roles by name. Requires Mattermost 4.9 or later and authentication.</summary>
+        /// <param name="roleNames">Nonempty collection of up to 100 distinct names; whitespace and duplicate names are removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Matching roles. Input order is not preserved; missing names may be omitted.</returns>
+        Task<IList<Role>> GetRolesByNamesAsync(IEnumerable<string> roleNames, CancellationToken cancellationToken = default);
 
         #endregion
 
