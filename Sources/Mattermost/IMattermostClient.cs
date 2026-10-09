@@ -1091,6 +1091,20 @@ namespace Mattermost
         /// <returns>Authorized <see cref="User"/> object.</returns>
         Task<User> LoginAsync(string username, string password);
 
+        /// <summary>Check server health without authentication. Requires Mattermost 3.10 or later.</summary>
+        /// <param name="checkBackends">Ask the server to test database and file-storage connectivity.</param>
+        /// <param name="useRestSemantics">Return an unhealthy status as data instead of an HTTP error. Requires Mattermost 9.6 or later when true.</param>
+        /// <param name="cancellationToken">Cancels the request.</param>
+        /// <returns>Server status, optional backend statuses, and mobile client requirements.</returns>
+        /// <remarks>By default, an unhealthy server returns HTTP 500 and throws MattermostClientException. Backend checks perform test writes on the server. No login or user-profile request is made.</remarks>
+        Task<SystemStatusResponse> GetSystemStatusAsync(bool checkBackends = false, bool useRestSemantics = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get server-supported timezone names. Requires authentication and Mattermost 3.10 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Timezone names, such as Europe/Berlin.</returns>
+        Task<IList<string>> GetSupportedTimezonesAsync(CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Logout from server.
         /// </summary>

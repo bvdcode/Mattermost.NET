@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-09
-- Implemented specification operations: 98/608 (16.1%)
+- Implemented specification operations: 100/608 (16.4%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -25,7 +25,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Reactions | 3 / 3 |
 | Roles | 4 / 5 |
 | Status | 2 / 7 |
-| System | 1 / 51 |
+| System | 3 / 51 |
 | Teams | 16 / 38 |
 | Users | 12 / 77 |
 
@@ -1861,8 +1861,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/system/ping - Check system health
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L25) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L25) | `IMattermostClient.GetSystemStatusAsync`
+✅ Implemented
 
 ## GET /api/v4/system/schema/version - Get applied database schema migrations
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1405) | `—`
@@ -1873,8 +1873,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/system/timezones - Retrieve a list of supported timezones
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L2) | `IMattermostClient.GetSupportedTimezonesAsync`
+✅ Implemented
 
 ## GET /api/v4/trial-license/prev - Get last trial license used
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1087) | `—`

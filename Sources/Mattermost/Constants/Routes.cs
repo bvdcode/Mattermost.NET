@@ -13,6 +13,7 @@
         internal const string Roles = version + "/roles";
         internal const string Teams = version + "/teams";
         internal const string Files = version + "/files";
+        internal const string System = version + "/system";
         internal const string Channels = version + "/channels";
         internal const string WebSocket = version + "/websocket";
         internal const string GroupChannels = Channels + "/group";

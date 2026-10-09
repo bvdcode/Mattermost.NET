@@ -678,6 +678,18 @@ For dynamic selects, set `InteractiveDialogElement.DataSource` to `InteractiveDi
 
 See Mattermost's [interactive dialogs documentation](https://developers.mattermost.com/integrate/plugins/interactive-dialogs/) for the full server-side flow and field behavior.
 
+## Server health and timezones
+
+```csharp
+SystemStatusResponse health = await client.GetSystemStatusAsync(cancellationToken: cancellationToken);
+SystemStatusResponse backends = await client.GetSystemStatusAsync(checkBackends: true, useRestSemantics: true, cancellationToken: cancellationToken);
+IList<string> timezones = await client.GetSupportedTimezonesAsync(cancellationToken);
+```
+
+Use `Mattermost.Models.Responses` for `SystemStatusResponse`. Health checks do not authenticate, so they also work before login. The default check reads basic server health; `checkBackends: true` additionally asks the server to test database and file-storage connectivity, including test writes. Backend statuses are null when not requested.
+
+By default, unhealthy health checks return HTTP 500 and throw `MattermostClientException`, retaining the response body. On Mattermost 9.6 or later, `useRestSemantics: true` returns the status as data; check `health.Status` rather than assuming HTTP success means the server is healthy. Supported timezone names require authentication. Both endpoints require Mattermost 3.10 or later.
+
 ## File previews and profile images
 
 ```csharp
@@ -835,12 +847,14 @@ The public API is exposed through `IMattermostClient` and includes:
 - authentication and logout;
 - current user, users by id, username, or email;
 - bulk user profiles and single or bulk presence statuses;
-- team lookup, membership reads, statistics, and unread counts;
+- team creation, metadata editing, search, lookup, membership reads and addition, statistics, and unread counts;
 - create, update, delete, read, and list posts;
-- thread posts;
+- thread posts, team-wide and cross-team search, saved posts, and unread-boundary reads;
 - channel lookup, creation, archiving, membership reads and changes, statistics, unread counts, and member timezones;
 - direct and group channels;
-- file upload, download, streaming, and metadata;
+- file upload, download, streaming, metadata, previews, thumbnails, and public links;
+- profile images, custom emoji metadata, role metadata, and user preferences;
+- server health and supported timezones;
 - Calls plugin channel state, active call checks, and host call termination;
 - WebSocket events for messages, status changes, connection changes, and raw events.
 
