@@ -294,6 +294,92 @@ namespace Mattermost
         /// <returns> Team information. </returns>
         Task<Team> GetTeamByNameAsync(string teamName);
 
+        /// <summary>
+        /// Get one page of team memberships. Requires permission to view the team.
+        /// </summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="page">Zero-based page number.</param>
+        /// <param name="perPage">Members per page, from 1 to <see cref="MattermostApiLimits.MaxTeamMembersPerPage"/>.</param>
+        /// <param name="sortByUsername">Sort by username instead of user identifier.</param>
+        /// <param name="excludeDeletedUsers">Exclude deactivated users.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Membership records, not user profiles. The server may hide other members' role data.</returns>
+        /// <exception cref="ArgumentException">The team identifier is blank.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page is negative or the page size is outside the allowed range.</exception>
+        Task<IList<TeamMember>> GetTeamMembersAsync(string teamId, int page = 0, int perPage = 60,
+            bool sortByUsername = false, bool excludeDeletedUsers = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get a user's team membership. Requires permission to view the team and user.
+        /// </summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Membership record. A missing membership is reported as an API error.</returns>
+        /// <exception cref="ArgumentException">An identifier is blank.</exception>
+        Task<TeamMember> GetTeamMemberAsync(string teamId, string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get team memberships by user identifiers in one request. Requires permission to view the team.
+        /// </summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="userIds">A nonempty collection of actual user identifiers, not "me".</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Visible membership records. Missing or inaccessible members may be omitted; input order is not preserved.</returns>
+        /// <exception cref="ArgumentNullException">The collection is null.</exception>
+        /// <exception cref="ArgumentException">The team identifier is blank, or the collection is empty or contains blank identifiers.</exception>
+        Task<IList<TeamMember>> GetTeamMembersByIdsAsync(string teamId, IEnumerable<string> userIds,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get a user's memberships across teams, subject to server visibility permissions.
+        /// </summary>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Team membership and role records. The server may hide role data.</returns>
+        /// <exception cref="ArgumentException">The user identifier is blank.</exception>
+        Task<IList<TeamMember>> GetUserTeamMembersAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get membership counts for a team. Requires permission to view the team.
+        /// </summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Total and active member counts, subject to visibility restrictions.</returns>
+        /// <exception cref="ArgumentException">The team identifier is blank.</exception>
+        Task<TeamStats> GetTeamStatsAsync(string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Check whether a team exists and is visible to the current user.
+        /// </summary>
+        /// <param name="teamName">Team URL name, not its display name.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>True when a visible team exists; false otherwise. HTTP failures are propagated.</returns>
+        /// <exception cref="ArgumentException">The team name is blank.</exception>
+        Task<bool> TeamExistsAsync(string teamName, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get a user's unread counts for a team. Requires permission to access the user and view the team.
+        /// </summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Unread message and mention counts. This does not mark messages as read.</returns>
+        /// <exception cref="ArgumentException">An identifier is blank.</exception>
+        Task<TeamUnread> GetTeamUnreadAsync(string teamId, string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get unread counts across a user's teams. Reading another user's counts requires system administrator permissions.
+        /// </summary>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="excludeTeamId">Team to omit. Null, empty or whitespace means no exclusion.</param>
+        /// <param name="includeCollapsedThreads">Include unread counts for followed collapsed threads.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Unread counts for the user's teams. This does not mark messages as read.</returns>
+        /// <exception cref="ArgumentException">The user identifier is blank.</exception>
+        Task<IList<TeamUnread>> GetUserTeamsUnreadAsync(string userId, string? excludeTeamId = null,
+            bool includeCollapsedThreads = false, CancellationToken cancellationToken = default);
+
         #endregion
 
         #region Channels

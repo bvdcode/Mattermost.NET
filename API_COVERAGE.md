@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-09
-- Implemented specification operations: 48/608 (7.9%)
+- Implemented specification operations: 56/608 (9.2%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -23,7 +23,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Reactions | 3 / 3 |
 | Status | 2 / 7 |
 | System | 1 / 51 |
-| Teams | 4 / 38 |
+| Teams | 12 / 38 |
 | Users | 10 / 77 |
 
 ## Legend
@@ -2028,20 +2028,20 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/teams/{team_id}/members - Get team members
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L567) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L567) | `IMattermostClient.GetTeamMembersAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/members_minus_group_members - Team members minus group members.
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1670) | `—`
 ❌ Not implemented
 
 ## GET /api/v4/teams/{team_id}/members/{user_id} - Get a team member
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L797) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L797) | `IMattermostClient.GetTeamMemberAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/stats - Get a team stats
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L916) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L916) | `IMattermostClient.GetTeamStatsAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/invite/{invite_id} - Get invite info for a team
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1576) | `—`
@@ -2052,24 +2052,24 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/teams/name/{team_name}/exists - Check if team exists
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L503) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L503) | `IMattermostClient.TeamExistsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams - Get a user's teams
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L533) | `IMattermostClient.GetUserTeamsAsync`
 ✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/unread - Get unreads for a team
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1349) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1349) | `IMattermostClient.GetTeamUnreadAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/members - Get team members for a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L760) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L760) | `IMattermostClient.GetUserTeamMembersAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/unread - Get team unreads for a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1301) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1301) | `IMattermostClient.GetUserTeamsUnreadAsync`
+✅ Implemented
 
 ## POST /api/v4/teams - Create a team
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L2) | `—`
@@ -2100,8 +2100,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/teams/{team_id}/members/ids - Get team members by ids
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L875) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L875) | `IMattermostClient.GetTeamMembersByIdsAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/regenerate_invite_id - Regenerate the Invite ID from a Team
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1033) | `—`

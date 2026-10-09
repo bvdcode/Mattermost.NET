@@ -20,5 +20,10 @@
         /// Maximum number of channel memberships returned on a single page.
         /// </summary>
         public const int MaxChannelMembersPerPage = 200;
+
+        /// <summary>
+        /// Maximum number of team memberships returned on a single page.
+        /// </summary>
+        public const int MaxTeamMembersPerPage = 200;
     }
 }

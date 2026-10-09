@@ -364,6 +364,29 @@ Console.WriteLine(presence.Status);
 
 These methods return `UserPresence` with a typed `UserStatus` (`Online`, `Offline`, `Away`, `DoNotDisturb`, or `OutOfOffice`), `IsManual`, `LastActivityAt` (Unix milliseconds), and `DoNotDisturbEndTime` (Unix seconds; zero means no expiry). Bulk status lookup requires actual user IDs, not `"me"`; match responses by `UserId`, not list position. Server errors are propagated, including a missing single-user status.
 
+## Read teams and memberships
+
+```csharp
+IList<TeamMember> memberships = await client.GetUserTeamMembersAsync("me", cancellationToken);
+IList<TeamMember> members = await client.GetTeamMembersAsync(teamId, page: 0, perPage: 100,
+    sortByUsername: true, excludeDeletedUsers: true, cancellationToken: cancellationToken);
+TeamMember member = await client.GetTeamMemberAsync(teamId, "me", cancellationToken);
+IList<TeamMember> selectedMembers = await client.GetTeamMembersByIdsAsync(teamId, userIds, cancellationToken);
+TeamStats stats = await client.GetTeamStatsAsync(teamId, cancellationToken);
+bool exists = await client.TeamExistsAsync("team-name", cancellationToken);
+TeamUnread unread = await client.GetTeamUnreadAsync(teamId, "me", cancellationToken);
+IList<TeamUnread> otherTeamsUnread = await client.GetUserTeamsUnreadAsync("me", excludeTeamId: teamId,
+    includeCollapsedThreads: true, cancellationToken: cancellationToken);
+```
+
+`TeamMember` describes membership and roles, not the user's profile. Use `GetUserAsync(member.UserId)` for a profile. Reading team members and statistics requires permission to view the team; server visibility restrictions still apply. The server may hide another member's role fields and return `-1` for `DeletedAt`. A missing single membership produces an API error.
+
+Membership pages are zero-based and contain 1–200 entries. Bulk lookup takes a nonempty collection of actual user IDs, not `"me"`; match results by `UserId` because missing or inaccessible members may be omitted and input order is not preserved. `GetUserTeamMembersAsync` reads memberships across teams, whereas `GetUserTeamsAsync` returns the team objects themselves.
+
+`TeamExistsAsync` uses the team's URL name, not its display name. It returns false for a missing team or a team hidden from the current user; HTTP errors are propagated.
+
+`TeamStats` reports total and active membership counts. `TeamUnread` contains unread message, mention, root-post and followed-thread counters. All counts are 64-bit (`long`). Unread reads do not mark messages as read. `includeCollapsedThreads: true` requests followed-thread counts from servers supporting collapsed threads; reading another user's all-team unread counts requires system administrator permissions.
+
 ## Work with channels
 
 ```csharp
@@ -690,6 +713,7 @@ The public API is exposed through `IMattermostClient` and includes:
 - authentication and logout;
 - current user, users by id, username, or email;
 - bulk user profiles and single or bulk presence statuses;
+- team lookup, membership reads, statistics, and unread counts;
 - create, update, delete, read, and list posts;
 - thread posts;
 - channel lookup, creation, archiving, and membership changes;
