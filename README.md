@@ -678,6 +678,19 @@ For dynamic selects, set `InteractiveDialogElement.DataSource` to `InteractiveDi
 
 See Mattermost's [interactive dialogs documentation](https://developers.mattermost.com/integrate/plugins/interactive-dialogs/) for the full server-side flow and field behavior.
 
+## Team management
+
+```csharp
+Team team = await client.CreateTeamAsync("support", "Support", TeamType.InviteOnly, cancellationToken);
+team = await client.PatchTeamAsync(team.Id, description: "Customer support", cancellationToken: cancellationToken);
+IList<Team> teams = await client.SearchTeamsAsync("support", cancellationToken: cancellationToken);
+TeamMember member = await client.AddTeamMemberAsync(team.Id, userId, cancellationToken);
+```
+
+Use `Mattermost.Enums` for `TeamType` and `Mattermost.Models.Teams` for team models. Creating a team requires `create_team`; edits require `manage_team`; adding another user requires `add_user_to_team`. `AddTeamMemberAsync` requires an actual user ID, not `"me"`.
+
+`PatchTeamAsync` leaves null parameters unchanged. Empty descriptions, company names, or allowed domains clear those values, and `allowOpenInvite: false` disables open invitations. Team names and membership type are not changed by this method. Search returns the unpaged list visible to the current user.
+
 ## Custom slash commands
 
 These types help you implement the HTTP endpoint for a custom slash command; they do not register the command in Mattermost. Configure the command's request URL and HTTP method in Mattermost, then use `SlashCommandRequestParser` to decode the URL-encoded POST body or GET query string and return a `SlashCommandResponse` as JSON.

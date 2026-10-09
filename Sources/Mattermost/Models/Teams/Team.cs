@@ -44,10 +44,16 @@ namespace Mattermost.Models.Teams
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The URL of the team's icon.
+        /// Team description.
         /// </summary>
         [JsonPropertyName("description")]
         public string Description { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Company name associated with the team.
+        /// </summary>
+        [JsonPropertyName("company_name")]
+        public string CompanyName { get; set; } = string.Empty;
 
         /// <summary>
         /// The email address associated with the team, used for notifications and other purposes.

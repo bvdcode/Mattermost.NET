@@ -267,6 +267,43 @@ namespace Mattermost
 
         #region Teams
 
+        /// <summary>Create a team. Requires create_team permission.</summary>
+        /// <param name="name">Team URL name. Surrounding whitespace is removed.</param>
+        /// <param name="displayName">Team display name. Surrounding whitespace is removed.</param>
+        /// <param name="type">Open or invite-only membership.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The created team.</returns>
+        Task<Team> CreateTeamAsync(string name, string displayName, TeamType type,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Partially update team metadata. Requires manage_team permission.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="displayName">Replacement display name.</param>
+        /// <param name="description">Replacement description. An empty string clears it.</param>
+        /// <param name="companyName">Replacement company name. An empty string clears it.</param>
+        /// <param name="allowedDomains">Replacement allowed email domains. An empty string removes the restriction.</param>
+        /// <param name="allowOpenInvite">Whether open invitations are allowed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The updated team.</returns>
+        /// <remarks>Null parameters are omitted. Empty strings and false are sent unchanged. Server validation applies.</remarks>
+        Task<Team> PatchTeamAsync(string teamId, string? displayName = null, string? description = null,
+            string? companyName = null, string? allowedDomains = null, bool? allowOpenInvite = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Search teams visible to the current user, without pagination.</summary>
+        /// <param name="term">Search term. An empty string matches all visible teams.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Matching teams. Visibility depends on team-listing permissions.</returns>
+        Task<IList<Team>> SearchTeamsAsync(string term, CancellationToken cancellationToken = default);
+
+        /// <summary>Add a user to a team.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="userId">Actual user identifier; the me alias is not supported.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The team membership.</returns>
+        /// <remarks>Adding another user requires add_user_to_team permission. Joining as the current user requires an open team or appropriate membership permission.</remarks>
+        Task<TeamMember> AddTeamMemberAsync(string teamId, string userId, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get team by specified identifier.
         /// </summary>

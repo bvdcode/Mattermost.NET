@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-09
-- Implemented specification operations: 85/608 (14.0%)
+- Implemented specification operations: 89/608 (14.6%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -26,7 +26,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Roles | 4 / 5 |
 | Status | 2 / 7 |
 | System | 1 / 51 |
-| Teams | 12 / 38 |
+| Teams | 16 / 38 |
 | Users | 10 / 77 |
 
 ## Legend
@@ -2075,8 +2075,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/teams - Create a team
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L2) | `IMattermostClient.CreateTeamAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/files/search - Search files in a team
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L445) | `—`
@@ -2095,8 +2095,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/teams/{team_id}/members - Add user to team
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L627) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L627) | `IMattermostClient.AddTeamMemberAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/members/batch - Add multiple users to team
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L707) | `—`
@@ -2119,8 +2119,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/teams/search - Search teams
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L416) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L416) | `IMattermostClient.SearchTeamsAsync`
+✅ Implemented
 
 ## PUT /api/v4/teams/{team_id} - Update a team
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L133) | `—`
@@ -2135,8 +2135,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## PUT /api/v4/teams/{team_id}/patch - Patch a team
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L245) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L245) | `IMattermostClient.PatchTeamAsync`
+✅ Implemented
 
 ## PUT /api/v4/teams/{team_id}/privacy - Update teams's privacy
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L297) | `—`
