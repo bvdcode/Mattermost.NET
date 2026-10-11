@@ -1058,6 +1058,15 @@ namespace Mattermost
         Task<Emoji> GetEmojiAsync(string emojiId, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Download a custom emoji image. Requires authentication and enabled custom emojis.
+        /// </summary>
+        /// <param name="emojiId">Emoji identifier. Surrounding whitespace is removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Image bytes in the format stored on the server. A missing emoji produces an API error.</returns>
+        /// <exception cref="ArgumentException">The identifier is null, empty, or whitespace.</exception>
+        Task<byte[]> GetEmojiImageAsync(string emojiId, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Get custom emoji metadata by name. Requires Mattermost 4.7 or later, authentication, and enabled custom emojis.
         /// </summary>
         /// <param name="emojiName">Emoji name. Surrounding whitespace and colons are removed; case is preserved.</param>

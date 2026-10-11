@@ -41,6 +41,15 @@ namespace Mattermost
         }
 
         /// <inheritdoc />
+        public Task<byte[]> GetEmojiImageAsync(string emojiId, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            string escapedId = EscapeReadIdentifier(emojiId, nameof(emojiId));
+            cancellationToken.ThrowIfCancellationRequested();
+            return GetBinaryContentAsync(Routes.Emojis + "/" + escapedId + "/image", cancellationToken);
+        }
+
+        /// <inheritdoc />
         public Task<Emoji> GetEmojiByNameAsync(string emojiName, CancellationToken cancellationToken = default)
         {
             CheckDisposed();

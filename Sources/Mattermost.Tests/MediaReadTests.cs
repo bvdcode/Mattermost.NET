@@ -11,6 +11,7 @@ namespace Mattermost.Tests
         [TestCase("thumbnail", "/files/id%2F1%3F%23/thumbnail")]
         [TestCase("profile", "/users/id%2F1%3F%23/image")]
         [TestCase("default", "/users/id%2F1%3F%23/image/default")]
+        [TestCase("emoji", "/emoji/id%2F1%3F%23/image")]
         public async Task BinaryReads_EscapeIdentifiersAndPreserveBytes(string operation, string path)
         {
             byte[] bytes = { 0, 255, 128, 1, 34, 10 };
@@ -64,7 +65,7 @@ namespace Mattermost.Tests
         {
             using HttpClient http = ApiTestHttp.RejectRequests();
             using MattermostClient client = ApiTestHttp.Client(http);
-            foreach (string operation in new[] { "preview", "thumbnail", "profile", "default", "link" })
+            foreach (string operation in new[] { "preview", "thumbnail", "profile", "default", "emoji", "link" })
             {
                 await Assert.ThrowsAsync<ArgumentException>(() => InvokeAsync(client, operation, id!));
             }
@@ -72,7 +73,7 @@ namespace Mattermost.Tests
 
         [Test]
         public async Task ApiErrors_PreserveDetailsAndDisposeContent(
-            [Values("preview", "thumbnail", "profile", "default", "link")] string operation,
+            [Values("preview", "thumbnail", "profile", "default", "emoji", "link")] string operation,
             [Values(HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden, HttpStatusCode.NotFound)] HttpStatusCode status)
         {
             const string json = "{\"message\":\"inaccessible\"}";
@@ -94,7 +95,38 @@ namespace Mattermost.Tests
         }
 
         [Test]
-        public async Task NonJsonErrors_PreserveRawResponse([Values("preview", "thumbnail", "profile", "default", "link")] string operation)
+        public async Task EmojiImage_DisabledCustomEmojisPreservesApiError()
+        {
+            const string body = "{\"message\":\"Custom emojis are disabled\"}";
+            using HttpClient http = ApiTestHttp.Create((_, _) => Task.FromResult(ApiTestHttp.Json(HttpStatusCode.NotImplemented, body)));
+            using MattermostClient client = ApiTestHttp.Client(http);
+            MattermostClientException? exception = await Assert.ThrowsAsync<MattermostClientException>(() => client.GetEmojiImageAsync("emoji-1"));
+            Assert.That(exception!.StatusCode, Is.EqualTo(HttpStatusCode.NotImplemented));
+            Assert.That(exception.Message, Is.EqualTo("Custom emojis are disabled"));
+            Assert.That(exception.ResponseJson, Is.EqualTo(body));
+        }
+
+        [Test]
+        public async Task EmojiImage_CancellationDuringAuthenticationReachesHttp()
+        {
+            using CancellationTokenSource source = new CancellationTokenSource();
+            TaskCompletionSource entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            using HttpClient http = new HttpClient(new DelegateHttpMessageHandler(async (request, token) =>
+            {
+                Assert.That(request.RequestUri!.PathAndQuery, Is.EqualTo("/chat/api/v4/users/me"));
+                entered.SetResult();
+                await Task.Delay(Timeout.InfiniteTimeSpan, token);
+                throw new InvalidOperationException("Cancellation was not propagated.");
+            }));
+            using MattermostClient client = ApiTestHttp.Client(http);
+            Task request = client.GetEmojiImageAsync("emoji-1", source.Token);
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            await source.CancelAsync();
+            await Assert.CatchAsync<OperationCanceledException>(() => request);
+        }
+
+        [Test]
+        public async Task NonJsonErrors_PreserveRawResponse([Values("preview", "thumbnail", "profile", "default", "emoji", "link")] string operation)
         {
             const string body = "<html>upstream failed</html>";
             using HttpClient http = ApiTestHttp.Create((_, _) => Task.FromResult(ApiTestHttp.Json(HttpStatusCode.BadGateway, body)));
@@ -105,7 +137,7 @@ namespace Mattermost.Tests
         }
 
         [Test]
-        public async Task InFlightCancellation_ReachesHttp([Values("preview", "thumbnail", "profile", "default", "link")] string operation)
+        public async Task InFlightCancellation_ReachesHttp([Values("preview", "thumbnail", "profile", "default", "emoji", "link")] string operation)
         {
             using CancellationTokenSource source = new CancellationTokenSource();
             TaskCompletionSource entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -123,7 +155,7 @@ namespace Mattermost.Tests
         }
 
         [Test]
-        public async Task CancellationAndDisposal_RejectBeforeHttp([Values("preview", "thumbnail", "profile", "default", "link")] string operation)
+        public async Task CancellationAndDisposal_RejectBeforeHttp([Values("preview", "thumbnail", "profile", "default", "emoji", "link")] string operation)
         {
             using HttpClient http = ApiTestHttp.RejectRequests();
             using MattermostClient client = ApiTestHttp.Client(http);
@@ -148,6 +180,7 @@ namespace Mattermost.Tests
                 case "thumbnail": return client.GetFileThumbnailAsync(id, token);
                 case "profile": return client.GetUserImageAsync(id, token);
                 case "default": return client.GetDefaultUserImageAsync(id, token);
+                case "emoji": return client.GetEmojiImageAsync(id, token);
                 default: throw new ArgumentOutOfRangeException(nameof(operation));
             }
         }

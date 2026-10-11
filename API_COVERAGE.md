@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-10
-- Implemented specification operations: 104/608 (17.1%)
+- Implemented specification operations: 105/608 (17.3%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -17,7 +17,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Category | Implemented / total |
 |---|---|
 | Channels | 28 / 61 |
-| Emoji | 6 / 9 |
+| Emoji | 7 / 9 |
 | Files | 6 / 12 |
 | Integration Actions | 1 / 4 |
 | Posts | 14 / 28 |
@@ -801,8 +801,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/emoji/{emoji_id}/image - Get custom emoji image
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/emoji.yaml#L193) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/emoji.yaml#L193) | `IMattermostClient.GetEmojiImageAsync`
+✅ Implemented
 
 ## GET /api/v4/emoji/autocomplete - Autocomplete custom emoji
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/emoji.yaml#L272) | `IMattermostClient.AutocompleteEmojisAsync`

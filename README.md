@@ -504,12 +504,13 @@ IList<Emoji> emojis = await client.GetEmojisAsync(page: 0, perPage: 100,
     sortByName: true, cancellationToken: cancellationToken);
 Emoji emoji = await client.GetEmojiAsync(emojiId, cancellationToken);
 Emoji namedEmoji = await client.GetEmojiByNameAsync(":party_parrot:", cancellationToken);
+byte[] image = await client.GetEmojiImageAsync(namedEmoji.Id, cancellationToken);
 IList<Emoji> selected = await client.GetEmojisByNamesAsync(new[] { "party_parrot", "custom_rocket" }, cancellationToken);
 IList<Emoji> matches = await client.SearchEmojisAsync("parrot", prefixOnly: false, cancellationToken: cancellationToken);
 IList<Emoji> suggestions = await client.AutocompleteEmojisAsync("party_", cancellationToken);
 ```
 
-These methods return metadata for custom emojis, not image contents or the built-in emoji catalog. They require authentication and custom emojis enabled on the server. `Emoji` contains `Id`, `Name`, `CreatorId`, and 64-bit creation, update, and deletion timestamps in Unix milliseconds.
+The lookup methods return metadata for custom emojis, not the built-in emoji catalog. `GetEmojiImageAsync` returns the original image bytes without decoding or converting them. All these methods require authentication and custom emojis enabled on the server. `Emoji` contains `Id`, `Name`, `CreatorId`, and 64-bit creation, update, and deletion timestamps in Unix milliseconds.
 
 Pages are zero-based with 1–200 entries; the default page size is 60. Name sorting, lookup by name, search, and autocomplete require Mattermost 4.7 or later. Bulk name lookup requires Mattermost 9.2 or later and accepts up to 200 distinct names. Duplicate names are removed; missing and built-in names are omitted from the response. Match results by `Name` or `Id`, not input position.
 
@@ -877,7 +878,7 @@ The public API is exposed through `IMattermostClient` and includes:
 - channel lookup, creation, archiving, membership reads and changes, statistics, unread counts, and member timezones;
 - direct and group channels;
 - file upload, download, streaming, metadata, previews, thumbnails, and public links;
-- profile images, custom emoji metadata, role metadata, and user preferences;
+- profile images, custom emoji metadata and images, role metadata, and user preferences;
 - server health and supported timezones;
 - Calls plugin channel state, active call checks, and host call termination;
 - WebSocket events for messages, status changes, connection changes, and raw events.
