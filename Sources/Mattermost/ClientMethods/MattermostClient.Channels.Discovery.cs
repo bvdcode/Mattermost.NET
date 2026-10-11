@@ -12,6 +12,16 @@ namespace Mattermost
     public partial class MattermostClient
     {
         /// <inheritdoc />
+        public Task<IList<Channel>> SearchGroupChannelsAsync(string term, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            if (string.IsNullOrWhiteSpace(term)) { throw new ArgumentException("Search term cannot be blank.", nameof(term)); }
+            cancellationToken.ThrowIfCancellationRequested();
+            return SendRequestAsync<IList<Channel>>(HttpMethod.Post, Routes.GroupChannels + "/search", new { term = term.Trim() },
+                cancellationToken);
+        }
+
+        /// <inheritdoc />
         public Task<IList<Channel>> GetDeletedChannelsAsync(string teamId, int page = 0, int perPage = 60,
             CancellationToken cancellationToken = default)
         {

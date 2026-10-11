@@ -1106,6 +1106,62 @@ namespace Mattermost
 
         #endregion
 
+        #region Channel membership settings and read state
+
+        /// <summary>Replace a member's channel roles. Requires manage_channel_roles permission in the channel.</summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="userId">User identifier, or me for the current user.</param>
+        /// <param name="roles">Space-delimited roles, passed unchanged. The server validates role names.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task UpdateChannelMemberRolesAsync(string channelId, string userId, string roles, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace a member's scheme-derived channel roles. Requires Mattermost 5.0 or later and manage_channel_roles permission.</summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="userId">User identifier, or me for the current user.</param>
+        /// <param name="schemeUser">Whether the member has the scheme user role.</param>
+        /// <param name="schemeAdmin">Whether the member has the scheme administrator role.</param>
+        /// <param name="schemeGuest">Whether the member has the scheme guest role, mutually exclusive with schemeUser.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task UpdateChannelMemberSchemeRolesAsync(string channelId, string userId, bool schemeUser, bool schemeAdmin,
+            bool schemeGuest = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Update supplied channel notification properties. Omitted properties are preserved.</summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="userId">User identifier, or me for the current user. Other users require edit_other_users permission.</param>
+        /// <param name="notifyProps">String-valued settings such as desktop, push, email, mark_unread and ignore_channel_mentions. Values and keys are passed unchanged; unsupported keys may be ignored by the server.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task UpdateChannelMemberNotifyPropsAsync(string channelId, string userId, IDictionary<string, string> notifyProps,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get member counts for several accessible channels.</summary>
+        /// <param name="channelIds">Nonempty channel identifier collection. Match results by channel ID, not input order. Missing channels may be omitted.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IDictionary<string, long>> GetChannelsMemberCountsAsync(IEnumerable<string> channelIds, CancellationToken cancellationToken = default);
+
+        /// <summary>Perform the server's channel-view action: mark channels read, clear push notifications and update the active channel.</summary>
+        /// <param name="userId">User identifier, or me for the current user. Other users require edit_other_users permission.</param>
+        /// <param name="channelId">Viewed channel identifier. An empty string explicitly reports loss of focus.</param>
+        /// <param name="previousChannelId">Previous channel identifier when switching channels. Null omits the field; empty is allowed.</param>
+        /// <param name="collapsedThreadsSupported">Whether the caller supports collapsed reply threads.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Operation status and view timestamps, available since Mattermost 4.3. Timestamps are Unix milliseconds.</returns>
+        Task<ChannelViewResponse> ViewChannelAsync(string userId, string channelId, string? previousChannelId = null,
+            bool collapsedThreadsSupported = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Mark several channels as read for a user. This changes unread counters and can update followed thread read state.</summary>
+        /// <param name="userId">User identifier, or me for the current user. Other users require edit_other_users permission.</param>
+        /// <param name="channelIds">Nonempty collection of accessible channel identifiers.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Operation status and Unix-millisecond view times keyed by channel identifier.</returns>
+        Task<ChannelViewResponse> MarkChannelsReadAsync(string userId, IEnumerable<string> channelIds, CancellationToken cancellationToken = default);
+
+        /// <summary>Search the current user's group channels by member names.</summary>
+        /// <param name="term">Nonblank search term. Surrounding whitespace is removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<Channel>> SearchGroupChannelsAsync(string term, CancellationToken cancellationToken = default);
+
+        #endregion
+
         #region Sidebar categories
 
         /// <summary>Get a user's sidebar categories and their order. Requires Mattermost 5.26 or later and access to the team.</summary>

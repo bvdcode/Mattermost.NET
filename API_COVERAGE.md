@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 113/608 (18.6%)
+- Implemented specification operations: 120/608 (19.7%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -16,7 +16,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 
 | Category | Implemented / total |
 |---|---|
-| Channels | 36 / 61 |
+| Channels | 43 / 61 |
 | Emoji | 7 / 9 |
 | Files | 6 / 12 |
 | Integration Actions | 1 / 4 |
@@ -385,24 +385,24 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/channels/group/search - Search Group Channels
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L365) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L365) | `IMattermostClient.SearchGroupChannelsAsync`
+✅ Implemented
 
 ## POST /api/v4/channels/members/{user_id}/mark_read - Mark multiple channels as read
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1984) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1984) | `IMattermostClient.MarkChannelsReadAsync`
+✅ Implemented
 
 ## POST /api/v4/channels/members/{user_id}/view - View channel
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2061) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2061) | `IMattermostClient.ViewChannelAsync`
+✅ Implemented
 
 ## POST /api/v4/channels/search - Search all private and open type channels across all teams
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L210) | `—`
 ❌ Not implemented
 
 ## POST /api/v4/channels/stats/member_count - Get member counts for multiple channels
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2027) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2027) | `IMattermostClient.GetChannelsMemberCountsAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/channels/ids - Get a list of channels by ids
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L404) | `IMattermostClient.GetPublicChannelsByIdsAsync`
@@ -429,16 +429,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## PUT /api/v4/channels/{channel_id}/members/{user_id}/notify_props - Update channel notifications
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1882) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1882) | `IMattermostClient.UpdateChannelMemberNotifyPropsAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id}/members/{user_id}/roles - Update channel roles
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1774) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1774) | `IMattermostClient.UpdateChannelMemberRolesAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id}/members/{user_id}/schemeRoles - Update the scheme-derived roles of a channel member.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1822) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1822) | `IMattermostClient.UpdateChannelMemberSchemeRolesAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id}/moderations/patch - Update a channel's moderation settings.
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2535) | `—`

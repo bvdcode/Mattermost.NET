@@ -516,6 +516,25 @@ Pages are zero-based with 1–200 entries; the default page size is 60. Name sor
 
 Names and search terms have surrounding whitespace and colons removed; case is preserved. Search matches anywhere in the name unless `prefixOnly: true` is set and returns up to 200 results. Autocomplete always matches a prefix and returns up to 100 results. Both are sorted by name. A missing single emoji produces an API error; a search without matches returns an empty list. HTTP errors, including disabled custom emojis or unsupported endpoints, are propagated.
 
+## Update channel membership settings and read state
+
+```csharp
+await client.UpdateChannelMemberRolesAsync(channelId, userId, "channel_user channel_admin", cancellationToken);
+await client.UpdateChannelMemberSchemeRolesAsync(channelId, userId, schemeUser: true, schemeAdmin: true,
+    cancellationToken: cancellationToken);
+await client.UpdateChannelMemberNotifyPropsAsync(channelId, "me",
+    new Dictionary<string, string> { ["desktop"] = "mention" }, cancellationToken);
+ChannelViewResponse viewed = await client.ViewChannelAsync("me", channelId,
+    collapsedThreadsSupported: true, cancellationToken: cancellationToken);
+ChannelViewResponse read = await client.MarkChannelsReadAsync("me", new[] { channelId }, cancellationToken);
+IDictionary<string, long> counts = await client.GetChannelsMemberCountsAsync(new[] { channelId }, cancellationToken);
+IList<Channel> groups = await client.SearchGroupChannelsAsync("member name", cancellationToken);
+```
+
+Role updates require `manage_channel_roles` in the channel. Scheme roles replace all supplied flags; `schemeGuest` and `schemeUser` are mutually exclusive. Notification updates change only supplied settings, whose values are strings. Unsupported keys may be ignored by the server.
+
+Viewing a channel and marking channels read are writes, not metadata reads: they affect unread counters, push notifications and, where enabled, thread read state. `ViewChannelAsync` accepts an empty channel ID to report loss of focus; a null previous channel ID is omitted. `ChannelViewResponse` is in `Mattermost.Models.Responses`. View times and member counts are 64-bit values; times are Unix milliseconds, and the view-time map may be null when nothing was updated. Match bulk counts by channel ID; missing channels may be omitted. Group search matches member names in the current user's group channels and returns an empty list when nothing matches. HTTP errors are propagated.
+
 ## Manage sidebar categories
 
 ```csharp
