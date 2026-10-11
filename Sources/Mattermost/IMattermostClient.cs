@@ -8,6 +8,7 @@ using Mattermost.Models.Dialogs;
 using Mattermost.Models.Emojis;
 using Mattermost.Models.Enums;
 using Mattermost.Models.Jobs;
+using Mattermost.Models.Plugins;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses;
 using Mattermost.Models.Roles;
@@ -1104,6 +1105,35 @@ namespace Mattermost
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         /// <remarks>Requires ownership or edit_other_users. Does not delete personal access tokens; a valid access token can create a new session.</remarks>
         Task RevokeAllUserSessionsAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Read installed plugin manifests grouped by activation state. Requires Mattermost 4.4 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires enabled plugins and sysconsole_read_plugins. Does not return current plugin configuration values.</remarks>
+        Task<PluginsResponse> GetPluginsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read active plugins with web application bundles. Requires Mattermost 4.4 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires enabled plugins. Server-side executable and settings-schema data are omitted by the server.</remarks>
+        Task<IList<PluginManifest>> GetWebappPluginsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read cluster-aware installed plugin runtime states. Requires Mattermost 4.4 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires enabled plugins and sysconsole_read_plugins. Error details and server paths may be sensitive.</remarks>
+        Task<IList<PluginStatus>> GetPluginStatusesAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read Marketplace plugin metadata. Requires Mattermost 5.16 or later.</summary>
+        /// <param name="filter">Optional search text; empty searches all plugins.</param>
+        /// <param name="localOnly">Read local metadata without fetching the remote Marketplace.</param>
+        /// <param name="remoteOnly">Read only remote metadata; mutually exclusive with localOnly.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires enabled plugins and Marketplace. Unless remoteOnly is true, requires sysconsole_read_plugins. Returns the native matching list without client-side paging. No plugin is installed or activated.</remarks>
+        Task<IList<MarketplacePlugin>> GetMarketplacePluginsAsync(string? filter = null, bool localOnly = false,
+            bool remoteOnly = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Read whether a system administrator has visited the Marketplace. Requires Mattermost 5.33 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. Does not mark the Marketplace as visited.</remarks>
+        Task<bool> GetMarketplaceVisitedByAdminAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get current authorized user information.

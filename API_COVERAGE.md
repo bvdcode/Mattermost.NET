@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 227/608 (37.3%)
+- Implemented specification operations: 232/608 (38.2%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -23,6 +23,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Files | 9 / 12 |
 | Integration Actions | 1 / 4 |
 | Jobs | 3 / 7 |
+| Plugins | 5 / 13 |
 | Posts | 19 / 28 |
 | Preferences | 5 / 5 |
 | Reactions | 3 / 3 |
@@ -1247,24 +1248,24 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/plugins - Get plugins
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L52) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L52) | `IMattermostClient.GetPluginsAsync`
+✅ Implemented
 
 ## GET /api/v4/plugins/marketplace - Gets all the marketplace plugins
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L356) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L356) | `IMattermostClient.GetMarketplacePluginsAsync`
+✅ Implemented
 
 ## GET /api/v4/plugins/marketplace/first_admin_visit - Get if the Plugin Marketplace has been visited by at least an admin.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L422) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L422) | `IMattermostClient.GetMarketplaceVisitedByAdminAsync`
+✅ Implemented
 
 ## GET /api/v4/plugins/statuses - Get plugins status
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L290) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L290) | `IMattermostClient.GetPluginStatusesAsync`
+✅ Implemented
 
 ## GET /api/v4/plugins/webapp - Get webapp plugins
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L260) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L260) | `IMattermostClient.GetWebappPluginsAsync`
+✅ Implemented
 
 ## POST /api/v4/plugins - Upload plugin
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/plugins.yaml#L2) | `—`

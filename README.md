@@ -851,6 +851,24 @@ Use `Mattermost.Models.Responses` for `SystemStatusResponse`. Health checks do n
 
 By default, unhealthy health checks return HTTP 500 and throw `MattermostClientException`, retaining the response body. On Mattermost 9.6 or later, `useRestSemantics: true` returns the status as data; check `health.Status` rather than assuming HTTP success means the server is healthy. Supported timezone names require authentication. Both endpoints require Mattermost 3.10 or later.
 
+## Plugin metadata
+
+```csharp
+var installed = await client.GetPluginsAsync(cancellationToken);
+var webapp = await client.GetWebappPluginsAsync(cancellationToken);
+var statuses = await client.GetPluginStatusesAsync(cancellationToken);
+var marketplace = await client.GetMarketplacePluginsAsync(filter: "calls", localOnly: true, cancellationToken: cancellationToken);
+bool visited = await client.GetMarketplaceVisitedByAdminAsync(cancellationToken);
+```
+
+These methods only read metadata; they do not install, activate, disable or remove plugins. Installed manifests, active webapp manifests and runtime states require Mattermost 4.4+ and enabled plugins. Installed manifests and runtime states require `sysconsole_read_plugins`; webapp manifests omit server executables and setting definitions. Runtime states include cluster node identifiers, error details and server paths, which may be sensitive.
+
+Models in `Mattermost.Models.Plugins` preserve manifest components, platform executable paths, setting definitions, grouped sections and selectable options. Plugin-defined property values and setting defaults use `JsonElement` to retain their native JSON types. Setting definitions are not current configured values. `PluginState` in `Mattermost.Enums` uses the native numeric values and retains unrecognized numeric states.
+
+Marketplace reads require Mattermost 5.16+ with plugins and Marketplace enabled. `localOnly` excludes the remote catalog; `remoteOnly` excludes local and prepackaged metadata and may require remote Marketplace access to be enabled. They cannot both be true. Unless `remoteOnly` is true, `sysconsole_read_plugins` is required. The method returns the native matching list. Mattermost 12.0.0 ignores Marketplace pagination and `server_version` parameters, so this method does not expose them or apply client-side pagination. Reading the administrator visit flag requires Mattermost 5.33+ and `manage_system` and does not mark it visited.
+
+Live checks on Mattermost 12.0.0 passed all five reads with nonempty installed/webapp/status and local/remote Marketplace metadata, manifest/default/runtime-state comparison with direct HTTP, search filtering and unchanged visit state. A non-administrator bot could read webapp and remote-only Marketplace metadata; installed manifests, runtime states, local Marketplace metadata and the administrator visit flag returned the native HTTP 403.
+
 ## User account management
 
 ```csharp
