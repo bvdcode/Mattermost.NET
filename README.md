@@ -44,6 +44,22 @@ await client.CreatePostAsync(channelId, "Hello from Mattermost.NET!");
 
 ---
 
+# Client interfaces
+
+`IMattermostClient` combines the complete API and connection management. A service can instead depend on the narrower `IMattermostUsersClient`, `IMattermostPostsClient`, `IMattermostChannelsClient`, `IMattermostTeamsClient`, `IMattermostFilesClient`, `IMattermostIntegrationsClient`, `IMattermostEmojisClient`, or `IMattermostSystemClient` contract.
+
+```csharp
+using Mattermost;
+
+using MattermostClient client = new MattermostClient(server, token);
+IMattermostPostsClient posts = client;
+await posts.CreatePostAsync(channelId, "Hello!");
+```
+
+All contracts refer to the same client instance, authentication state and HTTP transport. The owning application disposes the `MattermostClient`; no separate client instances are needed for different API groups.
+
+---
+
 # Authentication
 
 ## Use a personal access token or bot token
