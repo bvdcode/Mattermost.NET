@@ -516,6 +516,27 @@ Pages are zero-based with 1–200 entries; the default page size is 60. Name sor
 
 Names and search terms have surrounding whitespace and colons removed; case is preserved. Search matches anywhere in the name unless `prefixOnly: true` is set and returns up to 200 results. Autocomplete always matches a prefix and returns up to 100 results. Both are sorted by name. A missing single emoji produces an API error; a search without matches returns an empty list. HTTP errors, including disabled custom emojis or unsupported endpoints, are propagated.
 
+## Manage team lifecycle and memberships
+
+```csharp
+Team team = await client.GetTeamAsync(teamId);
+team.Description = "Project discussion";
+team = await client.UpdateTeamAsync(team, cancellationToken);
+team = await client.UpdateTeamPrivacyAsync(teamId, TeamType.InviteOnly, cancellationToken);
+IList<TeamMember> members = await client.AddTeamMembersAsync(teamId, new[] { userId }, cancellationToken);
+await client.UpdateTeamMemberSchemeRolesAsync(teamId, userId, schemeUser: true, schemeAdmin: false,
+    cancellationToken: cancellationToken);
+await client.RemoveTeamMemberAsync(teamId, userId, cancellationToken);
+await client.DeleteTeamAsync(teamId, cancellationToken: cancellationToken);
+team = await client.RestoreTeamAsync(teamId, cancellationToken);
+```
+
+`UpdateTeamAsync` sends complete writable metadata; read the team first to avoid clearing fields. `UpdateTeamPrivacyAsync` changes privacy and open-invitation settings together. Team management requires `manage_team`, invitation changes also require `invite_user`, and membership role changes require `manage_team_roles`.
+
+`DeleteTeamAsync` is a reversible soft deletion by default. `permanent: true` irreversibly removes the team and its data and requires the `EnableAPITeamDeletion` server setting. Restore requires Mattermost 5.24 or later. Removing a team member also removes their channel memberships.
+
+Batch member addition accepts at most 256 actual user IDs, not `me`. Match returned memberships by `UserId`; an error does not guarantee rollback of users already added. This method uses the normal fail-on-error endpoint mode. `RegenerateTeamInviteIdAsync` returns the updated team and invalidates its previous invite ID. `GetTeamInviteInfoAsync` requires an open team and returns only `Id`, `Name`, `DisplayName` and `Description`, without authentication; it does not return complete metadata for an update. HTTP errors are propagated.
+
 ## Update channel membership settings and read state
 
 ```csharp

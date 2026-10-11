@@ -1106,6 +1106,74 @@ namespace Mattermost
 
         #endregion
 
+        #region Team lifecycle and membership management
+
+        /// <summary>Update complete team metadata. Requires manage_team permission.</summary>
+        /// <param name="team">Team with an identifier and all writable metadata. Read it first to preserve fields. Invite settings additionally require invite_user permission.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Team> UpdateTeamAsync(Team team, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete a team. By default this is a reversible soft deletion. Requires manage_team permission.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="permanent">Irreversibly delete the team and its data. Requires the EnableAPITeamDeletion server setting.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task DeleteTeamAsync(string teamId, bool permanent = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Restore a soft-deleted team. Requires manage_team permission and Mattermost 5.24 or later.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Team> RestoreTeamAsync(string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>Change team privacy. Requires manage_team and invite_user permissions.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="privacy">Open or InviteOnly. This also enables or disables open invitations, respectively.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Team> UpdateTeamPrivacyAsync(string teamId, TeamType privacy, CancellationToken cancellationToken = default);
+
+        /// <summary>Regenerate a team's invitation identifier, invalidating its previous invite link. Requires manage_team and invite_user permissions.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Team metadata with the new InviteId.</returns>
+        Task<Team> RegenerateTeamInviteIdAsync(string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>Read public metadata for an open team from its invitation identifier without authentication. Requires Mattermost 4.0 or later.</summary>
+        /// <param name="inviteId">Team invitation identifier.</param>
+        /// <param name="cancellationToken">Cancels the request.</param>
+        /// <returns>Team with only Id, Name, DisplayName and Description populated.</returns>
+        Task<Team> GetTeamInviteInfoAsync(string inviteId, CancellationToken cancellationToken = default);
+
+        /// <summary>Add multiple users to a team. Requires add_user_to_team permission. Errors abort the request rather than returning per-user errors.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="userIds">Nonempty collection of up to 256 actual user identifiers, not the me alias. Match results by UserId.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>An error does not guarantee rollback of users already added by the server.</remarks>
+        Task<IList<TeamMember>> AddTeamMembersAsync(string teamId, IEnumerable<string> userIds, CancellationToken cancellationToken = default);
+
+        /// <summary>Remove a team member, including their channel memberships. Removing another user requires remove_user_from_team permission.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="userId">User identifier, or me to leave the team.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task RemoveTeamMemberAsync(string teamId, string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace a member's team roles. Requires manage_team_roles permission.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="userId">User identifier, or me for the current user.</param>
+        /// <param name="roles">Space-delimited roles, passed unchanged. The server validates role names.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task UpdateTeamMemberRolesAsync(string teamId, string userId, string roles, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace a member's scheme-derived team roles. Requires Mattermost 5.0 or later and manage_team_roles permission.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="userId">User identifier, or me for the current user.</param>
+        /// <param name="schemeUser">Whether the member has the scheme user role.</param>
+        /// <param name="schemeAdmin">Whether the member has the scheme administrator role.</param>
+        /// <param name="schemeGuest">Whether the member has the scheme guest role, mutually exclusive with schemeUser.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task UpdateTeamMemberSchemeRolesAsync(string teamId, string userId, bool schemeUser, bool schemeAdmin,
+            bool schemeGuest = false, CancellationToken cancellationToken = default);
+
+        #endregion
+
         #region Channel membership settings and read state
 
         /// <summary>Replace a member's channel roles. Requires manage_channel_roles permission in the channel.</summary>

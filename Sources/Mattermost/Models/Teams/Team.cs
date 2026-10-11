@@ -86,6 +86,20 @@ namespace Mattermost.Models.Teams
         public bool AllowOpenInvite { get; set; }
 
         /// <summary>
+        /// Last team icon update time in Unix milliseconds, or zero if no icon is set.
+        /// </summary>
+        [JsonPropertyName("last_team_icon_update")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public long LastIconUpdate { get; set; }
+
+        /// <summary>
+        /// Whether membership is restricted to linked groups. Null means no group constraint.
+        /// </summary>
+        [JsonPropertyName("group_constrained")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? GroupConstrained { get; set; }
+
+        /// <summary>
         /// The data retention policy to which this team has been assigned.
         /// If no such policy exists, or the caller does not have the sysconsole_read_compliance_data_retention permission, this field will be null.
         /// </summary>

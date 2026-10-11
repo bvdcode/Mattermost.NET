@@ -26,6 +26,9 @@
         /// </summary>
         public const int MaxTeamMembersPerPage = 200;
 
+        /// <summary>Maximum number of users added to a team in one batch.</summary>
+        public const int MaxTeamMembersPerRequest = 256;
+
         /// <summary>
         /// Maximum number of custom emojis returned on a single page.
         /// </summary>
