@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 190/608 (31.3%)
+- Implemented specification operations: 195/608 (32.1%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -21,7 +21,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Emoji | 9 / 9 |
 | Files | 9 / 12 |
 | Integration Actions | 1 / 4 |
-| Posts | 14 / 28 |
+| Posts | 19 / 28 |
 | Preferences | 5 / 5 |
 | Reactions | 3 / 3 |
 | Roles | 4 / 5 |
@@ -1315,16 +1315,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/posts/{post_id}/edit_history - Get post edit history
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L666) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L666) | `IMattermostClient.GetPostEditHistoryAsync`
+✅ Implemented
 
 ## GET /api/v4/posts/{post_id}/files/info - Get file info for post
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L592) | `IMattermostClient.GetPostFilesAsync`
 ✅ Implemented
 
 ## GET /api/v4/posts/{post_id}/info - Get post info
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L634) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L634) | `IMattermostClient.GetPostInfoAsync`
+✅ Implemented
 
 ## GET /api/v4/posts/{post_id}/reveal - Reveal a burn-on-read post
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L1381) | `—`
@@ -1359,8 +1359,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/posts/{post_id}/restore/{restore_version_id} - Restores a past version of a post
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L1333) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L1333) | `IMattermostClient.RestorePostVersionAsync`
+✅ Implemented
 
 ## POST /api/v4/posts/{post_id}/unpin - Unpin a post to the channel
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L998) | `IMattermostClient.UnpinPostAsync`
@@ -1391,12 +1391,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/{user_id}/posts/{post_id}/reminder - Set a post reminder
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L1133) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L1133) | `IMattermostClient.SetPostReminderAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/posts/{post_id}/set_unread - Mark as unread from a post.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L332) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L332) | `IMattermostClient.MarkPostUnreadAsync`
+✅ Implemented
 
 ## PUT /api/v4/posts/{post_id} - Update a post
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L274) | `—`

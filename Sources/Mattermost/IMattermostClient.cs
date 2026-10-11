@@ -168,6 +168,45 @@ namespace Mattermost
         /// <returns> Post information. </returns>
         Task<Post> GetPostAsync(string postId);
 
+        /// <summary>Get saved versions of a post authored by the current user.</summary>
+        /// <param name="postId">Current post identifier, not a historical version identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Historical posts whose OriginalId refers to the current post.</returns>
+        /// <remarks>Requires permission to edit the post. Server retention settings may limit the available history; no saved versions may produce HTTP 404.</remarks>
+        Task<IList<Post>> GetPostEditHistoryAsync(string postId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get channel, team and membership information for a post without fetching its contents.</summary>
+        /// <param name="postId">Post identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Location and membership information visible to the current user.</returns>
+        /// <remarks>The result does not grant permission to read or join the channel.</remarks>
+        Task<PostLocationInfo> GetPostInfoAsync(string postId, CancellationToken cancellationToken = default);
+
+        /// <summary>Restore a saved version of a post authored by the current user.</summary>
+        /// <param name="postId">Current post identifier.</param>
+        /// <param name="restoreVersionId">Historical identifier returned by GetPostEditHistoryAsync.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The updated current post.</returns>
+        /// <remarks>Requires permission to edit the post. Cancellation cannot undo an accepted restoration.</remarks>
+        Task<Post> RestorePostVersionAsync(string postId, string restoreVersionId, CancellationToken cancellationToken = default);
+
+        /// <summary>Mark a post and subsequent messages unread for a user.</summary>
+        /// <param name="userId">User identifier or "me". Updating another user requires appropriate permissions.</param>
+        /// <param name="postId">Post identifier.</param>
+        /// <param name="collapsedThreadsSupported">Apply the server's collapsed-thread read-state handling.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The channel's updated read boundary and mention counts, not its total unread message count.</returns>
+        Task<ChannelReadState> MarkPostUnreadAsync(string userId, string postId, bool collapsedThreadsSupported = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Schedule or replace a user's reminder for a post.</summary>
+        /// <param name="userId">User identifier or "me". Updating another user requires appropriate permissions.</param>
+        /// <param name="postId">Post identifier.</param>
+        /// <param name="remindAt">Reminder time, sent as Unix seconds with subsecond precision discarded.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires permission to read the post. Cancellation cannot undo an accepted reminder.</remarks>
+        Task SetPostReminderAsync(string userId, string postId, DateTimeOffset remindAt, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get multiple posts in one request.
         /// </summary>

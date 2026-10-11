@@ -330,6 +330,24 @@ Bulk lookup accepts 1–1000 post IDs. Results may omit missing or inaccessible 
 
 `GetPostFilesAsync` returns file metadata, not file contents. Use `GetFileAsync(file.Id)` or `GetFileStreamAsync(file.Id)` to download an attachment. Its optional `includeDeleted: true` flag requires system administrator permissions.
 
+## Post history, location and reminders
+
+```csharp
+var history = await client.GetPostEditHistoryAsync(postId, cancellationToken);
+var location = await client.GetPostInfoAsync(postId, cancellationToken);
+await client.RestorePostVersionAsync(postId, historicalVersionId, cancellationToken);
+var readState = await client.MarkPostUnreadAsync("me", postId, cancellationToken: cancellationToken);
+await client.SetPostReminderAsync("me", postId, DateTimeOffset.UtcNow.AddHours(1), cancellationToken);
+```
+
+Edit history normally requires the post's author and `edit_post` permission. Each historical entry has its own `Id` and an `OriginalId` pointing to the current post; pass the historical `Id` to restore a version. A post without saved history may return HTTP 404. Restoration updates the current post and requires permission to edit it. Server retention and attachment permissions still apply.
+
+`GetPostInfoAsync` returns `PostLocationInfo` from `Mattermost.Models.Posts`: channel/team identifiers, display names and the current user's membership flags, without the post's contents. This information does not grant access to the channel. Direct and group channels have no team information.
+
+`MarkPostUnreadAsync` returns `ChannelReadState` from `Mattermost.Models.Channels`. Its `MessageCount` and `RootMessageCount` are counters at the updated read boundary, not unread totals; use `GetChannelUnreadAsync` for unread counts. `LastViewedAt` is Unix milliseconds. Set `collapsedThreadsSupported: true` when the caller supports collapsed-thread read states. Updating another user's state requires appropriate permissions.
+
+`SetPostReminderAsync` requires access to the post and accepts a `DateTimeOffset`; it sends Unix seconds, discarding subsecond precision. Scheduling the same post for the same user replaces that user's reminder. Cancellation cannot undo a restoration or reminder already accepted by the server.
+
 ## Get current user
 
 ```csharp
