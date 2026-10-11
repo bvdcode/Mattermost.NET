@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 214/608 (35.2%)
+- Implemented specification operations: 217/608 (35.7%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -22,6 +22,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Emoji | 9 / 9 |
 | Files | 9 / 12 |
 | Integration Actions | 1 / 4 |
+| Jobs | 3 / 7 |
 | Posts | 19 / 28 |
 | Preferences | 5 / 5 |
 | Reactions | 3 / 3 |
@@ -1076,20 +1077,20 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Jobs
 
 ## GET /api/v4/jobs - Get the jobs.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L2) | `IMattermostClient.GetJobsAsync`
+✅ Implemented
 
 ## GET /api/v4/jobs/{job_id} - Get a job.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L115) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L115) | `IMattermostClient.GetJobAsync`
+✅ Implemented
 
 ## GET /api/v4/jobs/{job_id}/download - Download the results of a job.
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L156) | `—`
 ❌ Not implemented
 
 ## GET /api/v4/jobs/type/{job_type} - Get the jobs of the given type.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L224) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L224) | `IMattermostClient.GetJobsByTypeAsync`
+✅ Implemented
 
 ## PATCH /api/v4/jobs/{job_id}/status - Update the status of a job
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L288) | `—`

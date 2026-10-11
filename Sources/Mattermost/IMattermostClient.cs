@@ -7,6 +7,7 @@ using Mattermost.Models.Channels;
 using Mattermost.Models.Dialogs;
 using Mattermost.Models.Emojis;
 using Mattermost.Models.Enums;
+using Mattermost.Models.Jobs;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses;
 using Mattermost.Models.Roles;
@@ -1008,6 +1009,32 @@ namespace Mattermost
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         /// <remarks>Requires manage_system. Does not set or clear the flag.</remarks>
         Task<ServerBusyState> GetServerBusyAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of background jobs readable by the current session. Requires Mattermost 4.1 or later.</summary>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="jobType">Optional native job type; null includes all readable types.</param>
+        /// <param name="status">Optional native job status; null includes all statuses.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Permissions depend on job type. Does not accept a team filter.</remarks>
+        Task<IList<Job>> GetJobsAsync(int page = 0, int perPage = 60, string? jobType = null, string? status = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get a background job by identifier. Requires Mattermost 4.1 or later.</summary>
+        /// <param name="jobId">Job identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires permission to read the job's type.</remarks>
+        Task<Job> GetJobAsync(string jobId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of background jobs of one native type. Requires Mattermost 4.1 or later.</summary>
+        /// <param name="jobType">Native job type.</param>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="teamId">Optional team filter on servers supporting team-scoped jobs.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires permission to read the job type. Team administrators may read access_control_sync jobs for their team with manage_team_access_rules.</remarks>
+        Task<IList<Job>> GetJobsByTypeAsync(string jobType, int page = 0, int perPage = 60, string? teamId = null,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get current authorized user information.

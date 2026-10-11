@@ -851,6 +851,20 @@ Use `Mattermost.Models.Responses` for `SystemStatusResponse`. Health checks do n
 
 By default, unhealthy health checks return HTTP 500 and throw `MattermostClientException`, retaining the response body. On Mattermost 9.6 or later, `useRestSemantics: true` returns the status as data; check `health.Status` rather than assuming HTTP success means the server is healthy. Supported timezone names require authentication. Both endpoints require Mattermost 3.10 or later.
 
+## Background jobs
+
+```csharp
+var jobs = await client.GetJobsAsync(jobType: "migrations", status: "success", cancellationToken: cancellationToken);
+var job = await client.GetJobAsync(jobId, cancellationToken);
+var jobsByType = await client.GetJobsByTypeAsync("plugins", cancellationToken: cancellationToken);
+```
+
+These read-only methods require Mattermost 4.1+ and permission to read the requested job types. Without a type filter, the server lists only types readable by the session. `Job` in `Mattermost.Models.Jobs` preserves native type/status strings, 64-bit counters, Unix-millisecond timestamps and job-specific string data. Job data may contain sensitive information.
+
+`GetJobsAsync` supports independent type/status filters. `GetJobsByTypeAsync` also accepts `teamId` on servers supporting team-scoped jobs; the server filters by the job's stored team data. Team administrators with `manage_team_access_rules` may read their team's `access_control_sync` jobs without system-wide access. Neither listing starts, cancels or updates jobs.
+
+Live checks on Mattermost 12.0.0 passed nonempty pages, single-job retrieval, type/status filtering, paging and native field/data comparison. A team filter returned an empty matching list; nonempty team-scoped job data was not tested.
+
 ## Server diagnostics
 
 ```csharp
