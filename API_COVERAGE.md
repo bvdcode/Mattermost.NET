@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 179/608 (29.4%)
+- Implemented specification operations: 180/608 (29.6%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -17,7 +17,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Category | Implemented / total |
 |---|---|
 | Channels | 43 / 61 |
-| Commands | 9 / 10 |
+| Commands | 10 / 10 |
 | Emoji | 9 / 9 |
 | Files | 9 / 12 |
 | Integration Actions | 1 / 4 |
@@ -575,8 +575,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/commands/execute - Execute a command
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L352) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L352) | `IMattermostClient.ExecuteCommandAsync`
+✅ Implemented
 
 ## PUT /api/v4/commands/{command_id} - Update a command
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L198) | `IMattermostClient.UpdateCommandAsync`

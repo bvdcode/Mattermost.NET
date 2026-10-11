@@ -1457,6 +1457,16 @@ namespace Mattermost
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         Task<IList<SlashCommand>> GetCommandsAsync(string teamId, bool customOnly = false, CancellationToken cancellationToken = default);
 
+        /// <summary>Execute a slash command as the current user. The server processes its response and may create posts or invoke an external integration.</summary>
+        /// <param name="channelId">Channel context. Requires membership and create_post permission.</param>
+        /// <param name="command">Slash-prefixed command including arguments, such as "/echo hello". Argument whitespace is preserved.</param>
+        /// <param name="teamId">Optional team context, particularly for direct/group channels. Ordinary channels determine their own team.</param>
+        /// <param name="rootId">Optional thread root for response posts.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; the server may already have executed the command.</param>
+        /// <returns>The command response, including any client trigger identifier. Empty server visibility is represented by a null ResponseType.</returns>
+        Task<SlashCommandResponse> ExecuteCommandAsync(string channelId, string command, string? teamId = null,
+            string? rootId = null, CancellationToken cancellationToken = default);
+
         /// <summary>Get a manageable custom command, including its secret. Requires Mattermost 5.22 or later.</summary>
         /// <param name="commandId">Command identifier. Requires view_team and manage_own_slash_commands; other creators' commands also require manage_others_slash_commands.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>

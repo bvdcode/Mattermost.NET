@@ -28,7 +28,7 @@ namespace Mattermost.Models.SlashCommands
         /// </summary>
         [JsonPropertyName("response_type")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonConverter(typeof(SlashCommandResponseTypeConverter))]
         public SlashCommandResponseType? ResponseType { get; set; }
 
         /// <summary>

@@ -884,6 +884,15 @@ var suggestions = await client.GetCommandAutocompleteSuggestionsAsync(teamId, "/
 
 `UpdateCommandAsync` replaces writable settings; read a complete object with `GetCommandAsync` (Mattermost 5.22+) before changing it. The server preserves its token and creator; it does not persist plugin-provided structured autocomplete metadata for custom commands. `MoveCommandAsync` (Mattermost 5.22+) changes its team, `RegenerateCommandTokenAsync` returns a new secret and invalidates the old one, and `DeleteCommandAsync` removes the command. Treat command tokens as secrets. Listing with `customOnly: false` includes built-in/plugin commands and custom commands the current user can manage. Autocomplete listings may hide request URLs, methods, creators and tokens. Suggestions (Mattermost 5.24+) preserve input whitespace, include optional channel/thread context, and accept `"/"` for initial suggestions. Native autocomplete metadata and suggestion fields use PascalCase JSON names.
 
+Execute a command as the current user:
+
+```csharp
+SlashCommandResponse response = await client.ExecuteCommandAsync(channelId, "/help",
+    cancellationToken: cancellationToken);
+```
+
+Execution requires channel membership and `create_post` permission. Supply `teamId` for commands needing a team context in direct/group channels; ordinary channels determine their own team. `rootId` optionally places response posts in a thread. Arguments and their whitespace are sent unchanged. The server processes the response, so execution may create posts or invoke an external integration; do not post the returned text again automatically. Cancellation cannot undo an already executed command. `TriggerId` contains client trigger metadata when returned, and an empty server `response_type` is read as null. Existing integration responses still omit unset fields and serialize visibility as `"ephemeral"` or `"in_channel"`.
+
 To implement the command's HTTP endpoint, use `SlashCommandRequestParser` to decode the URL-encoded POST body or GET query string and return a `SlashCommandResponse` as JSON.
 
 For a POST command in an ASP.NET Core minimal API:
