@@ -1105,6 +1105,19 @@ namespace Mattermost
         /// <exception cref="ArgumentException">The prefix is null or blank after trimming.</exception>
         Task<IList<Emoji>> AutocompleteEmojisAsync(string name, CancellationToken cancellationToken = default);
 
+        /// <summary>Create a custom emoji owned by the authenticated user.</summary>
+        /// <param name="name">Emoji name, optionally surrounded by colons. The server validates and lowercases names.</param>
+        /// <param name="image">Nonempty image bytes. The server validates format, dimensions and upload size.</param>
+        /// <param name="fileName">Image filename with its extension, such as build.png.</param>
+        /// <param name="cancellationToken">Cancels authentication and the upload.</param>
+        /// <remarks>Requires EnableCustomEmoji and create_emojis permission. Sends multipart form data with the actual authenticated creator ID. Existing emoji names cannot be overwritten.</remarks>
+        Task<Emoji> CreateEmojiAsync(string name, byte[] image, string fileName, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete a custom emoji. Requires delete_emojis permission; deleting another user's emoji also requires delete_others_emojis.</summary>
+        /// <param name="emojiId">Custom emoji identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task DeleteEmojiAsync(string emojiId, CancellationToken cancellationToken = default);
+
         #endregion
 
         #region Team lifecycle and membership management

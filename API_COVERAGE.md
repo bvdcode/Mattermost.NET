@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 152/608 (25.0%)
+- Implemented specification operations: 154/608 (25.3%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -17,7 +17,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Category | Implemented / total |
 |---|---|
 | Channels | 43 / 61 |
-| Emoji | 7 / 9 |
+| Emoji | 9 / 9 |
 | Files | 6 / 12 |
 | Integration Actions | 1 / 4 |
 | Posts | 14 / 28 |
@@ -791,8 +791,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Emoji
 
 ## DELETE /api/v4/emoji/{emoji_id} - Delete a custom emoji
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/emoji.yaml#L125) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/emoji.yaml#L125) | `IMattermostClient.DeleteEmojiAsync`
+✅ Implemented
 
 ## GET /api/v4/emoji - Get a list of custom emoji
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/emoji.yaml#L46) | `IMattermostClient.GetEmojisAsync`
@@ -815,8 +815,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/emoji - Create a custom emoji
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/emoji.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/emoji.yaml#L2) | `IMattermostClient.CreateEmojiAsync`
+✅ Implemented
 
 ## POST /api/v4/emoji/names - Get custom emojis by name
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/emoji.yaml#L310) | `IMattermostClient.GetEmojisByNamesAsync`

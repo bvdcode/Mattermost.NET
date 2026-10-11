@@ -930,6 +930,18 @@ await client.CreatePostAsync(channelId, table);
 
 ---
 
+# Custom emoji management
+
+```csharp
+byte[] image = await File.ReadAllBytesAsync("build.png", cancellationToken);
+Emoji emoji = await client.CreateEmojiAsync("build", image, "build.png", cancellationToken);
+await client.DeleteEmojiAsync(emoji.Id, cancellationToken);
+```
+
+Creation uploads the image and the authenticated user's creator ID as multipart form data. Requires `EnableCustomEmoji` and `create_emojis` permission. The server validates image format, dimensions and upload size, lowercases names, and rejects duplicate or built-in emoji names. Deletion requires `delete_emojis`; deleting another user's emoji additionally requires `delete_others_emojis`. HTTP errors are propagated.
+
+---
+
 # Webhook management
 
 ```csharp
