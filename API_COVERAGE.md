@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 164/608 (27.0%)
+- Implemented specification operations: 173/608 (28.5%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -17,6 +17,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Category | Implemented / total |
 |---|---|
 | Channels | 43 / 61 |
+| Commands | 9 / 10 |
 | Emoji | 9 / 9 |
 | Files | 6 / 12 |
 | Integration Actions | 1 / 4 |
@@ -549,44 +550,44 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Commands
 
 ## DELETE /api/v4/commands/{command_id} - Delete a command
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L235) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L235) | `IMattermostClient.DeleteCommandAsync`
+✅ Implemented
 
 ## GET /api/v4/commands - List commands for a team
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L51) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L51) | `IMattermostClient.GetCommandsAsync`
+✅ Implemented
 
 ## GET /api/v4/commands/{command_id} - Get a command
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L164) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L164) | `IMattermostClient.GetCommandAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/commands/autocomplete - List autocomplete commands
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L93) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L93) | `IMattermostClient.GetAutocompleteCommandsAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/commands/autocomplete_suggestions - List commands' autocomplete data
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L125) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L125) | `IMattermostClient.GetCommandAutocompleteSuggestionsAsync`
+✅ Implemented
 
 ## POST /api/v4/commands - Create a command
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L2) | `IMattermostClient.CreateCommandAsync`
+✅ Implemented
 
 ## POST /api/v4/commands/execute - Execute a command
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L352) | `—`
 ❌ Not implemented
 
 ## PUT /api/v4/commands/{command_id} - Update a command
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L198) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L198) | `IMattermostClient.UpdateCommandAsync`
+✅ Implemented
 
 ## PUT /api/v4/commands/{command_id}/move - Move a command
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L269) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L269) | `IMattermostClient.MoveCommandAsync`
+✅ Implemented
 
 ## PUT /api/v4/commands/{command_id}/regen_token - Generate a new token
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L316) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/commands.yaml#L316) | `IMattermostClient.RegenerateCommandTokenAsync`
+✅ Implemented
 
 # Compliance
 

@@ -9,6 +9,7 @@
         internal const string Users = version + "/users";
         internal const string Posts = version + "/posts";
         internal const string Drafts = version + "/drafts";
+        internal const string Commands = version + "/commands";
         internal const string IncomingWebhooks = version + "/hooks/incoming";
         internal const string OutgoingWebhooks = version + "/hooks/outgoing";
         internal const string Reactions = version + "/reactions";

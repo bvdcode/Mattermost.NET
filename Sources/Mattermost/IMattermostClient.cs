@@ -9,6 +9,7 @@ using Mattermost.Models.Enums;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses;
 using Mattermost.Models.Roles;
+using Mattermost.Models.SlashCommands;
 using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
 using Mattermost.Models.Webhooks;
@@ -1410,6 +1411,62 @@ namespace Mattermost
         /// <param name="webhookId">Webhook identifier.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         Task DeleteOutgoingWebhookAsync(string webhookId, CancellationToken cancellationToken = default);
+
+        #endregion
+
+        #region Slash command management
+
+        /// <summary>List visible built-in, plugin and manageable custom commands for a team.</summary>
+        /// <param name="teamId">Team identifier. Requires view_team permission.</param>
+        /// <param name="customOnly">Return only manageable custom commands. Requires manage_own_slash_commands.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<SlashCommand>> GetCommandsAsync(string teamId, bool customOnly = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a manageable custom command, including its secret. Requires Mattermost 5.22 or later.</summary>
+        /// <param name="commandId">Command identifier. Requires view_team and manage_own_slash_commands; other creators' commands also require manage_others_slash_commands.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<SlashCommand> GetCommandAsync(string commandId, CancellationToken cancellationToken = default);
+
+        /// <summary>Register a custom slash command. Requires enabled commands and manage_own_slash_commands.</summary>
+        /// <param name="command">Team, trigger, request method, URL and display/autocomplete settings. CreatorId is optional; another creator requires manage_others_slash_commands. Identity, token and timestamps are server-generated. Plugin metadata is not persisted.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<SlashCommand> CreateCommandAsync(SlashCommand command, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace a custom command's request and display/autocomplete settings.</summary>
+        /// <param name="command">Full command settings, including Id and the current TeamId. The server preserves token, creator and timestamps; use MoveCommandAsync to change teams. Plugin metadata is not persisted.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_own_slash_commands; other creators' commands also require manage_others_slash_commands.</remarks>
+        Task<SlashCommand> UpdateCommandAsync(SlashCommand command, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete a manageable custom command.</summary>
+        /// <param name="commandId">Command identifier. Requires manage_own_slash_commands; other creators' commands also require manage_others_slash_commands.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task DeleteCommandAsync(string commandId, CancellationToken cancellationToken = default);
+
+        /// <summary>Move a custom command to another team. Requires Mattermost 5.22 or later.</summary>
+        /// <param name="commandId">Command identifier. Requires permission to manage it on its current team.</param>
+        /// <param name="teamId">Destination team. Both the caller and command creator need manage_own_slash_commands there.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task MoveCommandAsync(string commandId, string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>Regenerate a custom command's secret and return its new value. The previous token immediately becomes invalid.</summary>
+        /// <param name="commandId">Command identifier. Requires permission to manage the command.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<string> RegenerateCommandTokenAsync(string commandId, CancellationToken cancellationToken = default);
+
+        /// <summary>List autocomplete-enabled commands for a team, including structured plugin metadata.</summary>
+        /// <param name="teamId">Team identifier. Requires view_team permission.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<SlashCommand>> GetAutocompleteCommandsAsync(string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get command and argument suggestions for the current input. Requires Mattermost 5.24 or later.</summary>
+        /// <param name="teamId">Team identifier. Requires view_team permission.</param>
+        /// <param name="userInput">Nonempty input, optionally prefixed by a slash. Use "/" for initial suggestions. Whitespace is preserved for argument completion.</param>
+        /// <param name="channelId">Optional channel context for suggestions.</param>
+        /// <param name="rootId">Optional thread root context for suggestions.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<CommandAutocompleteSuggestion>> GetCommandAutocompleteSuggestionsAsync(string teamId, string userInput,
+            string? channelId = null, string? rootId = null, CancellationToken cancellationToken = default);
 
         #endregion
 

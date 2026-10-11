@@ -838,7 +838,32 @@ Use `Mattermost.Enums` for `TeamType` and `Mattermost.Models.Teams` for team mod
 
 ## Custom slash commands
 
-These types help you implement the HTTP endpoint for a custom slash command; they do not register the command in Mattermost. Configure the command's request URL and HTTP method in Mattermost, then use `SlashCommandRequestParser` to decode the URL-encoded POST body or GET query string and return a `SlashCommandResponse` as JSON.
+Register and manage custom commands through the API:
+
+```csharp
+var command = await client.CreateCommandAsync(new SlashCommand
+{
+    TeamId = teamId,
+    Trigger = "hello",
+    Method = "P",
+    Url = "https://example.com/commands/hello",
+    DisplayName = "Hello",
+    AutoComplete = true,
+    AutoCompleteDescription = "Say hello",
+    AutoCompleteHint = "[name]"
+}, cancellationToken);
+var commands = await client.GetCommandsAsync(teamId, customOnly: true, cancellationToken: cancellationToken);
+command.Description = "Hello command";
+command = await client.UpdateCommandAsync(command, cancellationToken);
+var autocomplete = await client.GetAutocompleteCommandsAsync(teamId, cancellationToken);
+var suggestions = await client.GetCommandAutocompleteSuggestionsAsync(teamId, "/hello ", channelId, cancellationToken: cancellationToken);
+```
+
+`SlashCommand` and the autocomplete models are in `Mattermost.Models.SlashCommands`. Triggers do not include the leading slash. `Method` is `"P"` for POST or `"G"` for GET; command URLs must be absolute HTTP or HTTPS URLs. Commands must be enabled on the server. Management requires `manage_own_slash_commands` for the team and `manage_others_slash_commands` for another creator's commands. `CreatorId` can be specified on creation when those permissions allow it.
+
+`UpdateCommandAsync` replaces writable settings; read a complete object with `GetCommandAsync` (Mattermost 5.22+) before changing it. The server preserves its token and creator; it does not persist plugin-provided structured autocomplete metadata for custom commands. `MoveCommandAsync` (Mattermost 5.22+) changes its team, `RegenerateCommandTokenAsync` returns a new secret and invalidates the old one, and `DeleteCommandAsync` removes the command. Treat command tokens as secrets. Listing with `customOnly: false` includes built-in/plugin commands and custom commands the current user can manage. Autocomplete listings may hide request URLs, methods, creators and tokens. Suggestions (Mattermost 5.24+) preserve input whitespace, include optional channel/thread context, and accept `"/"` for initial suggestions. Native autocomplete metadata and suggestion fields use PascalCase JSON names.
+
+To implement the command's HTTP endpoint, use `SlashCommandRequestParser` to decode the URL-encoded POST body or GET query string and return a `SlashCommandResponse` as JSON.
 
 For a POST command in an ASP.NET Core minimal API:
 
