@@ -851,6 +851,21 @@ Use `Mattermost.Models.Responses` for `SystemStatusResponse`. Health checks do n
 
 By default, unhealthy health checks return HTTP 500 and throw `MattermostClientException`, retaining the response body. On Mattermost 9.6 or later, `useRestSemantics: true` returns the status as data; check `health.Status` rather than assuming HTTP success means the server is healthy. Supported timezone names require authentication. Both endpoints require Mattermost 3.10 or later.
 
+## Server diagnostics
+
+```csharp
+var audits = await client.GetServerAuditsAsync(cancellationToken: cancellationToken);
+var logs = await client.GetServerLogsAsync(logsPerPage: 100, cancellationToken: cancellationToken);
+var metrics = await client.GetServerAnalyticsAsync(AnalyticsReport.Standard, cancellationToken: cancellationToken);
+var busy = await client.GetServerBusyAsync(cancellationToken);
+```
+
+Audit reads require `read_audits`, log reads `get_logs` and a non-restricted administrator session, analytics `get_analytics`, and busy-state reads `manage_system`. Logs and audit entries may include private event details, addresses and session identifiers; handle them accordingly. Paging is zero-based; log pages contain 1–10,000 lines, selected with the native `logs_per_page` parameter.
+
+Analytics requires Mattermost 4.0+. `AnalyticsReport` in `Mattermost.Enums` selects standard metrics, daily bot posts, daily posts, daily posting-user counts, or extra counters. An optional `teamId` filters by team. `AnalyticsRow` in `Mattermost.Models.Responses` preserves native metric/date labels and numeric values, including fractions. Live checks on Mattermost 12.0.0 passed all five global reports and four team-filtered reports; team-filtered `extra_counts` returned HTTP 500 while counting outgoing webhooks. That server error is propagated unchanged.
+
+Busy-state reads require Mattermost 5.20+ and return `ServerBusyState` in `Mattermost.Models.Responses`. `ExpiresAt` is Unix seconds, not milliseconds, and may be negative while idle; `ExpiresTimestamp` preserves the server's readable timestamp. This method does not set or clear the busy flag.
+
 ## File previews and profile images
 
 ```csharp

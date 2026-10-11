@@ -21,6 +21,10 @@
         internal const string Files = version + "/files";
         internal const string Uploads = version + "/uploads";
         internal const string System = version + "/system";
+        internal const string ServerLogs = version + "/logs";
+        internal const string ServerAudits = version + "/audits";
+        internal const string ServerAnalytics = version + "/analytics/old";
+        internal const string ServerBusy = version + "/server_busy";
         internal const string ClientConfig = version + "/config/client";
         internal const string License = version + "/license";
         internal const string Channels = version + "/channels";

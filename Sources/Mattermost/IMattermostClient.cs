@@ -981,6 +981,34 @@ namespace Mattermost
         /// <remarks>Requires manage_system. Does not revoke or modify tokens.</remarks>
         Task<long> GetNonCompliantUserAccessTokenCountAsync(CancellationToken cancellationToken = default);
 
+        /// <summary>Get a page of audit entries for all users.</summary>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires read_audits. Entries may include private addresses, session identifiers and event details.</remarks>
+        Task<IList<UserAudit>> GetServerAuditsAsync(int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of server log lines.</summary>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="logsPerPage">Between one and MaxServerLogsPerPage lines.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires get_logs and a non-restricted administrator session. Logs may contain sensitive data.</remarks>
+        Task<IList<string>> GetServerLogsAsync(int page = 0, int logsPerPage = MattermostApiLimits.MaxServerLogsPerPage,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get a server analytics report using the native name/value format. Requires Mattermost 4.0 or later.</summary>
+        /// <param name="report">Report to retrieve.</param>
+        /// <param name="teamId">Optional team filter; null requests server-wide data.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires get_analytics. Names and values depend on the requested report.</remarks>
+        Task<IList<AnalyticsRow>> GetServerAnalyticsAsync(AnalyticsReport report = AnalyticsReport.Standard, string? teamId = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Read the server's busy flag and expiry. Requires Mattermost 5.20 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. Does not set or clear the flag.</remarks>
+        Task<ServerBusyState> GetServerBusyAsync(CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get current authorized user information.
         /// </summary>
