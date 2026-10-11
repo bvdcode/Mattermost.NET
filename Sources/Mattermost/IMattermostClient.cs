@@ -2,6 +2,7 @@
 using Mattermost.Enums;
 using Mattermost.Events;
 using Mattermost.Models;
+using Mattermost.Models.Bots;
 using Mattermost.Models.Channels;
 using Mattermost.Models.Dialogs;
 using Mattermost.Models.Emojis;
@@ -873,6 +874,58 @@ namespace Mattermost
         /// <remarks>Uses the REST API and does not require StartReceivingAsync. Repeat while the user is typing.</remarks>
         /// <exception cref="ArgumentException">The channel ID is null, empty, or whitespace.</exception>
         Task SendTypingAsync(string channelId, string? parentId = null, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of bot accounts visible to the current user. Requires Mattermost 5.10 or later.</summary>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size; the server may limit it.</param>
+        /// <param name="includeDeleted">Include disabled bot accounts.</param>
+        /// <param name="onlyOrphaned">Return only bots whose owner has been deactivated.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires read_bots; reading bots owned by others also requires read_others_bots.</remarks>
+        Task<IList<Bot>> GetBotsAsync(int page = 0, int perPage = 60, bool includeDeleted = false, bool onlyOrphaned = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get a bot account. Requires Mattermost 5.10 or later and permission to read the bot.</summary>
+        /// <param name="botUserId">Bot's user identifier.</param>
+        /// <param name="includeDeleted">Include a disabled bot account.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Bot> GetBotAsync(string botUserId, bool includeDeleted = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Create a bot account owned by the current user. Requires Mattermost 5.10 or later.</summary>
+        /// <param name="username">Nonblank username. The server validates its format and uniqueness.</param>
+        /// <param name="displayName">Display name; null omits the field.</param>
+        /// <param name="description">Description; null omits the field.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires create_bot and enabled bot creation. Bot accounts cannot create other bots. Does not create an API token.</remarks>
+        Task<Bot> CreateBotAsync(string username, string? displayName = null, string? description = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Change selected bot metadata without replacing omitted fields. Requires Mattermost 5.10 or later.</summary>
+        /// <param name="botUserId">Bot's user identifier.</param>
+        /// <param name="username">New nonblank username; null leaves it unchanged.</param>
+        /// <param name="displayName">New display name; null leaves it unchanged, empty clears it.</param>
+        /// <param name="description">New description; null leaves it unchanged, empty clears it.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires permission to manage the bot. At least one field must be supplied.</remarks>
+        Task<Bot> PatchBotAsync(string botUserId, string? username = null, string? displayName = null, string? description = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Disable a bot account. Requires Mattermost 5.10 or later and permission to manage the bot.</summary>
+        /// <param name="botUserId">Bot's user identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Protected system bots may not be disabled. Existing credentials cannot authenticate while the bot is disabled.</remarks>
+        Task<Bot> DisableBotAsync(string botUserId, CancellationToken cancellationToken = default);
+
+        /// <summary>Enable a disabled bot account. Requires Mattermost 5.10 or later and permission to manage the bot.</summary>
+        /// <param name="botUserId">Bot's user identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Bot> EnableBotAsync(string botUserId, CancellationToken cancellationToken = default);
+
+        /// <summary>Assign a bot to a user. Requires Mattermost 5.10 or later and permission to manage the bot.</summary>
+        /// <param name="botUserId">Bot's user identifier.</param>
+        /// <param name="userId">New owner's identifier. The owner must not be a bot.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<Bot> AssignBotAsync(string botUserId, string userId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get current authorized user information.

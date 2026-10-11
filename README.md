@@ -355,6 +355,24 @@ var me = await client.GetMeAsync();
 Console.WriteLine(me.Username);
 ```
 
+## Bot accounts
+
+```csharp
+var bots = await client.GetBotsAsync(cancellationToken: cancellationToken);
+var bot = await client.CreateBotAsync("notification-bot", "Notifications", cancellationToken: cancellationToken);
+var details = await client.GetBotAsync(bot.UserId, cancellationToken: cancellationToken);
+await client.PatchBotAsync(bot.UserId, description: "Channel notifications", cancellationToken: cancellationToken);
+await client.DisableBotAsync(bot.UserId, cancellationToken);
+await client.EnableBotAsync(bot.UserId, cancellationToken);
+await client.AssignBotAsync(bot.UserId, ownerUserId, cancellationToken);
+```
+
+These methods require Mattermost 5.10+. `Bot` is in `Mattermost.Models.Bots`; its `UserId` identifies the associated user account, and its `OwnerId` may identify a user or plugin. Bot creation must be enabled and requires `create_bot`; bots cannot create other bots. The current user becomes the owner. Creation does not issue an API token.
+
+Reading owned bots requires `read_bots`; reading others' bots also requires `read_others_bots`. Lists use zero-based pages and positive page sizes. `includeDeleted: true` includes disabled bots in list/single reads. `onlyOrphaned: true` filters to bots whose owner was deactivated. An inaccessible or missing bot may produce HTTP 404.
+
+`PatchBotAsync` changes only supplied fields: null leaves a field unchanged, while an empty display name or description clears it. At least one field is required; usernames cannot be blank. Management methods require permission to manage the bot. Disabling preserves the account but prevents its credentials from authenticating; protected system bots may reject this operation. Assignment changes ownership to a non-bot user.
+
 ## Find users
 
 ```csharp

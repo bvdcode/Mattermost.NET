@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 195/608 (32.1%)
+- Implemented specification operations: 202/608 (33.2%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -16,6 +16,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 
 | Category | Implemented / total |
 |---|---|
+| Bots | 7 / 9 |
 | Channels | 47 / 61 |
 | Commands | 10 / 10 |
 | Emoji | 9 / 9 |
@@ -171,40 +172,40 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Bots
 
 ## GET /api/v4/bots - Get bots
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L41) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L41) | `IMattermostClient.GetBotsAsync`
+✅ Implemented
 
 ## GET /api/v4/bots/{bot_user_id} - Get a bot
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L145) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L145) | `IMattermostClient.GetBotAsync`
+✅ Implemented
 
 ## POST /api/v4/bots - Create a bot
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L2) | `IMattermostClient.CreateBotAsync`
+✅ Implemented
 
 ## POST /api/v4/bots/{bot_user_id}/assign/{user_id} - Assign a bot to a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L246) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L246) | `IMattermostClient.AssignBotAsync`
+✅ Implemented
 
 ## POST /api/v4/bots/{bot_user_id}/convert_to_user - Convert a bot into a user
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L283) | `—`
 ❌ Not implemented
 
 ## POST /api/v4/bots/{bot_user_id}/disable - Disable a bot
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L184) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L184) | `IMattermostClient.DisableBotAsync`
+✅ Implemented
 
 ## POST /api/v4/bots/{bot_user_id}/enable - Enable a bot
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L215) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L215) | `IMattermostClient.EnableBotAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/convert_to_bot - Convert a user into a bot
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1805) | `—`
 ❌ Not implemented
 
 ## PUT /api/v4/bots/{bot_user_id} - Patch a bot
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L94) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/bots.yaml#L94) | `IMattermostClient.PatchBotAsync`
+✅ Implemented
 
 # Brand
 
