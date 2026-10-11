@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 141/608 (23.2%)
+- Implemented specification operations: 152/608 (25.0%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -29,6 +29,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Teams | 26 / 38 |
 | Threads | 7 / 7 |
 | Users | 16 / 77 |
+| Webhooks | 11 / 11 |
 
 ## Legend
 
@@ -2558,45 +2559,45 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Webhooks
 
 ## DELETE /api/v4/hooks/incoming/{hook_id} - Delete an incoming webhook
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L145) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L145) | `IMattermostClient.DeleteIncomingWebhookAsync`
+✅ Implemented
 
 ## DELETE /api/v4/hooks/outgoing/{hook_id} - Delete an outgoing webhook
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L409) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L409) | `IMattermostClient.DeleteOutgoingWebhookAsync`
+✅ Implemented
 
 ## GET /api/v4/hooks/incoming - List incoming webhooks
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L59) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L59) | `IMattermostClient.GetIncomingWebhooksAsync`
+✅ Implemented
 
 ## GET /api/v4/hooks/incoming/{hook_id} - Get an incoming webhook
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L112) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L112) | `IMattermostClient.GetIncomingWebhookAsync`
+✅ Implemented
 
 ## GET /api/v4/hooks/outgoing - List outgoing webhooks
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L323) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L323) | `IMattermostClient.GetOutgoingWebhooksAsync`
+✅ Implemented
 
 ## GET /api/v4/hooks/outgoing/{hook_id} - Get an outgoing webhook
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L376) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L376) | `IMattermostClient.GetOutgoingWebhookAsync`
+✅ Implemented
 
 ## POST /api/v4/hooks/incoming - Create an incoming webhook
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L2) | `IMattermostClient.CreateIncomingWebhookAsync`
+✅ Implemented
 
 ## POST /api/v4/hooks/outgoing - Create an outgoing webhook
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L248) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L248) | `IMattermostClient.CreateOutgoingWebhookAsync`
+✅ Implemented
 
 ## POST /api/v4/hooks/outgoing/{hook_id}/regen_token - Regenerate the token for the outgoing webhook.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L502) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L502) | `IMattermostClient.RegenerateOutgoingWebhookTokenAsync`
+✅ Implemented
 
 ## PUT /api/v4/hooks/incoming/{hook_id} - Update an incoming webhook
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L178) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L178) | `IMattermostClient.UpdateIncomingWebhookAsync`
+✅ Implemented
 
 ## PUT /api/v4/hooks/outgoing/{hook_id} - Update an outgoing webhook
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L442) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/webhooks.yaml#L442) | `IMattermostClient.UpdateOutgoingWebhookAsync`
+✅ Implemented

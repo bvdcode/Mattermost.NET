@@ -930,6 +930,34 @@ await client.CreatePostAsync(channelId, table);
 
 ---
 
+# Webhook management
+
+```csharp
+IncomingWebhook incoming = await client.CreateIncomingWebhookAsync(new IncomingWebhook
+{
+    ChannelId = channelId,
+    DisplayName = "Build notifications",
+    ChannelLocked = true
+}, cancellationToken);
+
+IList<IncomingWebhook> hooks = await client.GetIncomingWebhooksAsync(teamId,
+    cancellationToken: cancellationToken);
+incoming.Description = "Build status updates";
+incoming = await client.UpdateIncomingWebhookAsync(incoming, cancellationToken);
+
+OutgoingWebhook outgoing = await client.GetOutgoingWebhookAsync(outgoingWebhookId, cancellationToken);
+outgoing.Description = "Updated description";
+outgoing = await client.UpdateOutgoingWebhookAsync(outgoing, cancellationToken);
+```
+
+Webhook operations require the corresponding server setting and `manage_own_incoming_webhooks` or `manage_own_outgoing_webhooks` permission. Managing another owner's webhook requires the corresponding `manage_others_*` permission. Incoming hooks require access to their destination channel. Outgoing hooks target public channels; a team-wide hook has an empty `ChannelId` and requires trigger words. Callback URLs must be absolute HTTP(S) URLs. `OutgoingWebhookTriggerWhen` matches the first word exactly or by prefix. Username and icon overrides are subject to server settings, and incoming channel locking may be enforced by permissions.
+
+Updates replace writable settings, so read the webhook first. For outgoing hooks, carry the existing `Token`: the server overwrites it, and the SDK rejects an empty token. `RegenerateOutgoingWebhookTokenAsync` returns the new configuration and token; update the receiver's token check accordingly. Creation ignores supplied IDs, tokens and timestamps; optional incoming `UserId` and outgoing `CreatorId` can assign another owner when permitted. Updates cannot change ownership or move a webhook to another team.
+
+Incoming webhook identifiers grant access to their posting URLs; outgoing tokens authenticate callback payloads. Keep both secret. List methods return empty collections for JSON null or empty arrays. For outgoing lists, a channel filter takes precedence over a team filter. Deletion invalidates the webhook without deleting existing posts. HTTP errors are propagated.
+
+---
+
 # Synced drafts
 
 ```csharp
@@ -986,6 +1014,7 @@ The public API is exposed through `IMattermostClient` and includes:
 - file upload, download, streaming, metadata, previews, thumbnails, and public links;
 - profile images, custom emoji metadata and images, role metadata, and user preferences;
 - server health and supported timezones;
+- incoming and outgoing webhook management, including outgoing token regeneration;
 - Calls plugin channel state, active call checks, and host call termination;
 - WebSocket events for messages, status changes, connection changes, and raw events.
 

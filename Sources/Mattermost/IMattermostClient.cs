@@ -11,6 +11,7 @@ using Mattermost.Models.Responses;
 using Mattermost.Models.Roles;
 using Mattermost.Models.Teams;
 using Mattermost.Models.Users;
+using Mattermost.Models.Webhooks;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -1283,6 +1284,75 @@ namespace Mattermost
         /// <param name="categoryId">Custom category identifier.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         Task DeleteSidebarCategoryAsync(string userId, string teamId, string categoryId, CancellationToken cancellationToken = default);
+
+        #endregion
+
+        #region Webhooks
+
+        /// <summary>Get incoming webhooks visible to the authenticated user.</summary>
+        /// <param name="teamId">Optional team identifier. Null lists accessible webhooks across teams.</param>
+        /// <param name="page">Zero-based page number.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_own_incoming_webhooks. Managing others' webhooks requires manage_others_incoming_webhooks. Identifiers are secrets.</remarks>
+        Task<IList<IncomingWebhook>> GetIncomingWebhooksAsync(string? teamId = null, int page = 0, int perPage = 60,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get an incoming webhook. Requires incoming-webhook management permission.</summary>
+        /// <param name="webhookId">Webhook identifier. Keep it secret.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IncomingWebhook> GetIncomingWebhookAsync(string webhookId, CancellationToken cancellationToken = default);
+
+        /// <summary>Create an incoming webhook. Requires incoming webhooks enabled and permission to manage webhooks and read the destination channel.</summary>
+        /// <param name="webhook">Configuration with ChannelId. Empty UserId assigns the authenticated user; assigning another owner requires additional permissions. Server-owned IDs, team and timestamps are ignored.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IncomingWebhook> CreateIncomingWebhookAsync(IncomingWebhook webhook, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace an incoming webhook's settings. Requires incoming-webhook management permission.</summary>
+        /// <param name="webhook">Complete configuration with Id and ChannelId. Read it first to preserve settings. Ownership and team cannot be changed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IncomingWebhook> UpdateIncomingWebhookAsync(IncomingWebhook webhook, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete an incoming webhook, invalidating its posting URL. Does not delete existing posts.</summary>
+        /// <param name="webhookId">Webhook identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task DeleteIncomingWebhookAsync(string webhookId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get outgoing webhooks visible to the authenticated user.</summary>
+        /// <param name="teamId">Optional team identifier.</param>
+        /// <param name="channelId">Optional channel identifier. Takes precedence over teamId on the server.</param>
+        /// <param name="page">Zero-based page number.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_own_outgoing_webhooks; managing others' webhooks requires manage_others_outgoing_webhooks. Returned tokens are secrets.</remarks>
+        Task<IList<OutgoingWebhook>> GetOutgoingWebhooksAsync(string? teamId = null, string? channelId = null,
+            int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
+        /// <summary>Get an outgoing webhook, including its secret token. Requires outgoing-webhook management permission.</summary>
+        /// <param name="webhookId">Webhook identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<OutgoingWebhook> GetOutgoingWebhookAsync(string webhookId, CancellationToken cancellationToken = default);
+
+        /// <summary>Create an outgoing webhook. Requires outgoing webhooks enabled and outgoing-webhook management permission.</summary>
+        /// <param name="webhook">Configuration with TeamId and HTTP(S) CallbackUrls. ChannelId must identify a public channel, or be empty with TriggerWords to match the team. Empty CreatorId assigns the authenticated user. Assigning another owner requires additional permissions. Id, Token and timestamps are not sent.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<OutgoingWebhook> CreateOutgoingWebhookAsync(OutgoingWebhook webhook, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace an outgoing webhook's settings. Requires outgoing-webhook management permission.</summary>
+        /// <param name="webhook">Complete configuration with Id, TeamId and Token. Read it first: the server overwrites the token and other writable fields, rather than preserving omitted values. Ownership and team cannot be changed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<OutgoingWebhook> UpdateOutgoingWebhookAsync(OutgoingWebhook webhook, CancellationToken cancellationToken = default);
+
+        /// <summary>Regenerate an outgoing webhook's secret token. Update the callback receiver to accept the new token.</summary>
+        /// <param name="webhookId">Webhook identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Updated webhook, including its new token.</returns>
+        Task<OutgoingWebhook> RegenerateOutgoingWebhookTokenAsync(string webhookId, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete an outgoing webhook. Does not delete existing posts.</summary>
+        /// <param name="webhookId">Webhook identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task DeleteOutgoingWebhookAsync(string webhookId, CancellationToken cancellationToken = default);
 
         #endregion
 
