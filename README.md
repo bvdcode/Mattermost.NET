@@ -930,6 +930,26 @@ await client.CreatePostAsync(channelId, table);
 
 ---
 
+# Synced drafts
+
+```csharp
+Draft? draft = await client.UpsertDraftAsync(new Draft
+{
+    ChannelId = channelId,
+    Text = "Work in progress"
+}, cancellationToken);
+
+IList<Draft> drafts = await client.GetDraftsAsync(teamId, cancellationToken);
+await client.DeleteDraftAsync(channelId, cancellationToken: cancellationToken);
+await client.DeleteDraftAsync(channelId, threadId: rootPostId, cancellationToken: cancellationToken);
+```
+
+Synced drafts require the server's `AllowSyncedDrafts` setting and permission to create posts in the channel. All draft methods operate on the authenticated user. `RootId` is empty for a channel draft and is the root post ID for a reply draft. Saving replaces the complete draft; read it first to preserve attachments, properties and priority. Server-owned user IDs, timestamps and metadata are not sent. `Props` and `Priority` use the server's JSON property bags; priority properties are `priority`, `requested_ack` and `persistent_notifications`.
+
+Saving empty `Text` deletes that draft and returns null. `GetDraftsAsync` returns an empty list when there are no drafts, including when the server sends JSON null. Deletion of an absent draft succeeds and does not delete posted messages. Disabled synced drafts return HTTP 501; HTTP errors are propagated.
+
+---
+
 # Followed threads
 
 ```csharp
@@ -959,7 +979,7 @@ The public API is exposed through `IMattermostClient` and includes:
 - current user, users by id, username, or email;
 - bulk user profiles and single or bulk presence statuses;
 - team creation, metadata editing, search, lookup, membership reads and addition, statistics, and unread counts;
-- create, update, delete, read, and list posts;
+- create, update, delete, read, and list posts, plus synchronized drafts;
 - thread posts, followed threads, thread read state, team-wide and cross-team search, saved posts, and unread-boundary reads;
 - channel lookup, creation, archiving, membership reads and changes, statistics, unread counts, and member timezones;
 - direct and group channels;

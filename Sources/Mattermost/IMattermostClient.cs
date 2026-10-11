@@ -1286,6 +1286,31 @@ namespace Mattermost
 
         #endregion
 
+        #region Synced drafts
+
+        /// <summary>Get the authenticated user's server-synchronized drafts for a team.</summary>
+        /// <param name="teamId">Team identifier. Requires view_team permission.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires AllowSyncedDrafts. The server returns HTTP 501 when synced drafts are disabled.</remarks>
+        /// <returns>Drafts, or an empty list when the server returns null or an empty array.</returns>
+        Task<IList<Draft>> GetDraftsAsync(string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>Create or replace the authenticated user's channel or thread draft.</summary>
+        /// <param name="draft">Complete draft. ChannelId and Text are required. Empty Text deletes the draft. RootId identifies the thread root, or is empty for a channel draft.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Saved draft, or null when an empty message deletes it.</returns>
+        /// <remarks>Requires AllowSyncedDrafts and permission to create posts in the channel. UserId, timestamps and Metadata are server-owned and are not sent. This is not a patch: omitted properties are not preserved.</remarks>
+        Task<Draft?> UpsertDraftAsync(Draft draft, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete the authenticated user's synced draft. Deleting an absent draft succeeds.</summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="threadId">Root post identifier for a reply draft. Null deletes the channel draft instead.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires AllowSyncedDrafts. Does not delete posted messages.</remarks>
+        Task DeleteDraftAsync(string channelId, string? threadId = null, CancellationToken cancellationToken = default);
+
+        #endregion
+
         #region Followed threads
 
         /// <summary>Get followed threads and aggregate unread counts. Requires Mattermost 5.29 or later and access to the team.</summary>

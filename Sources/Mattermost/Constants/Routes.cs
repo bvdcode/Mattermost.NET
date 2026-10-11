@@ -8,6 +8,7 @@
         internal const string Dialogs = version + "/actions/dialogs";
         internal const string Users = version + "/users";
         internal const string Posts = version + "/posts";
+        internal const string Drafts = version + "/drafts";
         internal const string Reactions = version + "/reactions";
         internal const string Emojis = version + "/emoji";
         internal const string Roles = version + "/roles";
