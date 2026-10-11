@@ -698,6 +698,41 @@ namespace Mattermost
         /// <remarks>Requires channel-read permission or file ownership, and public file links enabled on the server. Anyone with the returned link can access the file.</remarks>
         Task<string> GetPublicFileLinkAsync(string fileId, CancellationToken cancellationToken = default);
 
+        /// <summary>Get file HTTP headers without downloading its content. Requires channel-read permission or file ownership.</summary>
+        /// <param name="fileId">File identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<FileHeaders> GetFileHeadersAsync(string fileId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get preview image HTTP headers without downloading its content. Missing previews produce a server error.</summary>
+        /// <param name="fileId">File identifier. Requires channel-read permission or file ownership.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<FileHeaders> GetFilePreviewHeadersAsync(string fileId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get thumbnail HTTP headers without downloading its content. Missing thumbnails produce a server error.</summary>
+        /// <param name="fileId">File identifier. Requires channel-read permission or file ownership.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<FileHeaders> GetFileThumbnailHeadersAsync(string fileId, CancellationToken cancellationToken = default);
+
+        /// <summary>Create a resumable attachment upload session. Requires Mattermost 5.28 or later, enabled attachments and upload_file permission.</summary>
+        /// <param name="channelId">Destination channel identifier.</param>
+        /// <param name="fileName">Nonempty file name. The server strips directory components.</param>
+        /// <param name="fileSize">Positive total size in bytes, within the server's upload limit.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<UploadSession> CreateUploadAsync(string channelId, string fileName, long fileSize, CancellationToken cancellationToken = default);
+
+        /// <summary>Get an upload session and its current byte offset. Requires the creating account or a system administrator.</summary>
+        /// <param name="uploadId">Upload-session identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<UploadSession> GetUploadAsync(string uploadId, CancellationToken cancellationToken = default);
+
+        /// <summary>Append a binary chunk to a resumable upload owned by the current account.</summary>
+        /// <param name="uploadId">Upload-session identifier.</param>
+        /// <param name="data">Nonempty file bytes starting at the session's current FileOffset. The first chunk must be at least 5 MiB unless it completes the entire file. The buffer is copied before authentication.</param>
+        /// <param name="cancellationToken">Cancels authentication and the upload. Read the session offset before resuming after an interrupted request.</param>
+        /// <returns>File details when complete, or null for the server's 204 incomplete-upload response. Uploading does not create a post.</returns>
+        /// <remarks>Do not send concurrent chunks for one session. The server removes the upload session after completion.</remarks>
+        Task<FileDetails?> UploadDataAsync(string uploadId, byte[] data, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get file by identifier.
         /// </summary>

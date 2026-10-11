@@ -810,6 +810,27 @@ Image methods return the complete image as bytes. File reads require permission 
 
 Public file links must be enabled on the server. Anyone who has the returned URL can download the file without authentication; share it only when public access is intended. HTTP errors from these methods use `MattermostClientException`, including the status, response body, URL, and method.
 
+To inspect a file without downloading its content:
+
+```csharp
+FileHeaders headers = await client.GetFileHeadersAsync(fileId, cancellationToken);
+FileHeaders previewHeaders = await client.GetFilePreviewHeadersAsync(fileId, cancellationToken);
+FileHeaders thumbnailHeaders = await client.GetFileThumbnailHeadersAsync(fileId, cancellationToken);
+```
+
+These methods issue `HEAD` requests and return available content type, length, disposition, modification time and ETag headers. Optional headers may be absent. Missing images and permission errors are propagated; a `HEAD` error response may have no JSON body.
+
+For a resumable attachment upload (Mattermost 5.28+):
+
+```csharp
+UploadSession upload = await client.CreateUploadAsync(channelId, "report.txt", data.LongLength, cancellationToken);
+FileDetails? completed = await client.UploadDataAsync(upload.Id, data, cancellationToken);
+```
+
+`FileHeaders`, `UploadSession` and `FileDetails` are in `Mattermost.Models`. File attachments must be enabled and the account must have `upload_file` permission. `CreateUploadAsync` creates an attachment session, not an administrative import. `UploadDataAsync` sends a binary chunk and returns null for an incomplete upload (`204`), or file details when the file is complete. The first partial chunk must be at least 5 MiB; a smaller file can be uploaded in one complete chunk. Chunks must not be sent concurrently for the same session.
+
+To resume, call `GetUploadAsync` and send bytes starting at its `FileOffset`. Read this offset again after an interrupted request rather than assuming how many bytes reached the server. The server removes the session on completion, so keep the returned file details. Uploading does not create a post; pass the completed file's ID to `CreatePostAsync`. The input chunk is copied before authentication and is not modified by the client.
+
 ## Post search and saved posts
 
 ```csharp

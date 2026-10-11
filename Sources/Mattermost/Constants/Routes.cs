@@ -17,6 +17,7 @@
         internal const string Roles = version + "/roles";
         internal const string Teams = version + "/teams";
         internal const string Files = version + "/files";
+        internal const string Uploads = version + "/uploads";
         internal const string System = version + "/system";
         internal const string ClientConfig = version + "/config/client";
         internal const string License = version + "/license";

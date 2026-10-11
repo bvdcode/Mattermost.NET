@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 173/608 (28.5%)
+- Implemented specification operations: 179/608 (29.4%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -19,7 +19,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Channels | 43 / 61 |
 | Commands | 9 / 10 |
 | Emoji | 9 / 9 |
-| Files | 6 / 12 |
+| Files | 9 / 12 |
 | Integration Actions | 1 / 4 |
 | Posts | 14 / 28 |
 | Preferences | 5 / 5 |
@@ -29,6 +29,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | System | 6 / 51 |
 | Teams | 26 / 38 |
 | Threads | 7 / 7 |
+| Uploads | 3 / 3 |
 | Users | 23 / 77 |
 | Webhooks | 11 / 11 |
 
@@ -886,16 +887,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## HEAD /api/v4/files/{file_id} - Get file metadata headers
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L129) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L129) | `IMattermostClient.GetFileHeadersAsync`
+✅ Implemented
 
 ## HEAD /api/v4/files/{file_id}/preview - Get preview metadata headers
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L253) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L253) | `IMattermostClient.GetFilePreviewHeadersAsync`
+✅ Implemented
 
 ## HEAD /api/v4/files/{file_id}/thumbnail - Get thumbnail metadata headers
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L191) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L191) | `IMattermostClient.GetFileThumbnailHeadersAsync`
+✅ Implemented
 
 ## HEAD /files/{file_id}/public - Get public file metadata headers
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L412) | `—`
@@ -2192,16 +2193,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Uploads
 
 ## GET /api/v4/uploads/{upload_id} - Get an upload session
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/uploads.yaml#L56) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/uploads.yaml#L56) | `IMattermostClient.GetUploadAsync`
+✅ Implemented
 
 ## POST /api/v4/uploads - Create an upload
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/uploads.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/uploads.yaml#L2) | `IMattermostClient.CreateUploadAsync`
+✅ Implemented
 
 ## POST /api/v4/uploads/{upload_id} - Perform a file upload
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/uploads.yaml#L84) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/uploads.yaml#L84) | `IMattermostClient.UploadDataAsync`
+✅ Implemented
 
 # Usage
 
