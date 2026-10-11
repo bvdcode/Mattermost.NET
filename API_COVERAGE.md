@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 180/608 (29.6%)
+- Implemented specification operations: 185/608 (30.4%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -16,7 +16,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 
 | Category | Implemented / total |
 |---|---|
-| Channels | 43 / 61 |
+| Channels | 47 / 61 |
 | Commands | 10 / 10 |
 | Emoji | 9 / 9 |
 | Files | 9 / 12 |
@@ -30,7 +30,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Teams | 26 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
-| Users | 23 / 77 |
+| Users | 24 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -257,8 +257,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/channels/{channel_id}/common_teams - Get common teams for members of a Group Message.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2967) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2967) | `IMattermostClient.GetChannelMembersCommonTeamsAsync`
+✅ Implemented
 
 ## GET /api/v4/channels/{channel_id}/member_counts_by_group - Channel members counts for each group that has atleast one member in the channel
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2464) | `—`
@@ -297,8 +297,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels/autocomplete - Autocomplete channels
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1103) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1103) | `IMattermostClient.AutocompleteChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels/deleted - Get deleted channels
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1055) | `IMattermostClient.GetDeletedChannelsAsync`
@@ -317,12 +317,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels/recommended - Get recommended public channels for the current user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1008) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1008) | `IMattermostClient.GetRecommendedChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/channels/search_autocomplete - Autocomplete channels for search
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1150) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1150) | `IMattermostClient.AutocompleteChannelsForSearchAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/name/{team_name}/channels/name/{channel_name} - Get a channel by name and team name
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1335) | `IMattermostClient.FindChannelByNameAsync`
@@ -2285,8 +2285,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/users/{user_id}/uploads - Get uploads for a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3125) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3125) | `IMattermostClient.GetUserUploadsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/auth_data - Get a user by auth data
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1541) | `—`

@@ -1449,6 +1449,42 @@ namespace Mattermost
 
         #endregion
 
+        #region Channel and upload discovery
+
+        /// <summary>Autocomplete channels by name or display name within a team, respecting user visibility.</summary>
+        /// <param name="teamId">Team identifier. Requires list_team_channels permission.</param>
+        /// <param name="name">Name fragment. An empty string requests initial suggestions.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Results may include archived channels and omit expensive channel properties.</remarks>
+        Task<IList<Channel>> AutocompleteChannelsAsync(string teamId, string name, CancellationToken cancellationToken = default);
+
+        /// <summary>Autocomplete the current user's channels for a team's search filters. Requires Mattermost 5.4 or later.</summary>
+        /// <param name="teamId">Team context identifier.</param>
+        /// <param name="name">Name or display-name fragment. An empty string requests initial suggestions.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>May include archived channels and direct/group channels visible to the current user.</remarks>
+        Task<IList<Channel>> AutocompleteChannelsForSearchAsync(string teamId, string name, CancellationToken cancellationToken = default);
+
+        /// <summary>Get recommended public channels for the current user in a team.</summary>
+        /// <param name="teamId">Team identifier. Requires list_team_channels permission.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Recommendations require Enterprise Advanced and enabled attribute-based access control. Returns an empty list when that feature is unavailable.</remarks>
+        Task<IList<Channel>> GetRecommendedChannelsAsync(string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get teams shared by all active members of a direct or group message channel. Requires Mattermost 9.1 or later.</summary>
+        /// <param name="channelId">Direct or group message channel identifier. Requires read_channel permission; guests are not permitted.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The common teams, or an empty list if none exist.</returns>
+        Task<IList<Team>> GetChannelMembersCommonTeamsAsync(string channelId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get the current user's incomplete upload sessions. Requires Mattermost 5.28 or later.</summary>
+        /// <param name="userId">Current user's identifier or me. Other users' sessions cannot be requested, even by administrators.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Completed upload sessions are removed by the server.</remarks>
+        Task<IList<UploadSession>> GetUserUploadsAsync(string userId, CancellationToken cancellationToken = default);
+
+        #endregion
+
         #region Slash command management
 
         /// <summary>List visible built-in, plugin and manageable custom commands for a team.</summary>

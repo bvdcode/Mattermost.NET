@@ -1098,6 +1098,21 @@ Thread identifiers are root post IDs. These operations require Mattermost 5.29 o
 
 ---
 
+# Channel suggestions and upload discovery
+
+```csharp
+var channels = await client.AutocompleteChannelsAsync(teamId, "town", cancellationToken);
+var searchFilters = await client.AutocompleteChannelsForSearchAsync(teamId, "town", cancellationToken);
+var commonTeams = await client.GetChannelMembersCommonTeamsAsync(groupChannelId, cancellationToken);
+var uploads = await client.GetUserUploadsAsync("me", cancellationToken);
+```
+
+Autocomplete accepts an empty name for initial suggestions, respects channel visibility and may include archived channels. Search suggestions include the current user's channels, including direct/group channels in that team context. Common-team lookup supports direct and group message channels, requires Mattermost 9.1 or later and is not available to guests.
+
+`GetRecommendedChannelsAsync` returns attribute-based public-channel recommendations when Enterprise Advanced and attribute-based access control are enabled; it returns an empty list when that feature is unavailable. `GetUserUploadsAsync` (Mattermost 5.28+) lists only the current user's incomplete upload sessions. Administrators cannot use it to list someone else's uploads. Completed sessions are removed by the server. HTTP errors are propagated.
+
+---
+
 # API coverage
 
 The public API is exposed through `IMattermostClient` and includes:
