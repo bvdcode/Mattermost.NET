@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 130/608 (21.4%)
+- Implemented specification operations: 137/608 (22.5%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -27,6 +27,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Status | 6 / 7 |
 | System | 3 / 51 |
 | Teams | 26 / 38 |
+| Threads | 7 / 7 |
 | Users | 12 / 77 |
 
 ## Legend
@@ -2159,32 +2160,32 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Threads
 
 ## DELETE /api/v4/users/{user_id}/teams/{team_id}/threads/{thread_id}/following - Stop following a thread
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3614) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3614) | `IMattermostClient.UnfollowThreadAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/threads - Get all threads that user is following
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3303) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3303) | `IMattermostClient.GetUserThreadsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/threads/{thread_id} - Get a thread followed by the user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3655) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3655) | `IMattermostClient.GetUserThreadAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/teams/{team_id}/threads/{thread_id}/set_unread/{post_id} - Mark a thread that user is following as unread based on a post id
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3525) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3525) | `IMattermostClient.MarkThreadUnreadAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/teams/{team_id}/threads/{thread_id}/following - Start following a thread
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3574) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3574) | `IMattermostClient.FollowThreadAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/teams/{team_id}/threads/{thread_id}/read/{timestamp} - Mark a thread that user is following read state to the timestamp
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3478) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3478) | `IMattermostClient.UpdateThreadReadAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/teams/{team_id}/threads/read - Mark all threads that user is following as read
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3443) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3443) | `IMattermostClient.MarkAllThreadsReadAsync`
+✅ Implemented
 
 # Uploads
 

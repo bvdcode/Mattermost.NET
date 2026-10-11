@@ -930,6 +930,27 @@ await client.CreatePostAsync(channelId, table);
 
 ---
 
+# Followed threads
+
+```csharp
+await client.FollowThreadAsync("me", teamId, rootPostId, cancellationToken);
+UserThread thread = await client.GetUserThreadAsync("me", teamId, rootPostId,
+    extended: true, cancellationToken: cancellationToken);
+UserThreadsResponse followed = await client.GetUserThreadsAsync("me", teamId,
+    perPage: 60, excludeDirect: true, cancellationToken: cancellationToken);
+
+thread = await client.UpdateThreadReadAsync("me", teamId, rootPostId,
+    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), cancellationToken);
+thread = await client.MarkThreadUnreadAsync("me", teamId, rootPostId, replyPostId, cancellationToken);
+await client.UnfollowThreadAsync("me", teamId, rootPostId, cancellationToken);
+```
+
+Thread identifiers are root post IDs. These operations require Mattermost 5.29 or later; marking unread from a post requires 6.7 or later. The user must be able to read the thread, and accessing another user's state requires `edit_other_users` permission. Thread metadata is created after the first reply.
+
+`GetUserThreadsAsync` uses `beforeThreadId` or `afterThreadId` cursors, never both. `since` filters membership updates using Unix milliseconds. By default, direct and group message threads are included. `totalsOnly` returns counts without threads; `threadsOnly` returns threads with zero totals. These two flags are mutually exclusive. Empty thread and participant lists may be null. `MarkThreadUnreadAsync` also follows the thread; `MarkAllThreadsReadAsync` changes every followed thread's read state for the team. Unfollowing leaves posts intact. HTTP errors are propagated.
+
+---
+
 # API coverage
 
 The public API is exposed through `IMattermostClient` and includes:
@@ -939,7 +960,7 @@ The public API is exposed through `IMattermostClient` and includes:
 - bulk user profiles and single or bulk presence statuses;
 - team creation, metadata editing, search, lookup, membership reads and addition, statistics, and unread counts;
 - create, update, delete, read, and list posts;
-- thread posts, team-wide and cross-team search, saved posts, and unread-boundary reads;
+- thread posts, followed threads, thread read state, team-wide and cross-team search, saved posts, and unread-boundary reads;
 - channel lookup, creation, archiving, membership reads and changes, statistics, unread counts, and member timezones;
 - direct and group channels;
 - file upload, download, streaming, metadata, previews, thumbnails, and public links;

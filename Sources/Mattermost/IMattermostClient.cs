@@ -1286,6 +1286,78 @@ namespace Mattermost
 
         #endregion
 
+        #region Followed threads
+
+        /// <summary>Get followed threads and aggregate unread counts. Requires Mattermost 5.29 or later and access to the team.</summary>
+        /// <param name="userId">User identifier or me. Access to another user requires edit_other_users.</param>
+        /// <param name="teamId">Team identifier. Direct and group messages are included unless excludeDirect is true.</param>
+        /// <param name="perPage">Positive chunk size. Pagination uses thread cursors, not page numbers.</param>
+        /// <param name="beforeThreadId">Return threads before this cursor. Cannot be combined with afterThreadId.</param>
+        /// <param name="afterThreadId">Return threads after this cursor. Cannot be combined with beforeThreadId.</param>
+        /// <param name="since">Filter memberships updated since this nonnegative Unix millisecond timestamp.</param>
+        /// <param name="unread">Only return threads with unread replies.</param>
+        /// <param name="extended">Include participant profile details.</param>
+        /// <param name="deleted">Include deleted threads for synchronization.</param>
+        /// <param name="totalsOnly">Return counts without threads. Cannot be combined with threadsOnly.</param>
+        /// <param name="threadsOnly">Return threads without computing counts; totals are zero.</param>
+        /// <param name="excludeDirect">Exclude direct and group message threads.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<UserThreadsResponse> GetUserThreadsAsync(string userId, string teamId, int perPage = 60,
+            string? beforeThreadId = null, string? afterThreadId = null, long since = 0, bool unread = false,
+            bool extended = false, bool deleted = false, bool totalsOnly = false, bool threadsOnly = false,
+            bool excludeDirect = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a followed thread, its root post and unread state. Requires Mattermost 5.29 or later.</summary>
+        /// <param name="userId">User identifier or me. Access to another user requires edit_other_users.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="threadId">Root post identifier, not a reply identifier.</param>
+        /// <param name="extended">Include participant profile details.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<UserThread> GetUserThreadAsync(string userId, string teamId, string threadId, bool extended = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Follow a thread. Requires Mattermost 5.29 or later and permission to read the root post.</summary>
+        /// <param name="userId">User identifier or me. Access to another user requires edit_other_users.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="threadId">Root post identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task FollowThreadAsync(string userId, string teamId, string threadId, CancellationToken cancellationToken = default);
+
+        /// <summary>Stop following a thread. Does not delete posts. Requires Mattermost 5.29 or later.</summary>
+        /// <param name="userId">User identifier or me. Access to another user requires edit_other_users.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="threadId">Root post identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task UnfollowThreadAsync(string userId, string teamId, string threadId, CancellationToken cancellationToken = default);
+
+        /// <summary>Set a followed thread's read timestamp. Requires Mattermost 5.29 or later.</summary>
+        /// <param name="userId">User identifier or me. Access to another user requires edit_other_users.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="threadId">Root post identifier.</param>
+        /// <param name="timestamp">Positive Unix millisecond timestamp.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Updated thread and unread state.</returns>
+        Task<UserThread> UpdateThreadReadAsync(string userId, string teamId, string threadId, long timestamp,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Mark a thread unread starting at a post, and follow the thread. Requires Mattermost 6.7 or later.</summary>
+        /// <param name="userId">User identifier or me. Access to another user requires edit_other_users.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="threadId">Root post identifier.</param>
+        /// <param name="postId">Post in this thread from which to mark unread.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Updated thread and unread state.</returns>
+        Task<UserThread> MarkThreadUnreadAsync(string userId, string teamId, string threadId, string postId,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Mark all followed threads for a team as read. Requires Mattermost 5.29 or later and access to the team.</summary>
+        /// <param name="userId">User identifier or me. Access to another user requires edit_other_users.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task MarkAllThreadsReadAsync(string userId, string teamId, CancellationToken cancellationToken = default);
+
+        #endregion
+
         #region Calls
 
         /// <summary>
