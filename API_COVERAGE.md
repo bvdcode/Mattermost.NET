@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 217/608 (35.7%)
+- Implemented specification operations: 227/608 (37.3%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -32,7 +32,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Teams | 29 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
-| Users | 34 / 77 |
+| Users | 44 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -2227,8 +2227,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## DELETE /api/v4/users/{user_id} - Deactivate a user account.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1157) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1157) | `IMattermostClient.DeactivateUserAsync`
+✅ Implemented
 
 ## DELETE /api/v4/users/{user_id}/channels/{channel_id}/drafts - Delete synced draft
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3769) | `IMattermostClient.DeleteDraftAsync`
@@ -2343,16 +2343,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/users - Create a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L397) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L397) | `IMattermostClient.CreateUserAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/demote - Demote a user to a guest
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1727) | `—`
 ❌ Not implemented
 
 ## POST /api/v4/users/{user_id}/email/verify/member - Verify user email by ID
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2199) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2199) | `IMattermostClient.VerifyUserEmailAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/image - Set user's profile image
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1387) | `IMattermostClient.SetUserImageAsync`
@@ -2367,16 +2367,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/{user_id}/reset_failed_attempts - Reset the failed password attempts for a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3992) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3992) | `IMattermostClient.ResetUserFailedAttemptsAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/sessions/revoke - Revoke a user session
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1999) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1999) | `IMattermostClient.RevokeUserSessionAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/sessions/revoke/all - Revoke all active sessions for a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2043) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2043) | `IMattermostClient.RevokeAllUserSessionsAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/terms_of_service - Records user action when they accept or decline custom terms of service
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2955) | `—`
@@ -2503,8 +2503,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## PUT /api/v4/users/{user_id}/active - Activate or deactivate a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1303) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1303) | `IMattermostClient.UpdateUserActiveAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/auth - Update a user's authentication method
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2906) | `—`
@@ -2515,16 +2515,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## PUT /api/v4/users/{user_id}/password - Update a user's password
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1841) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1841) | `IMattermostClient.UpdateUserPasswordAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/patch - Patch a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1195) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1195) | `IMattermostClient.PatchUserAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/roles - Update a user's roles
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1257) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1257) | `IMattermostClient.UpdateUserRolesAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/sessions/device - Attach mobile device and extra props to the session object
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2078) | `—`

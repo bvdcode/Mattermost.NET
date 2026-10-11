@@ -1036,6 +1036,75 @@ namespace Mattermost
         Task<IList<Job>> GetJobsByTypeAsync(string jobType, int page = 0, int perPage = 60, string? teamId = null,
             CancellationToken cancellationToken = default);
 
+        /// <summary>Create an email/password account using the current authenticated session.</summary>
+        /// <param name="username">New username.</param>
+        /// <param name="email">Email address.</param>
+        /// <param name="password">Initial password, passed unchanged. Must meet server password policy.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Server signup settings apply unless the session is a system administrator. Does not support invitation or external-authentication signup.</remarks>
+        Task<User> CreateUserAsync(string username, string email, string password, CancellationToken cancellationToken = default);
+
+        /// <summary>Change only supplied user profile fields.</summary>
+        /// <param name="userId">User identifier, or me.</param>
+        /// <param name="patch">At least one profile field. Null omits a field; empty optional text clears it. Supplied maps replace previous maps.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires ownership or edit_other_users; provider-managed or locked profile fields may not be changed. Own-email changes require the current password in patch.Password.</remarks>
+        Task<User> PatchUserAsync(string userId, UserPatch patch, CancellationToken cancellationToken = default);
+
+        /// <summary>Deactivate an account and revoke its sessions. Does not permanently delete the account.</summary>
+        /// <param name="userId">User identifier, or me.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires ownership with self-deactivation enabled, or edit_other_users. Editing a system administrator requires manage_system.</remarks>
+        Task DeactivateUserAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Activate or deactivate a user account.</summary>
+        /// <param name="userId">User identifier, or me.</param>
+        /// <param name="active">True activates; false deactivates and revokes sessions.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Self-deactivation depends on server settings. Other changes require user-management write permission; system-administrator accounts additionally require manage_system. LDAP-managed status cannot be changed.</remarks>
+        Task UpdateUserActiveAsync(string userId, bool active, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace a user's system-level roles.</summary>
+        /// <param name="userId">User identifier, or me.</param>
+        /// <param name="roles">Space-separated native system role names; replaces all previous system roles.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_roles; some role names additionally require a license.</remarks>
+        Task UpdateUserRolesAsync(string userId, string roles, CancellationToken cancellationToken = default);
+
+        /// <summary>Change a user's password subject to the server's password policy.</summary>
+        /// <param name="userId">User identifier, or me.</param>
+        /// <param name="newPassword">New password, passed unchanged.</param>
+        /// <param name="currentPassword">Required for your own account; an authorized administrator changing another account may omit it.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Other-user changes require administrative user-management permission. The server may send an email notification.</remarks>
+        Task UpdateUserPasswordAsync(string userId, string newPassword, string? currentPassword = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Reset the failed password-attempt counter for an email/password or LDAP account.</summary>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires sysconsole_write_user_management_users. System-administrator accounts additionally require manage_system.</remarks>
+        Task ResetUserFailedAttemptsAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Administratively verify an account's email without a verification token.</summary>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. Returns the native user response; it does not send a verification email.</remarks>
+        Task<User> VerifyUserEmailAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Revoke one session belonging to the specified user.</summary>
+        /// <param name="userId">User identifier, or me.</param>
+        /// <param name="sessionId">Session identifier, not the session token.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires ownership or edit_other_users. Revoking a session does not delete a personal access token.</remarks>
+        Task RevokeUserSessionAsync(string userId, string sessionId, CancellationToken cancellationToken = default);
+
+        /// <summary>Revoke all active sessions for one user. Requires Mattermost 4.4 or later.</summary>
+        /// <param name="userId">User identifier, or me.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires ownership or edit_other_users. Does not delete personal access tokens; a valid access token can create a new session.</remarks>
+        Task RevokeAllUserSessionsAsync(string userId, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get current authorized user information.
         /// </summary>

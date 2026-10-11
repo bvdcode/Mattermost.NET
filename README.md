@@ -851,6 +851,25 @@ Use `Mattermost.Models.Responses` for `SystemStatusResponse`. Health checks do n
 
 By default, unhealthy health checks return HTTP 500 and throw `MattermostClientException`, retaining the response body. On Mattermost 9.6 or later, `useRestSemantics: true` returns the status as data; check `health.Status` rather than assuming HTTP success means the server is healthy. Supported timezone names require authentication. Both endpoints require Mattermost 3.10 or later.
 
+## User account management
+
+```csharp
+var user = await client.CreateUserAsync(username, email, password, cancellationToken);
+await client.PatchUserAsync(user.Id, new UserPatch { Nickname = "" }, cancellationToken);
+await client.UpdateUserPasswordAsync(user.Id, newPassword, currentPassword, cancellationToken);
+await client.UpdateUserActiveAsync(user.Id, active: true, cancellationToken: cancellationToken);
+```
+
+`CreateUserAsync` creates an email/password account using the current authenticated session. Signup restrictions apply unless the session is a system administrator. Invitation signup and external authentication are not supported by this method. Passwords are sent unchanged and must meet server policy.
+
+`UserPatch` in `Mattermost.Models.Users` omits null fields. Empty strings clear optional name/nickname/position fields; username, email and locale cannot be blank. A supplied `Props`, `NotifyProps` or `Timezone` replaces that whole native map, not individual entries. Preserve existing values when changing only one map entry. `Password` confirms an own-email change; it does not update the password. Other-user profile edits require `edit_other_users`; provider-managed or locked fields may be rejected.
+
+`DeactivateUserAsync` archives the account and revokes sessions without permanent deletion. `UpdateUserActiveAsync` can reactivate it; administrative user-management permission is required except for permitted self-deactivation. `UpdateUserRolesAsync` replaces system roles and requires `manage_roles`. Own-password changes require the current password; authorized administrators may omit it for other accounts. Administrative changes may send email notifications.
+
+`ResetUserFailedAttemptsAsync` resets email/password or LDAP lockout counters and requires `sysconsole_write_user_management_users`. `VerifyUserEmailAsync` marks email verified without sending a verification message and requires `manage_system`. `RevokeUserSessionAsync` takes the session ID, not its token; `RevokeAllUserSessionsAsync` revokes every session of one account and requires Mattermost 4.4+. Both require ownership or `edit_other_users`. Session revocation does not delete personal access tokens, which can create new sessions while valid.
+
+Live checks on Mattermost 12.0.0 passed all ten methods on a separate account: profile clearing preserved other fields, map replacement persisted, role replacement was restored, both password-change flows authenticated, reset removed an actual login lockout, verification persisted in the account's own profile, session revocation invalidated old sessions, and deactivation/reactivation retained a working account.
+
 ## Background jobs
 
 ```csharp
