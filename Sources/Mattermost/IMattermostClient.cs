@@ -881,6 +881,50 @@ namespace Mattermost
         /// <exception cref="ArgumentException">The collection is empty or contains blank identifiers.</exception>
         Task<IList<UserPresence>> GetUsersStatusesByIdsAsync(IEnumerable<string> userIds, CancellationToken cancellationToken = default);
 
+        /// <summary>Get identifiers of users sharing channels with the current account, including direct and group channels. Requires Mattermost 5.23 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<string>> GetKnownUserIdsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Autocomplete visible users by username, nickname or full name, subject to privacy settings.</summary>
+        /// <param name="name">Search text. An empty string requests initial suggestions; email addresses are not searched.</param>
+        /// <param name="teamId">Optional team filter.</param>
+        /// <param name="channelId">Optional channel filter. Requires teamId and returns separate in-channel and out-of-channel suggestions.</param>
+        /// <param name="limit">Maximum users per result group. The server may cap this value.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<UserAutocomplete> AutocompleteUsersAsync(string name, string? teamId = null, string? channelId = null,
+            int limit = 100, CancellationToken cancellationToken = default);
+
+        /// <summary>Get the server-reported total user count, subject to user visibility restrictions.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<long> GetTotalUserCountAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Get other members keyed by group-channel identifier, excluding the current user. Requires Mattermost 5.14 or later.</summary>
+        /// <param name="channelIds">Between 1 and 50 group-channel identifiers. Channels the current user does not belong to are omitted.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IDictionary<string, IList<User>>> GetUsersByGroupChannelIdsAsync(IEnumerable<string> channelIds,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of channel memberships across teams, with team metadata. Requires Mattermost 6.2 or later.</summary>
+        /// <param name="userId">User identifier, or "me". Reading another user's memberships requires edit_other_users.</param>
+        /// <param name="page">Zero-based page. The request always uses the server's paginated JSON-array mode.</param>
+        /// <param name="perPage">Positive number of memberships per page. The server may cap this value.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<ChannelMemberWithTeamData>> GetUserChannelMembersAsync(string userId, int page = 0, int perPage = 60,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get user session metadata without usable session tokens.</summary>
+        /// <param name="userId">User identifier, or "me". Reading another user's sessions requires edit_other_users.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<UserSession>> GetUserSessionsAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of user audit records.</summary>
+        /// <param name="userId">User identifier, or "me". Reading another user's audit history requires edit_other_users.</param>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive number of records per page. The server may cap this value.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<UserAudit>> GetUserAuditsAsync(string userId, int page = 0, int perPage = 60,
+            CancellationToken cancellationToken = default);
+
         /// <summary>Set a user's presence status. Updating another user requires edit_other_users permission.</summary>
         /// <param name="userId">User identifier, or "me" for the current user.</param>
         /// <param name="status">Online, Offline, Away or DoNotDisturb. Unknown and OutOfOffice cannot be set through this endpoint.</param>

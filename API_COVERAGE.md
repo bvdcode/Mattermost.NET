@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 157/608 (25.8%)
+- Implemented specification operations: 164/608 (27.0%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -28,7 +28,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | System | 6 / 51 |
 | Teams | 26 / 38 |
 | Threads | 7 / 7 |
-| Users | 16 / 77 |
+| Users | 23 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -2251,12 +2251,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/users/{user_id}/audits - Get user's audits
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2167) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2167) | `IMattermostClient.GetUserAuditsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/channel_members - Get all channel members from all teams for a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3160) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3160) | `IMattermostClient.GetUserChannelMembersAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/image - Get user's profile image
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1352) | `IMattermostClient.GetUserImageAsync`
@@ -2267,8 +2267,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/users/{user_id}/sessions - Get user's sessions
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1964) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1964) | `IMattermostClient.GetUserSessionsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/drafts - Get synced drafts for a team
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3730) | `IMattermostClient.GetDraftsAsync`
@@ -2291,8 +2291,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/users/autocomplete - Autocomplete users
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L881) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L881) | `IMattermostClient.AutocompleteUsersAsync`
+✅ Implemented
 
 ## GET /api/v4/users/email/{email} - Get a user by email
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1929) | `IMattermostClient.GetUserByEmailAsync`
@@ -2303,16 +2303,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/users/known - Get user IDs of known users
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L935) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L935) | `IMattermostClient.GetKnownUserIdsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/sessions/attributes/manifest - Get the session attributes manifest
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2128) | `—`
 ❌ Not implemented
 
 ## GET /api/v4/users/stats - Get total count of users in the system
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L959) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L959) | `IMattermostClient.GetTotalUserCountAsync`
+✅ Implemented
 
 ## GET /api/v4/users/stats/filtered - Get total count of users in the system matching the specified filters
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L984) | `—`
@@ -2395,8 +2395,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/group_channels - Get users by group channels ids
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L726) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L726) | `IMattermostClient.GetUsersByGroupChannelIdsAsync`
+✅ Implemented
 
 ## POST /api/v4/users/ids - Get users by ids
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L683) | `IMattermostClient.GetUsersByIdsAsync`

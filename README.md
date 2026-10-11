@@ -354,6 +354,22 @@ var namedUsers = await client.GetUsersByUsernamesAsync(new[] { "alice", "@bob" }
 
 Collections must be nonempty and contain no blank entries. Results may omit missing or inaccessible users and do not preserve the input order; match profiles by `User.Id`. The optional `since` parameter of `GetUsersByIdsAsync` filters profiles updated after a Unix timestamp in milliseconds (requires Mattermost 5.14 or later). Zero disables filtering.
 
+For suggestions, channel memberships and account activity:
+
+```csharp
+var knownIds = await client.GetKnownUserIdsAsync(cancellationToken);
+var suggestions = await client.AutocompleteUsersAsync("alice", teamId, channelId, cancellationToken: cancellationToken);
+long totalUsers = await client.GetTotalUserCountAsync(cancellationToken);
+var groupMembers = await client.GetUsersByGroupChannelIdsAsync(groupChannelIds, cancellationToken);
+var memberships = await client.GetUserChannelMembersAsync("me", page: 0, perPage: 60, cancellationToken: cancellationToken);
+var sessions = await client.GetUserSessionsAsync("me", cancellationToken);
+var audits = await client.GetUserAuditsAsync("me", page: 0, perPage: 60, cancellationToken: cancellationToken);
+```
+
+Known IDs are users sharing any channel with the current account, including direct and group channels (Mattermost 5.23+). Autocomplete does not search email addresses; an empty search string requests initial suggestions. A channel filter requires its team ID. `UserAutocomplete.Users` contains in-channel matches and `OutOfChannel` contains matches outside that channel; without a channel filter, `Users` is the main result list. Optional suggestion lists may be absent.
+
+The user count is subject to server visibility restrictions. Group-channel lookup (Mattermost 5.14+) accepts 1–50 IDs, returns other members keyed by channel ID, excludes the current user, and omits channels the current user does not belong to. Membership listing (Mattermost 6.2+) always requests a JSON-array page, with team metadata on each `ChannelMemberWithTeamData`; increase `page` to retrieve more. Session and audit methods return metadata, not usable authentication tokens. Reading another user's memberships, sessions or audits requires `edit_other_users` permission.
+
 ## Read user presence
 
 ```csharp
