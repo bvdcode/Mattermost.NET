@@ -364,6 +364,30 @@ Console.WriteLine(presence.Status);
 
 These methods return `UserPresence` with a typed `UserStatus` (`Online`, `Offline`, `Away`, `DoNotDisturb`, or `OutOfOffice`), `IsManual`, `LastActivityAt` (Unix milliseconds), and `DoNotDisturbEndTime` (Unix seconds; zero means no expiry). Bulk status lookup requires actual user IDs, not `"me"`; match responses by `UserId`, not list position. Server errors are propagated, including a missing single-user status.
 
+## Update user presence and custom status
+
+```csharp
+using Mattermost.Models.Enums;
+
+UserPresence presence = await client.UpdateUserStatusAsync("me", UserStatus.Away,
+    cancellationToken: cancellationToken);
+long dndExpiry = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds();
+await client.UpdateUserStatusAsync("me", UserStatus.DoNotDisturb, dndExpiry, cancellationToken);
+
+DateTimeOffset expiry = DateTimeOffset.UtcNow.AddHours(1);
+await client.UpdateUserCustomStatusAsync("me", "coffee", "Taking a break",
+    CustomStatusDuration.OneHour, expiry, cancellationToken);
+await client.ClearUserCustomStatusAsync("me", cancellationToken);
+await client.DeleteRecentUserCustomStatusAsync("me", "coffee", "Taking a break",
+    CustomStatusDuration.OneHour, expiry, cancellationToken);
+```
+
+Presence updates accept `Online`, `Offline`, `Away` and `DoNotDisturb`; `OutOfOffice` is readable but cannot be set through this endpoint. Setting `Online` resumes automatic activity-based presence. DND expiry is in Unix seconds; zero means no expiry.
+
+Custom statuses require the server feature to be enabled. Omitting `duration` and `expiresAt` creates a non-expiring status. Every other `CustomStatusDuration` requires an explicit future `expiresAt`; the duration is a label, not a calculation of the deadline. Updating another user requires `edit_other_users` permission. HTTP errors are propagated.
+
+Clearing the current custom status preserves its recent history. History deletion uses the POST endpoint and must match the stored emoji, text, duration and expiry exactly. Strings are preserved without trimming; use the stored text if the server truncated it to its 100-character limit. Removing a recent entry does not clear the current status.
+
 ## Read teams and memberships
 
 ```csharp

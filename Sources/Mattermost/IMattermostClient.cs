@@ -5,6 +5,7 @@ using Mattermost.Models;
 using Mattermost.Models.Channels;
 using Mattermost.Models.Dialogs;
 using Mattermost.Models.Emojis;
+using Mattermost.Models.Enums;
 using Mattermost.Models.Posts;
 using Mattermost.Models.Responses;
 using Mattermost.Models.Roles;
@@ -878,6 +879,43 @@ namespace Mattermost
         /// <exception cref="ArgumentNullException">The collection is null.</exception>
         /// <exception cref="ArgumentException">The collection is empty or contains blank identifiers.</exception>
         Task<IList<UserPresence>> GetUsersStatusesByIdsAsync(IEnumerable<string> userIds, CancellationToken cancellationToken = default);
+
+        /// <summary>Set a user's presence status. Updating another user requires edit_other_users permission.</summary>
+        /// <param name="userId">User identifier, or "me" for the current user.</param>
+        /// <param name="status">Online, Offline, Away or DoNotDisturb. Unknown and OutOfOffice cannot be set through this endpoint.</param>
+        /// <param name="dndEndTime">Do not disturb expiry as a Unix timestamp in seconds. Zero means no expiry; ignored for other statuses.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The user's updated presence metadata.</returns>
+        Task<UserPresence> UpdateUserStatusAsync(string userId, UserStatus status, long dndEndTime = 0,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Set a user's custom status and add it to their recent status history. Requires enabled custom statuses.</summary>
+        /// <param name="userId">User identifier, or "me" for the current user. Updating another user requires edit_other_users permission.</param>
+        /// <param name="emoji">Emoji name, preserved exactly. May be empty when text is supplied.</param>
+        /// <param name="text">Status text, preserved exactly. The server truncates it to 100 Unicode characters.</param>
+        /// <param name="duration">Expiration label. Never has no expiry; every other label requires expiresAt.</param>
+        /// <param name="expiresAt">Explicit expiration instant. Duration labels do not calculate this value; supply a future instant accepted by the server.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task UpdateUserCustomStatusAsync(string userId, string emoji, string text,
+            CustomStatusDuration duration = CustomStatusDuration.Never, DateTimeOffset? expiresAt = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Clear a user's current custom status without removing its recent history. Requires enabled custom statuses.</summary>
+        /// <param name="userId">User identifier, or "me" for the current user. Updating another user requires edit_other_users permission.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task ClearUserCustomStatusAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Remove one custom status from recent history using the POST endpoint. Requires enabled custom statuses.</summary>
+        /// <param name="userId">User identifier, or "me" for the current user. Updating another user requires edit_other_users permission.</param>
+        /// <param name="emoji">Exact stored emoji name.</param>
+        /// <param name="text">Exact stored text, including any truncation performed by the server.</param>
+        /// <param name="duration">Exact stored duration label.</param>
+        /// <param name="expiresAt">Exact stored expiry instant, or null or MinValue for a non-expiring status. An expired instant may be supplied.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>All four fields must match the history entry. Removing a history entry does not clear the current custom status.</remarks>
+        Task DeleteRecentUserCustomStatusAsync(string userId, string emoji, string text,
+            CustomStatusDuration duration = CustomStatusDuration.Never, DateTimeOffset? expiresAt = null,
+            CancellationToken cancellationToken = default);
 
         #endregion
 
