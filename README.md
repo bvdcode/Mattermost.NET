@@ -930,6 +930,22 @@ await client.CreatePostAsync(channelId, table);
 
 ---
 
+# Client settings
+
+```csharp
+IDictionary<string, string> config = await client.GetClientConfigAsync(
+    authenticated: true, cancellationToken: cancellationToken);
+IDictionary<string, string> license = await client.GetClientLicenseAsync(
+    cancellationToken: cancellationToken);
+long load = await client.GetLicenseLoadMetricAsync(cancellationToken);
+```
+
+Client configuration and license methods return the server's string-valued maps; boolean and numeric values remain strings, and available keys vary with server version, settings and permissions. Both methods default to an anonymous request without sending the saved token. Set `authenticated: true` to use the current account. Additional license information requires `read_license_information` permission. These methods neither change server configuration nor activate a license.
+
+The license load metric requires authentication and Mattermost 10.8 or later. It is the monthly active non-bot, non-deleted user count divided by the licensed user limit, multiplied by 1000 and rounded; 1000 represents 100 percent. It is zero when no license or user limit is present. HTTP errors are propagated.
+
+---
+
 # Custom emoji management
 
 ```csharp
@@ -1025,7 +1041,7 @@ The public API is exposed through `IMattermostClient` and includes:
 - direct and group channels;
 - file upload, download, streaming, metadata, previews, thumbnails, and public links;
 - profile images, custom emoji metadata and images, role metadata, and user preferences;
-- server health and supported timezones;
+- server health, supported timezones, client settings, client license information and license load metrics;
 - incoming and outgoing webhook management, including outgoing token regeneration;
 - Calls plugin channel state, active call checks, and host call termination;
 - WebSocket events for messages, status changes, connection changes, and raw events.

@@ -1512,6 +1512,23 @@ namespace Mattermost
         /// <returns>Timezone names, such as Europe/Berlin.</returns>
         Task<IList<string>> GetSupportedTimezonesAsync(CancellationToken cancellationToken = default);
 
+        /// <summary>Get the configuration subset exposed to Mattermost clients. Does not change server settings.</summary>
+        /// <param name="authenticated">Use the current account to request additional client settings. False makes no login request and does not send the saved token.</param>
+        /// <param name="cancellationToken">Cancels the request and, when requested, authentication.</param>
+        /// <returns>Native string values, including booleans and numbers encoded as strings. Keys vary with server version and configuration.</returns>
+        Task<IDictionary<string, string>> GetClientConfigAsync(bool authenticated = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Get the license subset exposed to Mattermost clients. Does not activate or change a license.</summary>
+        /// <param name="authenticated">Use the current account. Additional information requires read_license_information permission. False makes no login request and does not send the saved token.</param>
+        /// <param name="cancellationToken">Cancels the request and, when requested, authentication.</param>
+        /// <returns>Native string values. The server determines which license fields are visible.</returns>
+        Task<IDictionary<string, string>> GetClientLicenseAsync(bool authenticated = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Get the monthly active user load relative to the licensed user limit. Requires authentication and Mattermost 10.8 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Ratio multiplied by 1000 and rounded: 1000 represents 100 percent. Returns zero when no license or licensed user limit is present. Bot and deleted accounts are excluded.</returns>
+        Task<long> GetLicenseLoadMetricAsync(CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Logout from server.
         /// </summary>

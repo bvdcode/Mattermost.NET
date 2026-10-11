@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 154/608 (25.3%)
+- Implemented specification operations: 157/608 (25.8%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -25,7 +25,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Reactions | 3 / 3 |
 | Roles | 4 / 5 |
 | Status | 6 / 7 |
-| System | 3 / 51 |
+| System | 6 / 51 |
 | Teams | 26 / 38 |
 | Threads | 7 / 7 |
 | Users | 16 / 77 |
@@ -1815,8 +1815,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/config/client - Get client configuration
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L765) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L765) | `IMattermostClient.GetClientConfigAsync`
+✅ Implemented
 
 ## GET /api/v4/config/environment - Get configuration made through environment variables
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L778) | `—`
@@ -1831,12 +1831,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/license/client - Get client license
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1005) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1005) | `IMattermostClient.GetClientLicenseAsync`
+✅ Implemented
 
 ## GET /api/v4/license/load_metric - Get license load metric
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1020) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1020) | `IMattermostClient.GetLicenseLoadMetricAsync`
+✅ Implemented
 
 ## GET /api/v4/logs - Get logs
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1170) | `—`
