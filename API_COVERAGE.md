@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 202/608 (33.2%)
+- Implemented specification operations: 210/608 (34.5%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -31,7 +31,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Teams | 29 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
-| Users | 26 / 77 |
+| Users | 34 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -2282,8 +2282,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/users/{user_id}/tokens - Get user access tokens
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2477) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2477) | `IMattermostClient.GetUserAccessTokensAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/uploads - Get uploads for a user
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3125) | `IMattermostClient.GetUserUploadsAsync`
@@ -2322,16 +2322,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/users/tokens - Get user access tokens
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2528) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2528) | `IMattermostClient.GetAllUserAccessTokensAsync`
+✅ Implemented
 
 ## GET /api/v4/users/tokens/{token_id} - Get a user access token
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2690) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2690) | `IMattermostClient.GetUserAccessTokenAsync`
+✅ Implemented
 
 ## GET /api/v4/users/tokens/non_compliant/count - Count non-compliant personal access tokens
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2615) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2615) | `IMattermostClient.GetNonCompliantUserAccessTokenCountAsync`
+✅ Implemented
 
 ## GET /api/v4/users/username/{username} - Get a user by username
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1508) | `IMattermostClient.GetUserByUsernameAsync`
@@ -2382,8 +2382,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/{user_id}/tokens - Create a user access token
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2429) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2429) | `IMattermostClient.CreateUserAccessTokenAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/typing - Publish a user typing websocket event.
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3080) | `IMattermostClient.SendTypingAsync`
@@ -2462,12 +2462,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/tokens/disable - Disable personal access token
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2729) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2729) | `IMattermostClient.DisableUserAccessTokenAsync`
+✅ Implemented
 
 ## POST /api/v4/users/tokens/enable - Enable personal access token
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2771) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2771) | `IMattermostClient.EnableUserAccessTokenAsync`
+✅ Implemented
 
 ## POST /api/v4/users/tokens/non_compliant/revoke - Revoke non-compliant personal access tokens
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2650) | `—`
@@ -2482,8 +2482,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/tokens/search - Search tokens
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2866) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2866) | `IMattermostClient.SearchUserAccessTokensAsync`
+✅ Implemented
 
 ## POST /api/v4/users/trigger-notify-admin-posts - Trigger notify-admin posts
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L366) | `—`

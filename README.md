@@ -373,6 +373,25 @@ Reading owned bots requires `read_bots`; reading others' bots also requires `rea
 
 `PatchBotAsync` changes only supplied fields: null leaves a field unchanged, while an empty display name or description clears it. At least one field is required; usernames cannot be blank. Management methods require permission to manage the bot. Disabling preserves the account but prevents its credentials from authenticating; protected system bots may reject this operation. Assignment changes ownership to a non-bot user.
 
+## Personal access tokens
+
+```csharp
+var createdToken = await client.CreateUserAccessTokenAsync(userId, "Notification service", cancellationToken);
+var metadata = await client.GetUserAccessTokenAsync(createdToken.Id, cancellationToken);
+var userTokens = await client.GetUserAccessTokensAsync(userId, cancellationToken: cancellationToken);
+var allTokens = await client.GetAllUserAccessTokensAsync(cancellationToken: cancellationToken);
+var matches = await client.SearchUserAccessTokensAsync(username, cancellationToken);
+await client.DisableUserAccessTokenAsync(createdToken.Id, cancellationToken);
+await client.EnableUserAccessTokenAsync(createdToken.Id, cancellationToken);
+long policyViolations = await client.GetNonCompliantUserAccessTokenCountAsync(cancellationToken);
+```
+
+`UserAccessToken` is in `Mattermost.Models.Users`. `Id` is the metadata identifier used by management methods, not the authentication secret. Only creation returns `Token`; save that value securely without logging it. Metadata reads and searches omit it. `ExpiresAt` is Unix milliseconds, with zero indicating no expiry; an enabled token may still be expired.
+
+Creation and user-specific reads require Mattermost 4.1+, token enable/disable 4.4+, server-wide lists and search 4.7+, and the policy count 11.1+. Lists use zero-based pages and positive page sizes. Creation requires `create_user_access_token`, metadata reads `read_user_access_token`, and disabling `revoke_user_access_token`, along with permission to edit the owning user or bot. Global lists, search and policy counts require `manage_system`. Personal tokens must be enabled for non-bot accounts. Creation requests no expiry; server lifetime policies may reject that request. OAuth sessions may not create or change token activation.
+
+Run activation changes using another credential: disabling a token invalidates its sessions and prevents that token from re-enabling itself. Re-enabling restores activation but does not extend the expiry time. The policy count is read-only and returns zero when no maximum token lifetime is configured.
+
 ## Find users
 
 ```csharp

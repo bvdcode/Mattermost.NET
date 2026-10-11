@@ -927,6 +927,60 @@ namespace Mattermost
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         Task<Bot> AssignBotAsync(string botUserId, string userId, CancellationToken cancellationToken = default);
 
+        /// <summary>Create a personal access token. Requires Mattermost 4.1 or later.</summary>
+        /// <param name="userId">User identifier or "me".</param>
+        /// <param name="description">Nonblank description of the intended use.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Created token, including its secret value. Store it securely; later reads omit the secret.</returns>
+        /// <remarks>Requires create_user_access_token and permission to edit the user or bot. Personal tokens must be enabled for non-bot users. Server token-lifetime policies apply; no expiry is requested.</remarks>
+        Task<UserAccessToken> CreateUserAccessTokenAsync(string userId, string description, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a user's personal access token metadata. Requires Mattermost 4.1 or later.</summary>
+        /// <param name="userId">User identifier or "me".</param>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires read_user_access_token and permission to edit the user or bot. Secret values are omitted.</remarks>
+        Task<IList<UserAccessToken>> GetUserAccessTokensAsync(string userId, int page = 0, int perPage = 60,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Get personal access token metadata across the server. Requires Mattermost 4.7 or later.</summary>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. Secret values are omitted.</remarks>
+        Task<IList<UserAccessToken>> GetAllUserAccessTokensAsync(int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a personal access token's metadata. Requires Mattermost 4.1 or later.</summary>
+        /// <param name="tokenId">Token identifier, not its secret value.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires read_user_access_token and permission to edit the owning user or bot. The secret value is omitted.</remarks>
+        Task<UserAccessToken> GetUserAccessTokenAsync(string tokenId, CancellationToken cancellationToken = default);
+
+        /// <summary>Search token metadata by token ID, user ID or username. Requires Mattermost 4.7 or later.</summary>
+        /// <param name="term">Nonblank search term.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. Secret values are omitted.</remarks>
+        Task<IList<UserAccessToken>> SearchUserAccessTokensAsync(string term, CancellationToken cancellationToken = default);
+
+        /// <summary>Temporarily disable a personal access token. Requires Mattermost 4.4 or later.</summary>
+        /// <param name="tokenId">Token identifier, not its secret value.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires revoke_user_access_token and permission to edit the owning user or bot. Use another credential to re-enable it.</remarks>
+        Task DisableUserAccessTokenAsync(string tokenId, CancellationToken cancellationToken = default);
+
+        /// <summary>Re-enable a disabled personal access token. Requires Mattermost 4.4 or later.</summary>
+        /// <param name="tokenId">Token identifier, not its secret value.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires create_user_access_token and permission to edit the owning user or bot. This does not extend expiry.</remarks>
+        Task EnableUserAccessTokenAsync(string tokenId, CancellationToken cancellationToken = default);
+
+        /// <summary>Count active personal access tokens that violate the server's maximum-lifetime policy. Requires Mattermost 11.1 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Number of non-compliant tokens; zero when no maximum lifetime is configured.</returns>
+        /// <remarks>Requires manage_system. Does not revoke or modify tokens.</remarks>
+        Task<long> GetNonCompliantUserAccessTokenCountAsync(CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get current authorized user information.
         /// </summary>
