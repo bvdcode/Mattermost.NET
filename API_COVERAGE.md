@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 185/608 (30.4%)
+- Implemented specification operations: 190/608 (31.3%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -27,10 +27,10 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Roles | 4 / 5 |
 | Status | 6 / 7 |
 | System | 6 / 51 |
-| Teams | 26 / 38 |
+| Teams | 29 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
-| Users | 24 / 77 |
+| Users | 26 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -2003,8 +2003,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## DELETE /api/v4/teams/{team_id}/image - Remove the team icon
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1148) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1148) | `IMattermostClient.DeleteTeamImageAsync`
+✅ Implemented
 
 ## DELETE /api/v4/teams/{team_id}/members/{user_id} - Remove user from team
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L834) | `IMattermostClient.RemoveTeamMemberAsync`
@@ -2031,8 +2031,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/teams/{team_id}/image - Get the team icon
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1065) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1065) | `IMattermostClient.GetTeamImageAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/members - Get team members
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L567) | `IMattermostClient.GetTeamMembersAsync`
@@ -2087,8 +2087,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/teams/{team_id}/image - Sets the team icon
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1100) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1100) | `IMattermostClient.SetTeamImageAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/invite-guests/email - Invite guests to the team by email
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1477) | `—`
@@ -2237,8 +2237,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## DELETE /api/v4/users/{user_id}/image - Delete user's profile image
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1434) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1434) | `IMattermostClient.DeleteUserImageAsync`
+✅ Implemented
 
 ## GET /api/v4/limits/server - Gets the server limits for the server
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/limits.yaml#L2) | `—`
@@ -2353,8 +2353,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/{user_id}/image - Set user's profile image
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1387) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1387) | `IMattermostClient.SetUserImageAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/mfa/generate - Generate MFA secret
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1683) | `—`

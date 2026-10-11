@@ -808,6 +808,19 @@ string publicLink = await client.GetPublicFileLinkAsync(fileId, cancellationToke
 
 Image methods return the complete image as bytes. File reads require permission to read the channel or ownership of the upload. A missing preview or thumbnail produces the server's error, without substituting the original file. User-image reads require authentication and permission to view the user; the default-image endpoint requires Mattermost 5.5 or later.
 
+To change a profile image or team icon:
+
+```csharp
+byte[] image = await File.ReadAllBytesAsync("icon.png", cancellationToken);
+await client.SetUserImageAsync("me", image, "icon.png", cancellationToken);
+await client.SetTeamImageAsync(teamId, image, "icon.png", cancellationToken);
+byte[] teamImage = await client.GetTeamImageAsync(teamId, cancellationToken);
+await client.DeleteUserImageAsync("me", cancellationToken);
+await client.DeleteTeamImageAsync(teamId, cancellationToken);
+```
+
+Image writes use multipart uploads and require configured file storage. The server validates image format, dimensions and size. Profile-image changes require permission to edit the user; changing a bot image requires its owner's or an administrator's access, not just the bot's own token. Locked or externally synchronized images may be rejected. Removing a profile image restores the generated default. Team-icon management requires `manage_team`; upload/download require Mattermost 4.9+, removal 4.10+. Removing a team icon resets its metadata, but the stored image may remain downloadable; a team without a stored image returns HTTP 404.
+
 Public file links must be enabled on the server. Anyone who has the returned URL can download the file without authentication; share it only when public access is intended. HTTP errors from these methods use `MattermostClientException`, including the status, response body, URL, and method.
 
 To inspect a file without downloading its content:

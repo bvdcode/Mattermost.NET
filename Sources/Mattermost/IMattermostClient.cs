@@ -366,6 +366,25 @@ namespace Mattermost
         /// <returns> Team information. </returns>
         Task<Team> GetTeamAsync(string teamId);
 
+        /// <summary>Download a team's icon as PNG bytes. Requires Mattermost 4.9 or later.</summary>
+        /// <param name="teamId">Team identifier. Requires view_team permission unless it is an open team allowing open invitations.</param>
+        /// <param name="cancellationToken">Cancels authentication and the download.</param>
+        /// <remarks>Requires authentication and configured file storage. Returns HTTP 404 when no stored image is available.</remarks>
+        Task<byte[]> GetTeamImageAsync(string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace a team's icon. Requires manage_team permission and Mattermost 4.9 or later.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="image">Nonempty image bytes. The server validates the format, size and dimensions.</param>
+        /// <param name="fileName">Filename sent with the multipart image.</param>
+        /// <param name="cancellationToken">Cancels authentication and the upload.</param>
+        Task SetTeamImageAsync(string teamId, byte[] image, string fileName, CancellationToken cancellationToken = default);
+
+        /// <summary>Remove a team's custom icon. Requires manage_team permission and Mattermost 4.10 or later.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Resets the team's icon metadata. The server may retain the stored image at its download URL.</remarks>
+        Task DeleteTeamImageAsync(string teamId, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get a page of teams.
         /// </summary>
@@ -790,6 +809,20 @@ namespace Mattermost
         /// <returns>The complete default image as bytes.</returns>
         /// <remarks>Requires authentication and permission to view the user.</remarks>
         Task<byte[]> GetDefaultUserImageAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace a user's profile image.</summary>
+        /// <param name="userId">User identifier or me. Requires permission to edit the user or bot.</param>
+        /// <param name="image">Nonempty image bytes. The server validates the format, size and dimensions.</param>
+        /// <param name="fileName">Filename sent with the multipart image.</param>
+        /// <param name="cancellationToken">Cancels authentication and the upload.</param>
+        /// <remarks>Requires configured file storage. The server rejects locked or externally synchronized profile images.</remarks>
+        Task SetUserImageAsync(string userId, byte[] image, string fileName, CancellationToken cancellationToken = default);
+
+        /// <summary>Remove a user's custom profile image and reset it to the generated default.</summary>
+        /// <param name="userId">User identifier or me. Requires permission to edit the user or bot.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires configured file storage. The server rejects locked profile images.</remarks>
+        Task DeleteUserImageAsync(string userId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Notifies a channel that the current user is typing. Requires Mattermost 5.26 or later.
