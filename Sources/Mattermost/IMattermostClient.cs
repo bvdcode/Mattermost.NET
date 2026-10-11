@@ -1106,6 +1106,62 @@ namespace Mattermost
 
         #endregion
 
+        #region Sidebar categories
+
+        /// <summary>Get a user's sidebar categories and their order. Requires Mattermost 5.26 or later and access to the team.</summary>
+        /// <param name="userId">User identifier, or me for the current user. Other users require edit_other_users permission.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<OrderedSidebarCategories> GetSidebarCategoriesAsync(string userId, string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a single sidebar category. Requires Mattermost 5.26 or later and access to the team.</summary>
+        /// <param name="userId">User identifier, or me for the current user.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="categoryId">Category identifier, including a built-in category identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<SidebarCategory> GetSidebarCategoryAsync(string userId, string teamId, string categoryId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get the ordered sidebar category identifiers. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="userId">User identifier, or me for the current user.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<string>> GetSidebarCategoryOrderAsync(string userId, string teamId, CancellationToken cancellationToken = default);
+
+        /// <summary>Create a custom sidebar category. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="category">Category with actual UserId, TeamId, DisplayName, and Type set to custom. The server assigns its identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<SidebarCategory> CreateSidebarCategoryAsync(SidebarCategory category, CancellationToken cancellationToken = default);
+
+        /// <summary>Update a full sidebar category. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="category">Complete category with actual UserId, TeamId and Id. Read it first to preserve writable settings and channel order. To move channels between categories, update both categories with UpdateSidebarCategoriesAsync.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<SidebarCategory> UpdateSidebarCategoryAsync(SidebarCategory category, CancellationToken cancellationToken = default);
+
+        /// <summary>Update selected full sidebar categories, including channel order. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="categories">Nonempty collection of categories belonging to this user and team, with unique identifiers. Unspecified categories are preserved; writable settings inside supplied categories are replaced. Moving a channel requires supplying both its source and destination categories.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<SidebarCategory>> UpdateSidebarCategoriesAsync(string userId, string teamId, IEnumerable<SidebarCategory> categories,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Set sidebar category order. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="userId">User identifier, or me for the current user.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="categoryIds">Every category identifier exactly once, including built-in categories, in the desired order.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<string>> UpdateSidebarCategoryOrderAsync(string userId, string teamId, IEnumerable<string> categoryIds,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Delete a custom sidebar category. Built-in categories cannot be deleted. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="userId">User identifier, or me for the current user.</param>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="categoryId">Custom category identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task DeleteSidebarCategoryAsync(string userId, string teamId, string categoryId, CancellationToken cancellationToken = default);
+
+        #endregion
+
         #region Calls
 
         /// <summary>

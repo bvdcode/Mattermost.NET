@@ -516,6 +516,31 @@ Pages are zero-based with 1–200 entries; the default page size is 60. Name sor
 
 Names and search terms have surrounding whitespace and colons removed; case is preserved. Search matches anywhere in the name unless `prefixOnly: true` is set and returns up to 200 results. Autocomplete always matches a prefix and returns up to 100 results. Both are sorted by name. A missing single emoji produces an API error; a search without matches returns an empty list. HTTP errors, including disabled custom emojis or unsupported endpoints, are propagated.
 
+## Manage sidebar categories
+
+```csharp
+using Mattermost.Models.Channels;
+
+OrderedSidebarCategories sidebar = await client.GetSidebarCategoriesAsync("me", teamId, cancellationToken);
+SidebarCategory category = await client.CreateSidebarCategoryAsync(new SidebarCategory
+{
+    UserId = client.CurrentUserInfo.Id,
+    TeamId = teamId,
+    Type = "custom",
+    DisplayName = "Project channels",
+    Sorting = "manual",
+    ChannelIds = new List<string> { channelId }
+}, cancellationToken);
+category.Collapsed = true;
+category = await client.UpdateSidebarCategoryAsync(category, cancellationToken);
+IList<string> order = await client.GetSidebarCategoryOrderAsync("me", teamId, cancellationToken);
+await client.UpdateSidebarCategoryOrderAsync("me", teamId, order, cancellationToken);
+```
+
+Sidebar category operations require Mattermost 5.26 or later and access to the team. Reads, ordering, and deletion accept the `me` alias; category objects must contain actual user and team identifiers. Accessing another user's sidebar requires `edit_other_users` permission.
+
+`GetSidebarCategoriesAsync` returns an object containing `Categories` and `Order`. Updates replace writable settings of supplied categories: read them first to preserve settings and channel order. Bulk update leaves unspecified categories intact; moving a channel requires supplying both its source and destination categories. Category type and sort position are server-owned, and only custom categories can be renamed or deleted. Direct-message category channel IDs and mute settings cannot be replaced this way. Reordering requires every category ID exactly once, including built-in categories; these IDs are not necessarily ordinary Mattermost IDs. The server filters inaccessible channels, and changing a category's mute setting also affects its channels. An empty category may have a null `ChannelIds` list. HTTP errors are propagated.
+
 ## Work with calls
 
 ```csharp

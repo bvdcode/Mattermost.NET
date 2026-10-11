@@ -4,8 +4,8 @@ This document maps operations in the official Mattermost OpenAPI specification t
 
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
-- Last reviewed: 2026-10-10
-- Implemented specification operations: 105/608 (17.3%)
+- Last reviewed: 2026-10-11
+- Implemented specification operations: 113/608 (18.6%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -16,7 +16,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 
 | Category | Implemented / total |
 |---|---|
-| Channels | 28 / 61 |
+| Channels | 36 / 61 |
 | Emoji | 7 / 9 |
 | Files | 6 / 12 |
 | Integration Actions | 1 / 4 |
@@ -241,8 +241,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## DELETE /api/v4/users/{user_id}/teams/{team_id}/channels/categories/{category_id} - Delete sidebar category
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2917) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2917) | `IMattermostClient.DeleteSidebarCategoryAsync`
+✅ Implemented
 
 ## GET /api/v4/channels - Get a list of all channels
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2) | `—`
@@ -337,16 +337,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/channels/categories - Get user's sidebar categories
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2578) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2578) | `IMattermostClient.GetSidebarCategoriesAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/channels/categories/{category_id} - Get sidebar category
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2817) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2817) | `IMattermostClient.GetSidebarCategoryAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/channels/categories/order - Get user's sidebar category order
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2720) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2720) | `IMattermostClient.GetSidebarCategoryOrderAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/teams/{team_id}/channels/members - Get channel memberships and roles for a user
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2170) | `IMattermostClient.GetUserTeamChannelMembersAsync`
@@ -413,8 +413,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/users/{user_id}/teams/{team_id}/channels/categories - Create user's sidebar category
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2622) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2622) | `IMattermostClient.CreateSidebarCategoryAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id} - Update a channel
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L509) | `IMattermostClient.UpdateChannelAsync`
@@ -461,16 +461,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## PUT /api/v4/users/{user_id}/teams/{team_id}/channels/categories - Update user's sidebar categories
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2669) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2669) | `IMattermostClient.UpdateSidebarCategoriesAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/teams/{team_id}/channels/categories/{category_id} - Update sidebar category
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2864) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2864) | `IMattermostClient.UpdateSidebarCategoryAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/teams/{team_id}/channels/categories/order - Update user's sidebar category order
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2764) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2764) | `IMattermostClient.UpdateSidebarCategoryOrderAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/teams/{team_id}/read - Mark all channels and threads in a team as read
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3389) | `—`
