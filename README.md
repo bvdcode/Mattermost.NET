@@ -467,6 +467,24 @@ Known IDs are users sharing any channel with the current account, including dire
 
 The user count is subject to server visibility restrictions. Group-channel lookup (Mattermost 5.14+) accepts 1–50 IDs, returns other members keyed by channel ID, excludes the current user, and omits channels the current user does not belong to. Membership listing (Mattermost 6.2+) always requests a JSON-array page, with team metadata on each `ChannelMemberWithTeamData`; increase `page` to retrieve more. Session and audit methods return metadata, not usable authentication tokens. Reading another user's memberships, sessions or audits requires `edit_other_users` permission.
 
+## Current session device properties
+
+```csharp
+await client.UpdateSessionDeviceAsync(deviceId: "android_rn:your-push-token",
+    notificationDisabled: true, mobileVersion: "2.12.0",
+    cancellationToken: cancellationToken);
+
+// Change only the notification setting; retain device IDs and mobile version.
+await client.UpdateSessionDeviceAsync(notificationDisabled: false,
+    cancellationToken: cancellationToken);
+```
+
+Updates the authenticated session, not the user profile or every session. At least one property must be supplied. Null omits a property and preserves its stored value; it does not clear it. Supplied strings cannot be blank and are sent unchanged. Device IDs include native platform prefixes; `voipDeviceId` accepts an Apple VoIP token on servers supporting that field. The server validates formats and strict semantic versions.
+
+Attaching a device extends the session's mobile expiry and revokes the same user's other sessions with the same device ID. Use real device identifiers deliberately; push delivery also depends on server configuration. Notification and version properties are sent as native string values under `device_notification_disabled` and `mobile_version`.
+
+Live checks on Mattermost 12.0.0 passed both device identifiers, mobile expiry, independent native metadata readback, notification-only and version-only updates, preservation of omitted fields and rejected invalid versions without mutation. These checks used the built-in transport and a separate session retained with notifications disabled. Push delivery and actual device registration were not tested; existing sessions and server settings were unchanged.
+
 ## Count users with administrator filters
 
 ```csharp

@@ -453,6 +453,16 @@ namespace Mattermost
         Task<IList<ChannelMemberWithTeamData>> GetUserChannelMembersAsync(string userId, int page = 0, int perPage = 60,
             CancellationToken cancellationToken = default);
 
+        /// <summary>Update device and mobile properties of the currently authenticated session.</summary>
+        /// <param name="deviceId">Standard push device identifier, including its native platform prefix. Null preserves the stored identifier.</param>
+        /// <param name="voipDeviceId">VoIP push device identifier, including its native Apple platform prefix. Null preserves the stored identifier.</param>
+        /// <param name="notificationDisabled">Whether device notifications are disabled. Null preserves the stored setting.</param>
+        /// <param name="mobileVersion">Strict semantic version of the mobile client. Null preserves the stored version.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not changes already accepted by the server.</param>
+        /// <remarks>At least one property is required; supplied strings cannot be blank and are sent unchanged. Null omits a property, not clears it. The server validates device formats and versions; supported fields vary by server version. Attaching a device extends mobile session expiry and revokes the same user's other sessions with that device identifier. Changes apply to the current session, not all sessions or the user profile.</remarks>
+        Task UpdateSessionDeviceAsync(string? deviceId = null, string? voipDeviceId = null,
+            bool? notificationDisabled = null, string? mobileVersion = null, CancellationToken cancellationToken = default);
+
         /// <summary>Get user session metadata without usable session tokens.</summary>
         /// <param name="userId">User identifier, or "me". Reading another user's sessions requires edit_other_users.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
