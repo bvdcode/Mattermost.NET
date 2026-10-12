@@ -1048,6 +1048,39 @@ These read-only methods require Mattermost 4.1+ and permission to read the reque
 
 Live checks on Mattermost 12.0.0 passed nonempty pages, single-job retrieval, type/status filtering, paging and native field/data comparison. A team filter returned an empty matching list; nonempty team-scoped job data was not tested.
 
+## Administrative user reports
+
+```csharp
+IList<UserReport> users = await client.GetUserReportsAsync(
+    pageSize: 50,
+    hideInactive: true,
+    dateRange: UserReportDateRange.Last30Days,
+    cancellationToken: cancellationToken);
+long total = await client.GetUserReportCountAsync(
+    hideInactive: true,
+    cancellationToken: cancellationToken);
+
+if (users.Count > 0)
+{
+    UserReport last = users[users.Count - 1];
+    IList<UserReport> next = await client.GetUserReportsAsync(
+        pageSize: 50,
+        fromId: last.Id,
+        fromColumnValue: last.Username,
+        hideInactive: true,
+        dateRange: UserReportDateRange.Last30Days,
+        cancellationToken: cancellationToken);
+}
+```
+
+Both reads require `sysconsole_read_user_management_users`. Reports exclude bots and include active and deactivated accounts by default. `UserReport` is in `Mattermost.Models.Users`; report enums are in `Mattermost.Enums`. `ChannelCount` counts memberships in active public/private channels. `Teams` is the server-formatted list of team display names, not IDs. Timestamps use Unix milliseconds; nullable statistics distinguish missing values from zero.
+
+Pagination uses a user ID and the exact value of the selected sort column, not page numbers. Keep filters, sorting and the statistics period unchanged between requests. `previousPage: true` reads before the cursor. Page sizes range from 1 through 100. The server ignores cursors with an empty column value; the SDK rejects them. Username ordering avoids that limitation because usernames are nonempty.
+
+`dateRange` limits post statistics, not account selection or the total count. `hasNoTeam` overrides `teamId`; a non-null `guestFilter` overrides `role` and includes only guests. `AllGuests` means all guest accounts, not all users. `hideActive` selects deactivated users, while `hideInactive` selects active users; they cannot both be true.
+
+Live checks on Mattermost 12.0.0 passed list/count comparisons against a two-user fixture, both cursor directions with ascending/descending order and empty final pages, all seven sort columns, all four native statistics periods, positive team/role/activity filters, no-team precedence, bot exclusion and permission rejection. Guest-only filters excluded known non-guests and matched native responses; a nonempty guest cohort was not tested.
+
 ## Server limits and usage
 
 ```csharp

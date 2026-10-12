@@ -1,3 +1,4 @@
+using Mattermost.Enums;
 using Mattermost.Models.Bots;
 using Mattermost.Models.Channels;
 using Mattermost.Models.Enums;
@@ -14,6 +15,43 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostUsersClient
     {
+        /// <summary>Read a cursor-paged administrative user report, excluding bots.</summary>
+        /// <param name="pageSize">Number of users, from 1 through 100.</param>
+        /// <param name="sortColumn">Server-supported ordering column.</param>
+        /// <param name="descending">Sort the selected column in descending order.</param>
+        /// <param name="fromId">Cursor user's identifier; supply together with fromColumnValue.</param>
+        /// <param name="fromColumnValue">Exact nonempty value of the cursor user's selected column. Not trimmed.</param>
+        /// <param name="previousPage">Request users before the cursor instead of after it.</param>
+        /// <param name="dateRange">Limits post statistics only, not the users included in the report.</param>
+        /// <param name="teamId">Optional active team-membership filter.</param>
+        /// <param name="role">Optional system role filter, overridden by guestFilter.</param>
+        /// <param name="hasNoTeam">Include only users without active team memberships; overrides teamId.</param>
+        /// <param name="hideActive">Include only deactivated users; cannot combine with hideInactive.</param>
+        /// <param name="hideInactive">Include only active users; cannot combine with hideActive.</param>
+        /// <param name="searchTerm">Optional profile search text.</param>
+        /// <param name="guestFilter">Guest-only filter; null leaves guest filtering unset.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires sysconsole_read_user_management_users. Both active and deactivated accounts are included by default. The server ignores cursors with an empty column value; these are rejected locally. Keep sorting and filters unchanged between pages.</remarks>
+        Task<IList<UserReport>> GetUserReportsAsync(int pageSize = 50, UserReportSortColumn sortColumn = UserReportSortColumn.Username,
+            bool descending = false, string? fromId = null, string? fromColumnValue = null, bool previousPage = false,
+            UserReportDateRange dateRange = UserReportDateRange.AllTime, string? teamId = null, string? role = null,
+            bool hasNoTeam = false, bool hideActive = false, bool hideInactive = false, string? searchTerm = null,
+            UserReportGuestFilter? guestFilter = null, CancellationToken cancellationToken = default);
+
+        /// <summary>Count all non-bot users matching administrative report filters, without pagination.</summary>
+        /// <param name="teamId">Optional active team-membership filter.</param>
+        /// <param name="role">Optional system role filter, overridden by guestFilter.</param>
+        /// <param name="hasNoTeam">Include only users without active team memberships; overrides teamId.</param>
+        /// <param name="hideActive">Include only deactivated users; cannot combine with hideInactive.</param>
+        /// <param name="hideInactive">Include only active users; cannot combine with hideActive.</param>
+        /// <param name="searchTerm">Optional profile search text.</param>
+        /// <param name="guestFilter">Guest-only filter; null leaves guest filtering unset.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires sysconsole_read_user_management_users. Both active and deactivated accounts are included by default. This endpoint does not accept a statistics date range.</remarks>
+        Task<long> GetUserReportCountAsync(string? teamId = null, string? role = null, bool hasNoTeam = false,
+            bool hideActive = false, bool hideInactive = false, string? searchTerm = null,
+            UserReportGuestFilter? guestFilter = null, CancellationToken cancellationToken = default);
+
         /// <summary>Count users matching administrator filters. Requires Mattermost 5.26 or later.</summary>
         /// <param name="teamId">Optional team filter.</param>
         /// <param name="channelId">Optional channel filter.</param>
