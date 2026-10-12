@@ -15,6 +15,14 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostUsersClient
     {
+        /// <summary>Check the server's direct-message eligibility for two users. Requires Mattermost 10.11 or later.</summary>
+        /// <param name="userId">Source user identifier.</param>
+        /// <param name="otherUserId">Target user identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Whether the source can see the target and any applicable remote-cluster connection permits a direct message.</returns>
+        /// <remarks>Requires authentication. Shared-channel remote checks apply only when the server's sync service is available. This is not a user-existence check and does not create a channel or send a message.</remarks>
+        Task<bool> CanUserDirectMessageAsync(string userId, string otherUserId, CancellationToken cancellationToken = default);
+
         /// <summary>Read users selected by the server's invalid-email report.</summary>
         /// <param name="page">Zero-based page number.</param>
         /// <param name="perPage">Number of users per page, from 1 through 200.</param>

@@ -1118,6 +1118,16 @@ Ancillary permission lookup requires Mattermost 9.10 or later and any authentica
 
 Live checks on Mattermost 12.0.0 passed a log download containing a newly recorded marker and matching the native file bytes. Permission expansion returned the actual `read_other_users_teams` dependency, retained unknown names and matched native responses for both an administrator and ordinary bot without changing role metadata. The bot's log download was rejected with HTTP 403. Rotated log files and logging-disabled failures were not tested live.
 
+## Check direct-message eligibility
+
+```csharp
+bool allowed = await client.CanUserDirectMessageAsync(userId, otherUserId, cancellationToken);
+```
+
+Requires Mattermost 10.11 or later and authentication. The server checks whether the source user can see the target and, when shared-channel synchronization is available, whether the necessary connection to a remote user's original cluster exists. This does not create a DM, send a post or verify that both supplied IDs exist. Local-user results are available without enabling remote-cluster synchronization.
+
+Live checks on Mattermost 12.0.0 passed local-user checks in both directions and a self-check for an administrator and ordinary bot, matching independent native responses. Remote-cluster connection and restricted-visibility results were not tested live.
+
 ## Resolve a first redirect
 
 ```csharp

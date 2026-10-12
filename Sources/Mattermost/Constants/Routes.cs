@@ -12,6 +12,7 @@
         internal const string CorePlugins = version + "/plugins";
         internal const string BrandImage = version + "/brand/image";
         internal const string RedirectLocation = version + "/redirect_location";
+        internal const string SharedChannels = version + "/sharedchannels";
         internal const string UserAccessTokens = Users + "/tokens";
         internal const string Posts = version + "/posts";
         internal const string Drafts = version + "/drafts";

@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 291/608 (47.9%)
+- Implemented specification operations: 292/608 (48.0%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -34,6 +34,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Reactions | 3 / 3 |
 | Reports | 2 / 4 |
 | Roles | 4 / 5 |
+| Shared Channels | 1 / 7 |
 | Status | 6 / 7 |
 | System | 30 / 51 |
 | Teams | 31 / 38 |
@@ -1759,8 +1760,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/sharedchannels/users/{user_id}/can_dm/{other_user_id} - Check if user can DM another user in shared channels context
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/sharedchannels.yaml#L279) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/sharedchannels.yaml#L279) | `IMattermostClient.CanUserDirectMessageAsync`
+✅ Implemented
 
 ## POST /api/v4/remotecluster/{remote_id}/channels/{channel_id}/invite - Invites a remote cluster to a channel.
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/sharedchannels.yaml#L163) | `—`
