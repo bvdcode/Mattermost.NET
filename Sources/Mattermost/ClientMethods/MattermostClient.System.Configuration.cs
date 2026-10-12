@@ -15,6 +15,22 @@ namespace Mattermost
             CancellationToken cancellationToken = default)
         {
             CheckDisposed();
+            Dictionary<string, JsonElement> body = PrepareServerConfiguration(configuration, cancellationToken);
+            return SendRequestAsync<IDictionary<string, JsonElement>>(HttpMethod.Put, Routes.Config + "/patch", body, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<IDictionary<string, JsonElement>> UpdateServerConfigAsync(IDictionary<string, JsonElement> configuration,
+            CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            Dictionary<string, JsonElement> body = PrepareServerConfiguration(configuration, cancellationToken);
+            return SendRequestAsync<IDictionary<string, JsonElement>>(HttpMethod.Put, Routes.Config, body, cancellationToken);
+        }
+
+        private static Dictionary<string, JsonElement> PrepareServerConfiguration(IDictionary<string, JsonElement> configuration,
+            CancellationToken cancellationToken)
+        {
             if (configuration is null) { throw new ArgumentNullException(nameof(configuration)); }
             if (configuration.Count == 0) { throw new ArgumentException("At least one configuration section is required.", nameof(configuration)); }
             cancellationToken.ThrowIfCancellationRequested();
@@ -28,7 +44,7 @@ namespace Mattermost
                 }
                 body.Add(section.Key, section.Value.Clone());
             }
-            return SendRequestAsync<IDictionary<string, JsonElement>>(HttpMethod.Put, Routes.Config + "/patch", body, cancellationToken);
+            return body;
         }
     }
 }

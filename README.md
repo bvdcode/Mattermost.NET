@@ -1270,6 +1270,21 @@ Requires Mattermost 5.20+ and a system console write permission. Supply native c
 
 Live checks on Mattermost 12.0.0 passed changing and independently reading back one field, preserving every other section and team setting, restoring the original value and rejecting a non-administrator.
 
+## Replace server configuration
+
+```csharp
+IDictionary<string, JsonElement> config = await client.GetServerConfigAsync(cancellationToken: cancellationToken);
+Dictionary<string, JsonElement> teamSettings = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
+    config["TeamSettings"].GetRawText())!;
+teamSettings["SiteName"] = JsonSerializer.SerializeToElement("Support");
+config["TeamSettings"] = JsonSerializer.SerializeToElement(teamSettings);
+IDictionary<string, JsonElement> updated = await client.UpdateServerConfigAsync(config, cancellationToken);
+```
+
+This is a full PUT, not a patch: omitted writable settings receive server defaults. Read the complete current configuration without `removeMasked` or `removeDefaults`, preserve its other fields, and use `PatchServerConfigAsync` for individual changes instead. Requires a system console write permission. Sections are copied before authentication; no configuration read or merge is performed by the SDK. Native masked secret placeholders retain existing secrets, while environment overrides, protected settings and validation remain enforced. Responses mask secrets and filter settings by permissions. A stale snapshot can overwrite concurrent edits; cancellation cannot undo settings already applied.
+
+Live checks on Mattermost 12.0.0 passed a full snapshot update changing only the selected name, independent persisted-config readback, restoration of the original complete snapshot, native validation rejection with HTTP 400 and a non-administrator rejection with HTTP 403. Rejected requests left configuration unchanged.
+
 ## Server configuration and release metadata
 
 ```csharp

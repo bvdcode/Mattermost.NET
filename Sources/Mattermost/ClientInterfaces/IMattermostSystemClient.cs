@@ -137,6 +137,14 @@ namespace Mattermost
         Task<IDictionary<string, JsonElement>> PatchServerConfigAsync(IDictionary<string, JsonElement> configuration,
             CancellationToken cancellationToken = default);
 
+        /// <summary>Replace the writable server configuration with a complete configuration snapshot.</summary>
+        /// <param name="configuration">Native case-sensitive section names with JSON object values. Read the full current configuration without removing masked values or defaults before editing it.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not settings already applied by the server.</param>
+        /// <returns>The server's permission-filtered configuration with sensitive values masked.</returns>
+        /// <remarks>Requires a system console write permission. Unlike PatchServerConfigAsync, omitted writable settings receive server defaults. The SDK copies sections before authentication but does not read or merge existing settings. Native masked secret placeholders retain existing secrets; environment overrides, protected settings and server validation still apply. Concurrent configuration edits can be overwritten.</remarks>
+        Task<IDictionary<string, JsonElement>> UpdateServerConfigAsync(IDictionary<string, JsonElement> configuration,
+            CancellationToken cancellationToken = default);
+
         /// <summary>Ask the server to test a Site URL with a Mattermost ping request. Requires Mattermost 5.16 or later.</summary>
         /// <param name="siteUrl">Absolute HTTP or HTTPS URL; surrounding whitespace is removed.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
