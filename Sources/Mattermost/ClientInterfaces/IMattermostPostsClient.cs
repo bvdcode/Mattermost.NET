@@ -245,6 +245,13 @@ namespace Mattermost
         /// <exception cref="ArgumentOutOfRangeException">Thrown when message length exceed maximum limit of characters, see <see cref="MattermostApiLimits.MaxPostMessageLength"/>.</exception>
         Task<Post> UpdatePostAsync(string postId, string newText, PostProps? props = null);
 
+        /// <summary>Replace a post's editable fields using the full update endpoint.</summary>
+        /// <param name="post">Post whose identifier, text, pin and reaction flags, properties and file identifiers are sent. Other fields are not sent.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The updated post returned by the server.</returns>
+        /// <remarks>Text and both flags are always written, including empty text and false. Supplied properties and files replace existing values; null preserves them on the server, while empty collections clear them. Prefer PatchPostAsync for individual fields. Read a current post before replacing it to preserve flags; replacement is not an atomic read-modify-write. Editing permissions and time limits apply. HasReactions changes the stored flag, not individual reactions.</remarks>
+        Task<Post> ReplacePostAsync(Post post, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Partially update a post. Null parameters are omitted, leaving the corresponding fields unchanged.
         /// </summary>

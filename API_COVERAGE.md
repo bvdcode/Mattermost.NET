@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 295/608 (48.5%)
+- Implemented specification operations: 296/608 (48.7%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -29,7 +29,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | OAuth | 9 / 10 |
 | Permissions | 1 / 1 |
 | Plugins | 5 / 13 |
-| Posts | 20 / 28 |
+| Posts | 21 / 28 |
 | Preferences | 5 / 5 |
 | Reactions | 3 / 3 |
 | Reports | 2 / 4 |
@@ -1410,8 +1410,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## PUT /api/v4/posts/{post_id} - Update a post
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L274) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L274) | `IMattermostClient.ReplacePostAsync`
+✅ Implemented
 
 ## PUT /api/v4/posts/{post_id}/patch - Patch a post
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L377) | `IMattermostClient.PatchPostAsync`, `IMattermostClient.UpdatePostAsync`, `IMattermostClient.UpdatePostWithRawPropsAsync`

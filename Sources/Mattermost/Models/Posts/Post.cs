@@ -45,6 +45,13 @@ namespace Mattermost.Models.Posts
         public bool IsPinned { get; set; }
 
         /// <summary>
+        /// Whether the post has reactions according to the server's stored flag.
+        /// </summary>
+        [JsonPropertyName("has_reactions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public bool HasReactions { get; set; }
+
+        /// <summary>
         /// User who created the post.
         /// </summary>
         [JsonPropertyName("user_id")]

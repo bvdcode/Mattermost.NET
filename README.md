@@ -320,6 +320,20 @@ Supplied `props` replace the property bag rather than merging individual keys. I
 
 See Mattermost's [patch post documentation](https://docs.mattermost.com/api/reference/patch-post) for the endpoint contract and permissions.
 
+## Replace a post's editable fields
+
+```csharp
+Post post = await client.GetPostAsync(postId);
+post.Text = "Replacement message";
+Post updated = await client.ReplacePostAsync(post, cancellationToken);
+```
+
+This uses `PUT /posts/{post_id}`. It sends the identifier, text, both `IsPinned` and `HasReactions` flags, properties and file identifiers, without sending author, channel, thread, timestamps or other read-only fields. Both flags are written even when `false`; use a current post to preserve them. `HasReactions` is a stored flag, not a command to add or remove reactions.
+
+Properties and file identifiers replace existing values. Empty collections clear them; `null` preserves them on the server. Server-protected properties and editing restrictions still apply. A read followed by replacement can overwrite concurrent changes; use `PatchPostAsync` when you only need to change individual fields.
+
+Live checks on Mattermost 12.0.0 passed replacement with a real reaction, preservation and clearing of pin/reaction flags, property replacement, null preservation and empty clearing of properties/files, and explicit empty text. Independent native reads confirmed the stored values and unchanged author, channel and creation time. The server preserved its protected `from_bot` property; changing the reaction flag did not delete the reaction. Another author's post was rejected with HTTP 403 and remained unchanged.
+
 ## Delete a post
 
 ```csharp
