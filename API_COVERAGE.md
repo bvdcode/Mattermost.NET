@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 296/608 (48.7%)
+- Implemented specification operations: 297/608 (48.8%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -41,7 +41,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
 | Usage | 3 / 3 |
-| Users | 52 / 77 |
+| Users | 53 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -2508,8 +2508,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## PUT /api/v4/users/{user_id} - Update a user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1089) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1089) | `IMattermostClient.UpdateUserAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/active - Activate or deactivate a user
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1303) | `IMattermostClient.UpdateUserActiveAsync`

@@ -277,6 +277,14 @@ namespace Mattermost
         /// <remarks>Requires ownership or edit_other_users; provider-managed or locked profile fields may not be changed. Own-email changes require the current password in patch.Password.</remarks>
         Task<User> PatchUserAsync(string userId, UserPatch patch, CancellationToken cancellationToken = default);
 
+        /// <summary>Replace a user's complete editable profile using the full PUT endpoint.</summary>
+        /// <param name="userId">Actual user identifier; the me alias cannot be used as the required body identifier.</param>
+        /// <param name="profile">Complete profile, including required username, email and locale. Unspecified optional fields are cleared or reset, not preserved.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The updated user. The existing User model does not expose every native profile property or notification key.</returns>
+        /// <remarks>Prefer PatchUserAsync for individual fields. All optional text and collection fields and AllowMarketing are written. Null or empty notification properties reset native defaults; null timezone and profile properties clear their maps. Requires ownership or edit_other_users; editing a system administrator requires manage_system. Provider-managed and locked profile fields may not be changed. Changing your own email requires profile.Password and may trigger native email verification. Roles, account activity, authentication data and the password itself are not replaced. Cancellation cannot undo an accepted update.</remarks>
+        Task<User> UpdateUserAsync(string userId, UserProfileUpdate profile, CancellationToken cancellationToken = default);
+
         /// <summary>Deactivate an account and revoke its sessions. Does not permanently delete the account.</summary>
         /// <param name="userId">User identifier, or me.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>

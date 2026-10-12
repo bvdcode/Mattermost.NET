@@ -1048,6 +1048,25 @@ await client.UpdateUserActiveAsync(user.Id, active: true, cancellationToken: can
 
 `UserPatch` in `Mattermost.Models.Users` omits null fields. Empty strings clear optional name/nickname/position fields; username, email and locale cannot be blank. A supplied `Props`, `NotifyProps` or `Timezone` replaces that whole native map, not individual entries. Preserve existing values when changing only one map entry. `Password` confirms an own-email change; it does not update the password. Other-user profile edits require `edit_other_users`; provider-managed or locked fields may be rejected.
 
+## Replace a complete user profile
+
+```csharp
+User updated = await client.UpdateUserAsync(userId, new UserProfileUpdate
+{
+    Username = "account",
+    Email = "account@example.com",
+    Locale = "en",
+    Nickname = "New nickname",
+    AllowMarketing = false
+}, cancellationToken);
+```
+
+This uses `PUT /users/{user_id}` and requires an actual user ID, not `me`. Unlike `UserPatch`, `UserProfileUpdate` replaces all editable profile fields: unspecified optional text is cleared, null or empty profile properties clear the map, and null or empty notification properties reset native defaults. Null timezone clears its map. `AllowMarketing` is always written, including `false`. Supply the complete maps and values you intend to keep; use `PatchUserAsync` for individual changes.
+
+The input is copied before authentication. The SDK does not fetch, merge or retry the profile automatically. Roles, activity, authentication credentials, account timestamps and the password itself are not replaced. `Password` is only the current-password confirmation for changing your own email. The native server enforces permissions, provider-managed fields, profile locks and email verification. The existing `User` response model does not expose every native property or notification key; do not use it as a complete replacement snapshot.
+
+Live checks on Mattermost 12.0.0 passed administrator and own-account replacement, exact native notification maps including keys absent from the existing response model, replacement rather than merging of profile properties, clearing optional text/timezone/properties and resetting notification defaults. Identity, roles, creation time and password login were preserved. An ordinary bot received HTTP 403 and invalid email received HTTP 400; independent profile reads remained unchanged. Accepted email changes and external provider/profile-lock conflicts were not tested live.
+
 `DeactivateUserAsync` archives the account and revokes sessions without permanent deletion. `UpdateUserActiveAsync` can reactivate it; administrative user-management permission is required except for permitted self-deactivation. `UpdateUserRolesAsync` replaces system roles and requires `manage_roles`. Own-password changes require the current password; authorized administrators may omit it for other accounts. Administrative changes may send email notifications.
 
 `ResetUserFailedAttemptsAsync` resets email/password or LDAP lockout counters and requires `sysconsole_write_user_management_users`. `VerifyUserEmailAsync` marks email verified without sending a verification message and requires `manage_system`. `RevokeUserSessionAsync` takes the session ID, not its token; `RevokeAllUserSessionsAsync` revokes every session of one account and requires Mattermost 4.4+. Both require ownership or `edit_other_users`. Session revocation does not delete personal access tokens, which can create new sessions while valid.
