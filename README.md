@@ -1118,6 +1118,23 @@ Ancillary permission lookup requires Mattermost 9.10 or later and any authentica
 
 Live checks on Mattermost 12.0.0 passed a log download containing a newly recorded marker and matching the native file bytes. Permission expansion returned the actual `read_other_users_teams` dependency, retained unknown names and matched native responses for both an administrator and ordinary bot without changing role metadata. The bot's log download was rejected with HTTP 403. Rotated log files and logging-disabled failures were not tested live.
 
+## Manage user authentication metadata
+
+```csharp
+User user = await client.GetUserByAuthDataAsync(externalId, cancellationToken);
+UserAuthentication authentication = await client.UpdateUserAuthenticationAsync(
+    user.Id, "saml", externalId, cancellationToken);
+await client.UpdateUserAuthenticationAsync(user.Id, "email", cancellationToken: cancellationToken);
+```
+
+Import `Mattermost.Models.Users`. Both methods require a system administrator. Lookup uses the exact external authentication identifier, without an authentication-provider filter; it is not a username or email search. Supply the representation stored by that provider. Case and whitespace are preserved, and the native identifier limit is 128 UTF-8 bytes, not 128 characters. Lookup also obeys native user-visibility rules and returns an API error when no match exists.
+
+Authentication updates require Mattermost 4.6 or later. Use the native provider name; the server validates supported providers. For `email`, pass null authentication data; other providers require a nonempty identifier. The response contains only authentication metadata, not a user profile. The native email response may omit both fields, represented as an empty `AuthService` and null `AuthData`.
+
+Updating authentication revokes the user's sessions and is not atomic: authentication metadata may already have changed if revocation fails. It neither configures an identity provider nor verifies an external login. Returning to email does not set a password; use `UpdateUserPasswordAsync` separately when required. Other profile fields are not updated. Cancellation cannot undo an accepted change.
+
+Live checks on Mattermost 12.0.0 passed switching a separate account to SAML metadata, exact Unicode/reserved-character identifier lookup with independent native equality, preservation of profile fields and revocation of its previous session. Both methods rejected an ordinary bot with HTTP 403. Returning to email cleared the identifier and produced a subsequent lookup HTTP 404; a separately set password allowed successful login. Server configuration remained unchanged. Login through an external identity provider was not tested live.
+
 ## Replace channel membership
 
 ```csharp

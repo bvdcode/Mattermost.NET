@@ -8,6 +8,9 @@
         /// <summary>Maximum number of users returned by a normal paged user query.</summary>
         public const int MaxUsersPerPage = 200;
 
+        /// <summary>Maximum UTF-8 byte length of a user's external authentication identifier.</summary>
+        public const int MaxUserAuthDataBytes = 128;
+
         /// <summary>Maximum number of server log lines per page.</summary>
         public const int MaxServerLogsPerPage = 10000;
 

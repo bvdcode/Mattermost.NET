@@ -15,6 +15,22 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostUsersClient
     {
+        /// <summary>Find a user by the exact external authentication identifier.</summary>
+        /// <param name="authData">Identifier containing 1 through 128 UTF-8 bytes. Whitespace and case are preserved.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires a system administrator; native user-visibility rules still apply. This is not an email/username search and has no provider filter. A missing identifier returns the native API error.</remarks>
+        Task<User> GetUserByAuthDataAsync(string authData, CancellationToken cancellationToken = default);
+
+        /// <summary>Change a user's authentication provider and identifier. Requires Mattermost 4.6 or later.</summary>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="authService">Native provider name, trimmed. Use email to return to email/password authentication; other names are validated by the server.</param>
+        /// <param name="authData">Null for email, otherwise an exact nonempty identifier of at most 128 UTF-8 bytes. Not trimmed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not an update already applied.</param>
+        /// <returns>Updated authentication metadata, not a user profile. Native email responses may omit both fields.</returns>
+        /// <remarks>Requires a system administrator. Updates authentication metadata and revokes that user's sessions; it does not configure or test an external provider. Switching back to email does not set a password; use UpdateUserPasswordAsync separately when needed. Not atomic: metadata may already be changed if session revocation fails. Existing user profile fields are not updated.</remarks>
+        Task<UserAuthentication> UpdateUserAuthenticationAsync(string userId, string authService, string? authData = null,
+            CancellationToken cancellationToken = default);
+
         /// <summary>Check the server's direct-message eligibility for two users. Requires Mattermost 10.11 or later.</summary>
         /// <param name="userId">Source user identifier.</param>
         /// <param name="otherUserId">Target user identifier.</param>
