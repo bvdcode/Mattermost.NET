@@ -548,6 +548,19 @@ Custom statuses require the server feature to be enabled. Omitting `duration` an
 
 Clearing the current custom status preserves its recent history. History deletion uses the POST endpoint and must match the stored emoji, text, duration and expiry exactly. Strings are preserved without trimming; use the stored text if the server truncated it to its 100-character limit. Removing a recent entry does not clear the current status.
 
+## Mark all direct messages or a team read
+
+```csharp
+ChannelViewResponse direct = await client.MarkAllDirectMessagesReadAsync("me", cancellationToken);
+ChannelViewResponse team = await client.MarkAllTeamChannelsReadAsync("me", teamId, cancellationToken);
+```
+
+Requires Mattermost 11.3 or later and the server's `EnableShiftEscapeToMarkAllRead` feature flag. When disabled, the native endpoint returns HTTP 501; the SDK does not enable the flag or fall back to a different operation. The direct-message method includes group messages. The team method applies to the specified team's channels. Both also mark followed threads in their scope read and may clear push notifications.
+
+The response uses the existing `ChannelViewResponse`: status and channel IDs mapped to Unix-millisecond view times. Updating another user requires `edit_other_users`; the team operation also requires `view_team` for the requesting account. Cancellation cannot undo read-state changes already accepted.
+
+Live checks on Mattermost 12.0.0 with the feature enabled passed actual DM/GM unread clearing, team channel and followed-thread unread clearing, exact native membership view times and preservation of other scopes. Both methods returned HTTP 403 for an ordinary bot attempting another user's read state. Server configuration remained unchanged. Disabled-feature responses and push notification delivery were not tested live.
+
 ## Read teams and memberships
 
 ```csharp

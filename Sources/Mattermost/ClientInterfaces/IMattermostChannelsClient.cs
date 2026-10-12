@@ -382,6 +382,21 @@ namespace Mattermost
         /// <returns>Operation status and Unix-millisecond view times keyed by channel identifier.</returns>
         Task<ChannelViewResponse> MarkChannelsReadAsync(string userId, IEnumerable<string> channelIds, CancellationToken cancellationToken = default);
 
+        /// <summary>Mark all direct and group message channels and their followed threads read. Requires Mattermost 11.3 or later.</summary>
+        /// <param name="userId">User identifier or me. Updating another user requires edit_other_users permission.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Operation status and Unix-millisecond view times keyed by channel identifier.</returns>
+        /// <remarks>Requires the server's EnableShiftEscapeToMarkAllRead feature flag; otherwise the server returns HTTP 501. The SDK does not enable it. The native operation may clear push notifications. Cancellation cannot undo read-state changes already accepted.</remarks>
+        Task<ChannelViewResponse> MarkAllDirectMessagesReadAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Mark all channels and followed threads in a team read. Requires Mattermost 11.3 or later.</summary>
+        /// <param name="userId">User identifier or me. Updating another user requires edit_other_users permission.</param>
+        /// <param name="teamId">Team identifier. Requires view_team permission for the requesting account.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Operation status and Unix-millisecond view times keyed by channel identifier.</returns>
+        /// <remarks>Requires the server's EnableShiftEscapeToMarkAllRead feature flag; otherwise the server returns HTTP 501. The SDK does not enable it. The native operation may clear push notifications. Cancellation cannot undo read-state changes already accepted.</remarks>
+        Task<ChannelViewResponse> MarkAllTeamChannelsReadAsync(string userId, string teamId, CancellationToken cancellationToken = default);
+
         /// <summary>Search the current user's group channels by member names.</summary>
         /// <param name="term">Nonblank search term. Surrounding whitespace is removed.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>

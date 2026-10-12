@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 297/608 (48.8%)
+- Implemented specification operations: 299/608 (49.2%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -18,7 +18,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 |---|---|
 | Bots | 9 / 9 |
 | Brand | 2 / 3 |
-| Channels | 52 / 61 |
+| Channels | 54 / 61 |
 | Commands | 10 / 10 |
 | Emoji | 9 / 9 |
 | Files | 10 / 12 |
@@ -472,8 +472,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## PUT /api/v4/channels/members/{user_id}/direct/read - Mark all direct and group messages as read
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2124) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2124) | `IMattermostClient.MarkAllDirectMessagesReadAsync`
+✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/teams/{team_id}/channels/categories - Update user's sidebar categories
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2669) | `IMattermostClient.UpdateSidebarCategoriesAsync`
@@ -488,8 +488,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## PUT /api/v4/users/{user_id}/teams/{team_id}/read - Mark all channels and threads in a team as read
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3389) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3389) | `IMattermostClient.MarkAllTeamChannelsReadAsync`
+✅ Implemented
 
 # Cloud
 
