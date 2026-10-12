@@ -29,6 +29,8 @@
         internal const string ServerAudits = version + "/audits";
         internal const string ServerAnalytics = version + "/analytics/old";
         internal const string ServerBusy = version + "/server_busy";
+        internal const string Config = version + "/config";
+        internal const string LatestVersion = version + "/latest_version";
         internal const string ClientConfig = version + "/config/client";
         internal const string License = version + "/license";
         internal const string Channels = version + "/channels";

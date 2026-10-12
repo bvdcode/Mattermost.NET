@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 245/608 (40.3%)
+- Implemented specification operations: 250/608 (41.1%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -30,7 +30,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Reactions | 3 / 3 |
 | Roles | 4 / 5 |
 | Status | 6 / 7 |
-| System | 10 / 51 |
+| System | 15 / 51 |
 | Teams | 30 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
@@ -1817,24 +1817,24 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/config - Get configuration
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L629) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L629) | `IMattermostClient.GetServerConfigAsync`
+✅ Implemented
 
 ## GET /api/v4/config/client - Get client configuration
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L765) | `IMattermostClient.GetClientConfigAsync`
 ✅ Implemented
 
 ## GET /api/v4/config/environment - Get configuration made through environment variables
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L778) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L778) | `IMattermostClient.GetEnvironmentConfigAsync`
+✅ Implemented
 
 ## GET /api/v4/image - Get an image by url
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1574) | `—`
 ❌ Not implemented
 
 ## GET /api/v4/latest_version - Get latest public server release information
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1366) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1366) | `IMattermostClient.GetLatestServerReleaseAsync`
+✅ Implemented
 
 ## GET /api/v4/license/client - Get client license
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1005) | `IMattermostClient.GetClientLicenseAsync`
@@ -1865,16 +1865,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/system/onboarding/complete - Get first admin onboarding completion status
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L281) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L281) | `IMattermostClient.GetFirstAdminOnboardingCompleteAsync`
+✅ Implemented
 
 ## GET /api/v4/system/ping - Check system health
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L25) | `IMattermostClient.GetSystemStatusAsync`
 ✅ Implemented
 
 ## GET /api/v4/system/schema/version - Get applied database schema migrations
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1405) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1405) | `IMattermostClient.GetAppliedSchemaMigrationsAsync`
+✅ Implemented
 
 ## GET /api/v4/system/support_packet - Download a zip file which contains helpful and useful information for troubleshooting your mattermost instance.
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1723) | `—`

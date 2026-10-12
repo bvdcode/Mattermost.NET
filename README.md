@@ -975,6 +975,22 @@ Analytics requires Mattermost 4.0+. `AnalyticsReport` in `Mattermost.Enums` sele
 
 Busy-state reads require Mattermost 5.20+ and return `ServerBusyState` in `Mattermost.Models.Responses`. `ExpiresAt` is Unix seconds, not milliseconds, and may be negative while idle; `ExpiresTimestamp` preserves the server's readable timestamp. This method does not set or clear the busy flag.
 
+## Server configuration and release metadata
+
+```csharp
+IDictionary<string, JsonElement> config = await client.GetServerConfigAsync(cancellationToken: cancellationToken);
+IDictionary<string, JsonElement> overrides = await client.GetEnvironmentConfigAsync(cancellationToken);
+IList<AppliedSchemaMigration> migrations = await client.GetAppliedSchemaMigrationsAsync(cancellationToken);
+bool setupComplete = await client.GetFirstAdminOnboardingCompleteAsync(cancellationToken);
+ServerRelease release = await client.GetLatestServerReleaseAsync(cancellationToken);
+```
+
+Import `System.Text.Json` for configuration values and `Mattermost.Models.Responses` for migration/release models. Configuration retains native section and field names, including version-specific or plugin settings, and preserves JSON strings, booleans, numbers, arrays and objects. The server masks secrets and filters sections by system console read permissions; other configuration values may still be sensitive. Optional `removeMasked` and `removeDefaults` filters require Mattermost 10.4+.
+
+`GetEnvironmentConfigAsync` requires Mattermost 4.10+ and returns permission-filtered flags indicating environment overrides, not environment variable values. A native `null` response becomes an empty dictionary. Migration reads require a system console read permission and return version/name pairs without running migrations. Initial-setup status requires `manage_system`; release metadata additionally requires a non-restricted administrator session. `ServerRelease` preserves all seven native fields, including release-note text and string timestamps. Reading release metadata does not upgrade the server.
+
+Live checks on Mattermost 12.0.0 passed all five operations: all four configuration-filter combinations, nonempty environment overrides and migration lists, setup status and all release fields matched direct native responses. Non-administrator requests preserved four permission errors and the native empty environment result. No server settings were changed.
+
 ## File previews and profile images
 
 ```csharp

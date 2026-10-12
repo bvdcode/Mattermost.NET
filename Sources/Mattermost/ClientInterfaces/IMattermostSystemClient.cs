@@ -6,6 +6,7 @@ using Mattermost.Models.Responses;
 using Mattermost.Models.Roles;
 using Mattermost.Models.Users;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +17,35 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Read the server configuration visible to the current account.</summary>
+        /// <param name="removeMasked">Omit masked values. Requires Mattermost 10.4 or later.</param>
+        /// <param name="removeDefaults">Omit default values. Requires Mattermost 10.4 or later.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Native configuration sections, preserving field names and JSON value types.</returns>
+        /// <remarks>Requires a system console read permission; the server filters sections by permission and masks secrets. Configuration may still contain sensitive data. Does not change settings.</remarks>
+        Task<IDictionary<string, JsonElement>> GetServerConfigAsync(bool removeMasked = false, bool removeDefaults = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Read which configuration fields are overridden by environment variables. Requires Mattermost 4.10 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Permission-filtered native sections containing override flags, not the environment variable values. An empty or null server result becomes an empty dictionary.</returns>
+        Task<IDictionary<string, JsonElement>> GetEnvironmentConfigAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read the applied database schema migrations.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires a system console read permission. Does not run migrations or modify the database.</remarks>
+        Task<IList<AppliedSchemaMigration>> GetAppliedSchemaMigrationsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read whether the first administrator has completed initial server setup.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. Does not complete setup or install plugins.</remarks>
+        Task<bool> GetFirstAdminOnboardingCompleteAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read information about the latest Mattermost server release.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system and a non-restricted administrator session. The server fetches release metadata; this does not upgrade or restart the server.</remarks>
+        Task<ServerRelease> GetLatestServerReleaseAsync(CancellationToken cancellationToken = default);
+
         /// <summary>Get a page of audit entries for all users.</summary>
         /// <param name="page">Zero-based page.</param>
         /// <param name="perPage">Positive page size.</param>
