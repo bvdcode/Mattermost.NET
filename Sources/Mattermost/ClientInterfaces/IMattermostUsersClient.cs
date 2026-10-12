@@ -167,6 +167,20 @@ namespace Mattermost
         /// <remarks>Requires revoke_user_access_token and permission to edit the owning user or bot. Use another credential to re-enable it.</remarks>
         Task DisableUserAccessTokenAsync(string tokenId, CancellationToken cancellationToken = default);
 
+        /// <summary>Permanently revoke a personal access token and its sessions. Requires Mattermost 4.1 or later.</summary>
+        /// <param name="tokenId">Token identifier, not its secret value. Surrounding whitespace is removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; cannot undo completed revocation.</param>
+        /// <remarks>Requires revoke_user_access_token and permission to edit the owning user or bot. OAuth sessions cannot use this operation. Unlike disabling, revocation cannot be reversed.</remarks>
+        Task RevokeUserAccessTokenAsync(string tokenId, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace a personal access token's secret and immediately invalidate its old secret and sessions. Requires Mattermost 10.10 or later.</summary>
+        /// <param name="tokenId">Active token identifier, not its secret value. Surrounding whitespace is removed.</param>
+        /// <param name="expiresAt">New expiry as Unix milliseconds; zero removes expiry, subject to server policy.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; cannot undo completed rotation.</param>
+        /// <returns>Updated token with the new secret, returned only by this response. Store it before replacing the current credential.</returns>
+        /// <remarks>Requires create_user_access_token and permission to edit the owner; an administrator's token additionally requires manage_system. OAuth sessions and disabled tokens are rejected. Server expiry policy applies.</remarks>
+        Task<UserAccessToken> RotateUserAccessTokenAsync(string tokenId, long expiresAt = 0, CancellationToken cancellationToken = default);
+
         /// <summary>Re-enable a disabled personal access token. Requires Mattermost 4.4 or later.</summary>
         /// <param name="tokenId">Token identifier, not its secret value.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>

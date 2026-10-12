@@ -2,14 +2,14 @@ using System.Text.Json.Serialization;
 
 namespace Mattermost.Models.Users
 {
-    /// <summary>Personal access token metadata and, on creation, its secret value.</summary>
+    /// <summary>Personal access token metadata and, on creation or rotation, its secret value.</summary>
     public class UserAccessToken
     {
         /// <summary>Token identifier, distinct from the secret token value.</summary>
         [JsonPropertyName("id")]
         public string Id { get; set; } = string.Empty;
 
-        /// <summary>Secret authentication value returned on creation; null on metadata reads.</summary>
+        /// <summary>Secret authentication value returned on creation or rotation; null on metadata reads.</summary>
         [JsonPropertyName("token")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Token { get; set; }

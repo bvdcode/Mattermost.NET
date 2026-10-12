@@ -1010,6 +1010,21 @@ await client.UpdateUserActiveAsync(user.Id, active: true, cancellationToken: can
 
 Live checks on Mattermost 12.0.0 passed all ten methods on a separate account: profile clearing preserved other fields, map replacement persisted, role replacement was restored, both password-change flows authenticated, reset removed an actual login lockout, verification persisted in the account's own profile, session revocation invalidated old sessions, and deactivation/reactivation retained a working account.
 
+## Rotate or revoke access tokens
+
+```csharp
+DateTimeOffset expiry = DateTimeOffset.UtcNow.AddDays(30);
+UserAccessToken replacement = await client.RotateUserAccessTokenAsync(tokenId,
+    expiresAt: expiry.ToUnixTimeMilliseconds(), cancellationToken: cancellationToken);
+await client.RevokeUserAccessTokenAsync(otherTokenId, cancellationToken);
+```
+
+Pass the token's ID, not its authentication secret. Rotation requires Mattermost 10.10+ and returns a new secret while preserving the ID, owner and description. Store the returned secret securely; the old secret and its sessions are immediately invalidated. `expiresAt` is the new Unix-millisecond expiry; its default zero removes expiry, subject to server lifetime policy. Disabled tokens cannot be rotated. Rotation requires `create_user_access_token`, permission to edit the owner and, for an administrator's token, `manage_system`.
+
+Revocation requires Mattermost 4.1+, `revoke_user_access_token` and permission to edit the owner. It permanently removes the token and its sessions; unlike `DisableUserAccessTokenAsync`, it cannot be reversed. Neither operation permits OAuth sessions. Cancellation cannot undo an operation already completed on the server; use a separate administrative credential when rotating or revoking the token currently in use.
+
+Live checks on Mattermost 12.0.0 passed revocation with metadata/list removal and independent authentication rejection, repeated-revocation HTTP 404, rotation with future and zero expiry, stable metadata, old-secret rejection/new-secret authentication, disabled-token HTTP 400 and unauthorized HTTP 403.
+
 ## Background jobs
 
 ```csharp
