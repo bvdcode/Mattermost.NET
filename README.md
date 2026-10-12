@@ -1083,6 +1083,20 @@ Pagination uses a user ID and the exact value of the selected sort column, not p
 
 Live checks on Mattermost 12.0.0 passed list/count comparisons against a two-user fixture, both cursor directions with ascending/descending order and empty final pages, all seven sort columns, all four native statistics periods, positive team/role/activity filters, no-team precedence, bot exclusion and permission rejection. Guest-only filters excluded known non-guests and matched native responses; a nonempty guest cohort was not tested.
 
+## Server maintenance
+
+```csharp
+await client.ReloadServerConfigAsync(cancellationToken);
+await client.InvalidateServerCachesAsync(cancellationToken);
+await client.RecycleDatabaseConnectionsAsync(cancellationToken);
+```
+
+These are server-wide administrative operations, not client resets. They require `reload_config`, `invalidate_caches` and `recycle_database_connections`, respectively; restricted administrators are rejected. Reload reads the server's configuration storage and can apply externally changed settings. Cache invalidation can temporarily reduce performance while server caches are repopulated; it does not clear this client's authentication cache.
+
+Database recycling replaces connections in the server's database pools without restarting the database or migrating data. The server can hold the request during its recycling window; in-use connections may remain until released. The SDK waits for the HTTP response without adding reconnect loops, retries or a separate completion wait. Canceling a request does not undo maintenance already accepted by the server.
+
+Live checks on Mattermost 12.0.0 passed all three operations with administrator credentials and preserved ordinary-bot HTTP 403 responses. Configuration, authentication and fixture user metadata remained unchanged; database/file-store health and database-backed reads passed after each operation and after the recycling request completed. Configuration changes from external storage, cluster-wide propagation and individual connection replacement were not inspected.
+
 ## Job management
 
 ```csharp

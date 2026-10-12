@@ -18,6 +18,21 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Reload the server configuration from its configured storage.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request, not a reload already accepted by the server.</param>
+        /// <remarks>Requires reload_config; restricted administrators are rejected. Reads the server's configuration storage, not a local client file; externally changed persisted settings can take effect.</remarks>
+        Task ReloadServerConfigAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Invalidate the server's in-memory caches.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request, not invalidation already accepted by the server.</param>
+        /// <remarks>Requires invalidate_caches; restricted administrators are rejected. Applies to server caches, not this client's cached authentication. Performance can be reduced while caches are repopulated.</remarks>
+        Task InvalidateServerCachesAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Recycle the server's database connection pools.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request, not recycling already accepted by the server.</param>
+        /// <remarks>Requires recycle_database_connections; restricted administrators are rejected. The server can hold the request during recycling; in-use connections may remain until released. Does not restart the database server or migrate data.</remarks>
+        Task RecycleDatabaseConnectionsAsync(CancellationToken cancellationToken = default);
+
         /// <summary>Create a server background job. Requires Mattermost 4.1 or later.</summary>
         /// <param name="jobType">Native job type. The server validates support, permissions and worker availability.</param>
         /// <param name="data">Optional job-specific string map, copied before authentication. Keys and values are preserved; values cannot be null.</param>
