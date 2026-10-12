@@ -15,6 +15,21 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostUsersClient
     {
+        /// <summary>Generate and store a new multi-factor authentication secret for an account.</summary>
+        /// <param name="userId">User identifier or me for the current user.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not a secret already stored.</param>
+        /// <returns>Base32 TOTP secret and base64 PNG QR image. Both values are credentials.</returns>
+        /// <remarks>Requires enabled MFA, a non-OAuth session and permission to edit the user. Replaces the stored secret even if MFA is already active; does not activate MFA. The server controls permissions and configuration errors.</remarks>
+        Task<MfaSecret> GenerateMfaSecretAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Activate or deactivate multi-factor authentication for an account.</summary>
+        /// <param name="userId">User identifier or me for the current user.</param>
+        /// <param name="activate">True to activate with an authenticator code; false to deactivate and clear the stored secret.</param>
+        /// <param name="code">Nonempty TOTP code required for activation, preserved exactly. Ignored and omitted when deactivating.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not an update already applied.</param>
+        /// <remarks>Requires a non-OAuth session and permission to edit the user. Activation requires enabled MFA and an email/password or LDAP account. The server may impose additional MFA requirements for editing another user and sends an MFA-change email. Activation consumes the code; obtain a fresh code for the next login.</remarks>
+        Task UpdateUserMfaAsync(string userId, bool activate, string? code = null, CancellationToken cancellationToken = default);
+
         /// <summary>Record the current user's request to notify administrators about a paid feature.</summary>
         /// <param name="requiredPlan">Native plan identifier, trimmed. The server accepts professional or enterprise for built-in paid features; plugin-specific requests can use an empty plan.</param>
         /// <param name="requiredFeature">Nonblank native feature identifier, trimmed. The server validates support; this is not a display label.</param>

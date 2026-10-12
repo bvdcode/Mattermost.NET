@@ -561,6 +561,23 @@ The response uses the existing `ChannelViewResponse`: status and channel IDs map
 
 Live checks on Mattermost 12.0.0 with the feature enabled passed actual DM/GM unread clearing, team channel and followed-thread unread clearing, exact native membership view times and preservation of other scopes. Both methods returned HTTP 403 for an ordinary bot attempting another user's read state. Server configuration remained unchanged. Disabled-feature responses and push notification delivery were not tested live.
 
+## Manage user multi-factor authentication
+
+```csharp
+using Mattermost.Models.Users;
+
+MfaSecret setup = await client.GenerateMfaSecretAsync("me", cancellationToken);
+byte[] qrPng = Convert.FromBase64String(setup.QRCode);
+await client.UpdateUserMfaAsync("me", true, authenticatorCode, cancellationToken);
+await client.UpdateUserMfaAsync("me", false, cancellationToken: cancellationToken);
+```
+
+MFA generation and activation require the server's `EnableMultifactorAuthentication` setting. These methods do not change server settings. Use the current user or an account you have permission to edit; OAuth sessions cannot call these endpoints. Activation supports email/password and LDAP accounts, and the server may impose additional MFA requirements when editing another user.
+
+Generation immediately replaces the account's stored secret, even if MFA is already active, but does not activate MFA. `Secret` is base32 and `QRCode` is a base64 PNG containing the authenticator setup URI. Treat both as credentials; display the QR securely and do not log either value. Obtain `authenticatorCode` from the configured authenticator. Activation requires a nonempty code, preserved exactly, and consumes it; use a fresh code for the next login. Deactivation ignores the code and clears the stored secret. The server sends an MFA-change email. Cancellation cannot undo an accepted secret or state change, and native errors are propagated without retries.
+
+Live checks on Mattermost 12.0.0 with a separate email/password account passed secret and PNG generation, inactive state after generation, invalid-code rejection, TOTP activation, password-only login rejection, login with a fresh TOTP, deactivation and restored password-only login. The original server configuration was restored and verified unchanged. LDAP, OAuth rejection and MFA-change email delivery were not tested live.
+
 ## Request an administrator upgrade notification
 
 ```csharp
