@@ -12,6 +12,15 @@ namespace Mattermost
     public partial class MattermostClient
     {
         /// <inheritdoc />
+        public Task<OAuthServerMetadata> GetOAuthServerMetadataAsync(CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+            return SendRequestAsync<OAuthServerMetadata>(HttpMethod.Get, Routes.OAuthServerMetadata,
+                cancellationToken: cancellationToken, requiresAuthorization: false);
+        }
+
+        /// <inheritdoc />
         public Task<IList<OAuthApp>> GetOAuthAppsAsync(int page = 0, int perPage = 60, CancellationToken cancellationToken = default)
         {
             CheckDisposed();

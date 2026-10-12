@@ -154,6 +154,11 @@ namespace Mattermost
         Task<IList<CommandAutocompleteSuggestion>> GetCommandAutocompleteSuggestionsAsync(string teamId, string userInput,
             string? channelId = null, string? rootId = null, CancellationToken cancellationToken = default);
 
+        /// <summary>Read public OAuth authorization-server discovery metadata. Requires enabled OAuth service provider.</summary>
+        /// <param name="cancellationToken">Cancels the request.</param>
+        /// <remarks>Does not authenticate or send saved credentials. RegistrationEndpoint is empty when dynamic registration is disabled.</remarks>
+        Task<OAuthServerMetadata> GetOAuthServerMetadataAsync(CancellationToken cancellationToken = default);
+
         /// <summary>List registered OAuth applications, including client secrets. Requires enabled OAuth service provider and manage_oauth.</summary>
         /// <param name="page">Zero-based page.</param>
         /// <param name="perPage">Positive page size.</param>

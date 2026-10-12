@@ -884,6 +884,8 @@ By default, unhealthy health checks return HTTP 500 and throw `MattermostClientE
 ```csharp
 using Mattermost.Models.OAuth;
 
+OAuthServerMetadata metadata = await client.GetOAuthServerMetadataAsync();
+
 OAuthApp application = await client.CreateOAuthAppAsync(new OAuthApp
 {
     Name = "My integration",
@@ -899,7 +901,7 @@ application.Description = "Updated integration description";
 application = await client.UpdateOAuthAppAsync(application);
 ```
 
-The OAuth service provider must be enabled. Registration, management reads, updates, deletion and secret regeneration require `manage_oauth`; managing another creator's application also requires `manage_system_wide_oauth`. Trust changes require `manage_system`. `CreateOAuthAppAsync` registers a confidential client with a server-generated secret; dynamic and public-client registration are not covered by this method.
+The OAuth service provider must be enabled. `GetOAuthServerMetadataAsync` reads the public discovery endpoint without authenticating or sending saved credentials. It returns issuer and endpoint URLs, supported scopes, grants and PKCE/authentication methods. `RegistrationEndpoint` is empty when dynamic registration is disabled. Registration, management reads, updates, deletion and secret regeneration require `manage_oauth`; managing another creator's application also requires `manage_system_wide_oauth`. Trust changes require `manage_system`. `CreateOAuthAppAsync` registers a confidential client with a server-generated secret; dynamic and public-client registration are not covered by this method.
 
 `GetOAuthAppAsync`, `GetOAuthAppsAsync`, creation and regeneration responses can contain client secrets: store them securely and do not log them. `GetOAuthAppInfoAsync` needs only authentication and returns an empty secret. `GetAuthorizedOAuthAppsAsync` also omits secrets and requires `edit_other_users` when reading another account.
 
