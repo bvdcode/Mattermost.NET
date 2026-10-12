@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-12
-- Implemented specification operations: 300/608 (49.3%)
+- Implemented specification operations: 301/608 (49.5%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -36,7 +36,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Roles | 4 / 5 |
 | Shared Channels | 1 / 7 |
 | Status | 6 / 7 |
-| System | 31 / 51 |
+| System | 32 / 51 |
 | Teams | 31 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
@@ -2004,8 +2004,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## PUT /api/v4/system/notices/view - Update notices as 'viewed'
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L249) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L249) | `IMattermostClient.MarkProductNoticesViewedAsync`
+✅ Implemented
 
 # Teams
 

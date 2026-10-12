@@ -30,6 +30,12 @@ namespace Mattermost
         Task<IList<ProductNotice>> GetProductNoticesAsync(string teamId, ProductNoticeClientType client,
             string clientVersion, string? locale = null, CancellationToken cancellationToken = default);
 
+        /// <summary>Mark selected product notices viewed by the current user. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="noticeIds">Nonempty collection of nonblank notice identifiers, trimmed and copied before authentication.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not a view already recorded by the server.</param>
+        /// <remarks>Requires authentication. Updates the current user's view counts and timestamps across teams, not notice content or other users. The server deduplicates identifiers. Repeatable notices may return later according to server policy; cancellation cannot undo recorded views.</remarks>
+        Task MarkProductNoticesViewedAsync(IEnumerable<string> noticeIds, CancellationToken cancellationToken = default);
+
         /// <summary>Ask the server for a URL's first redirect location.</summary>
         /// <param name="url">Absolute HTTP or HTTPS URL. Surrounding whitespace is trimmed.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>

@@ -12,6 +12,15 @@ namespace Mattermost
     public partial class MattermostClient
     {
         /// <inheritdoc />
+        public Task MarkProductNoticesViewedAsync(IEnumerable<string> noticeIds, CancellationToken cancellationToken = default)
+        {
+            CheckDisposed();
+            List<string> ids = PrepareStringBatch(noticeIds, nameof(noticeIds));
+            cancellationToken.ThrowIfCancellationRequested();
+            return SendRequestAsync(HttpMethod.Put, Routes.System + "/notices/view", ids, cancellationToken);
+        }
+
+        /// <inheritdoc />
         public Task<IList<ProductNotice>> GetProductNoticesAsync(string teamId, ProductNoticeClientType client,
             string clientVersion, string? locale = null, CancellationToken cancellationToken = default)
         {

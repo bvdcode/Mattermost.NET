@@ -566,11 +566,17 @@ Live checks on Mattermost 12.0.0 with the feature enabled passed actual DM/GM un
 ```csharp
 IList<ProductNotice> notices = await client.GetProductNoticesAsync(teamId,
     ProductNoticeClientType.Web, "12.0.0", locale: "en", cancellationToken: cancellationToken);
+if (notices.Count > 0)
+{
+    await client.MarkProductNoticesViewedAsync(notices.Select(notice => notice.Id), cancellationToken);
+}
 ```
 
 Requires authentication and Mattermost 5.26 or later. The client platform is web, desktop, iOS or Android. Pass the calling client's version, not necessarily the server's version. The server selects notices using settings, roles, versions, notice conditions and previous views; an empty list is valid. Reading does not mark notices viewed. The optional locale is sent to the server, which determines the returned language.
 
 `ProductNotice` contains the selected message, optional button action and image, and administrator-audience flags. It is not the server's notice-source configuration. Markdown and `{{Mattermost}}` placeholders are preserved. Live checks on Mattermost 12.0.0 passed native JSON equality for all four platforms with and without a locale: a nonempty list for an ordinary bot and an empty list for an administrator. Server settings remained unchanged.
+
+`MarkProductNoticesViewedAsync` requires a nonempty list and records views only for the current user, across teams. Identifiers are trimmed and copied before authentication; the server deduplicates them. Repeatable notices may return later according to server policy. Cancellation does not undo a recorded view. A live check with a separate bot passed actual disappearance of an eligible notice in SDK and direct readback, acceptance of duplicate identifiers, and preservation of another account's notices and server settings.
 
 ## Read teams and memberships
 
