@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 265/608 (43.6%)
+- Implemented specification operations: 269/608 (44.2%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -34,7 +34,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Teams | 31 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
-| Users | 47 / 77 |
+| Usage | 3 / 3 |
+| Users | 48 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -2211,16 +2212,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Usage
 
 ## GET /api/v4/usage/posts - Get current usage of posts
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/usage.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/usage.yaml#L2) | `IMattermostClient.GetPostsUsageAsync`
+✅ Implemented
 
 ## GET /api/v4/usage/storage - Get the total file storage usage for the instance in bytes.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/usage.yaml#L28) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/usage.yaml#L28) | `IMattermostClient.GetStorageUsageAsync`
+✅ Implemented
 
 ## GET /api/v4/usage/teams - Get current usage of teams
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/usage.yaml#L54) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/usage.yaml#L54) | `IMattermostClient.GetTeamsUsageAsync`
+✅ Implemented
 
 # Users
 
@@ -2245,8 +2246,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/limits/server - Gets the server limits for the server
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/limits.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/limits.yaml#L2) | `IMattermostClient.GetServerLimitsAsync`
+✅ Implemented
 
 ## GET /api/v4/users - Get users
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L475) | `IMattermostClient.GetUsersAsync`

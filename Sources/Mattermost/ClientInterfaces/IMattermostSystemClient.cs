@@ -18,6 +18,28 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Read server-reported seat and post-history limits.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires authentication. User/guest limits and counts require both system administrator status and sysconsole_read_user_management_users; otherwise those fields are zero, while history fields remain available.</remarks>
+        Task<ServerLimits> GetServerLimitsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read the server's approximate user-post count. Requires Mattermost 7.0 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Server-rounded 64-bit count, excluding deleted posts and system messages. Not an exact post count.</returns>
+        /// <remarks>Requires authentication. The server may cache and round the count; no client-side recount is performed.</remarks>
+        Task<long> GetPostsUsageAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read approximate file-storage usage in bytes. Requires Mattermost 7.1 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Server-rounded 64-bit byte count, not an exact storage inventory.</returns>
+        /// <remarks>Requires authentication. Returns the native aggregate, without downloading or scanning files.</remarks>
+        Task<long> GetStorageUsageAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read active-team and cloud-archived-team counts.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires authentication. CloudArchived counts teams explicitly archived by cloud limits, not all deleted teams.</remarks>
+        Task<TeamsUsage> GetTeamsUsageAsync(CancellationToken cancellationToken = default);
+
         /// <summary>Patch selected server configuration fields. Requires Mattermost 5.20 or later.</summary>
         /// <param name="configuration">Native case-sensitive configuration section names mapped to JSON objects containing selected fields.</param>
         /// <param name="cancellationToken">Cancels authentication and the request; cannot undo applied settings.</param>

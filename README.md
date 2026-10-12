@@ -1048,6 +1048,21 @@ These read-only methods require Mattermost 4.1+ and permission to read the reque
 
 Live checks on Mattermost 12.0.0 passed nonempty pages, single-job retrieval, type/status filtering, paging and native field/data comparison. A team filter returned an empty matching list; nonempty team-scoped job data was not tested.
 
+## Server limits and usage
+
+```csharp
+ServerLimits limits = await client.GetServerLimitsAsync(cancellationToken);
+long posts = await client.GetPostsUsageAsync(cancellationToken);
+long bytes = await client.GetStorageUsageAsync(cancellationToken);
+TeamsUsage teams = await client.GetTeamsUsageAsync(cancellationToken);
+```
+
+These methods require authentication. `ServerLimits` and `TeamsUsage` are in `Mattermost.Models.Responses`; all counters are 64-bit. User/guest limit and count fields require both system administrator status and `sysconsole_read_user_management_users`. Other users receive zeros for those fields, not proof that the server has no users or limits. Post-history fields remain available. `LastAccessiblePostTime` is a Unix-millisecond boundary, zero when no history limit is reached.
+
+Post usage requires Mattermost 7.0+ and returns the server-rounded count of non-deleted user posts, excluding system messages. Storage usage requires Mattermost 7.1+ and returns rounded bytes. These are approximate server aggregates, not exact inventories; the library does not recount posts or scan files. Team usage returns active teams and teams specifically archived by cloud limits, not every deleted team.
+
+Live checks on Mattermost 12.0.0 passed native field/value comparisons for all four reads, exact active-team increment after creating a test team, all usage reads by an ordinary bot and native non-administrator user/guest-field masking.
+
 ## Server diagnostics
 
 ```csharp
