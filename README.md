@@ -1118,6 +1118,20 @@ Ancillary permission lookup requires Mattermost 9.10 or later and any authentica
 
 Live checks on Mattermost 12.0.0 passed a log download containing a newly recorded marker and matching the native file bytes. Permission expansion returned the actual `read_other_users_teams` dependency, retained unknown names and matched native responses for both an administrator and ordinary bot without changing role metadata. The bot's log download was rejected with HTTP 403. Rotated log files and logging-disabled failures were not tested live.
 
+## Custom brand image
+
+```csharp
+byte[] image = await File.ReadAllBytesAsync("brand.png", cancellationToken);
+await client.SetBrandImageAsync(image, "brand.png", cancellationToken);
+await client.DeleteBrandImageAsync(cancellationToken);
+```
+
+These methods manage the server-wide brand image and require `edit_brand`; they do not change a user or team avatar. Upload copies the bytes before authentication, uses the native multipart `image` field, and lets the server validate size, resolution and format. The server stores PNG and may back up a previous image. Neither method enables custom branding or changes server configuration.
+
+Deletion requires Mattermost 5.6 or later. A missing image returns HTTP 404; deletion does not restore a backup, remove backup files or disable custom branding. Canceling a request does not undo an upload or deletion already accepted by the server.
+
+Live checks on Mattermost 12.0.0 passed upload, independent anonymous PNG download with matching dimensions, ordinary-bot HTTP 403 without image mutation, deletion and repeated-delete HTTP 404. The image was absent before and after the checks and the complete server configuration remained unchanged. Replacing an existing image and backup creation were not tested live.
+
 ## Server busy flag
 
 ```csharp

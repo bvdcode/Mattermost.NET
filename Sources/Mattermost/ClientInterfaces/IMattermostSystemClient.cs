@@ -246,6 +246,18 @@ namespace Mattermost
         Task<IList<Job>> GetJobsByTypeAsync(string jobType, int page = 0, int perPage = 60, string? teamId = null,
             CancellationToken cancellationToken = default);
 
+        /// <summary>Replace the server's custom brand image. Requires edit_brand permission.</summary>
+        /// <param name="image">Nonempty image bytes, copied before authentication and buffered in memory. Native file-size, format and resolution limits apply.</param>
+        /// <param name="fileName">Multipart filename; surrounding whitespace is removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not an upload already accepted by the server.</param>
+        /// <remarks>The server converts the image to PNG and may back up an existing image. Changes the server-wide brand image, not a user or team image. Does not enable custom branding or change any server setting.</remarks>
+        Task SetBrandImageAsync(byte[] image, string fileName, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete the current custom brand image. Requires Mattermost 5.6 or later and edit_brand permission.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request, not deletion already accepted by the server.</param>
+        /// <remarks>A missing image returns HTTP 404. Does not delete native backup images, restore a previous image or disable custom branding.</remarks>
+        Task DeleteBrandImageAsync(CancellationToken cancellationToken = default);
+
         /// <summary>Read installed plugin manifests grouped by activation state. Requires Mattermost 4.4 or later.</summary>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         /// <remarks>Requires enabled plugins and sysconsole_read_plugins. Does not return current plugin configuration values.</remarks>
