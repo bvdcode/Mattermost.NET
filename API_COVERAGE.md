@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 284/608 (46.7%)
+- Implemented specification operations: 286/608 (47.0%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -34,7 +34,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Reports | 2 / 4 |
 | Roles | 4 / 5 |
 | Status | 6 / 7 |
-| System | 26 / 51 |
+| System | 28 / 51 |
 | Teams | 31 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
@@ -1806,8 +1806,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## DELETE /api/v4/server_busy - Clears the server busy (high load) flag
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1496) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1496) | `IMattermostClient.ClearServerBusyAsync`
+✅ Implemented
 
 ## DELETE /api/v4/system/e2e/ai_bridge - Reset AI bridge E2E test helper
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L406) | `—`
@@ -1970,8 +1970,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/server_busy - Set the server busy (high load) flag
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1436) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1436) | `IMattermostClient.SetServerBusyAsync`
+✅ Implemented
 
 ## POST /api/v4/site_url/test - Checks the validity of a Site URL
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L512) | `IMattermostClient.TestSiteUrlAsync`

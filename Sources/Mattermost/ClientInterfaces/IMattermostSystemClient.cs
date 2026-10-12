@@ -18,6 +18,18 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Mark the server as busy, temporarily disabling non-critical services. Requires Mattermost 5.20 or later.</summary>
+        /// <param name="seconds">Duration from 1 through 86400 seconds. Defaults to 3600; replaces the current busy expiry.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not a busy flag already set by the server.</param>
+        /// <remarks>Requires manage_system. Affects server services such as search, presence and typing notifications. The server automatically expires the flag; this method neither waits for expiry nor clears it when canceled. Use GetServerBusyAsync to read the actual state.</remarks>
+        Task SetServerBusyAsync(int seconds = MattermostApiLimits.DefaultServerBusySeconds,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Clear the server busy flag and re-enable non-critical services. Requires Mattermost 5.20 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. Clears the current server-wide flag, including one set by another administrator. An already idle server remains idle.</remarks>
+        Task ClearServerBusyAsync(CancellationToken cancellationToken = default);
+
         /// <summary>Download the current server log file as bytes.</summary>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         /// <remarks>Requires get_logs; restricted administrators are rejected. Downloads the configured current log file, not a paged query or support archive. Server-side file logging must provide an accessible file. The complete response is buffered in memory and can contain sensitive server data.</remarks>

@@ -1097,6 +1097,20 @@ Ancillary permission lookup requires Mattermost 9.10 or later and any authentica
 
 Live checks on Mattermost 12.0.0 passed a log download containing a newly recorded marker and matching the native file bytes. Permission expansion returned the actual `read_other_users_teams` dependency, retained unknown names and matched native responses for both an administrator and ordinary bot without changing role metadata. The bot's log download was rejected with HTTP 403. Rotated log files and logging-disabled failures were not tested live.
 
+## Server busy flag
+
+```csharp
+await client.SetServerBusyAsync(seconds: 60, cancellationToken: cancellationToken);
+ServerBusyState state = await client.GetServerBusyAsync(cancellationToken);
+await client.ClearServerBusyAsync(cancellationToken);
+```
+
+`ServerBusyState` is in `Mattermost.Models.Responses`. Setting and clearing the busy flag require `manage_system` and Mattermost 5.20 or later. Busy mode temporarily disables non-critical server services such as search, presence and typing notifications; it does not restart the server. The duration is 1–86400 seconds, defaulting to 3600. Setting the flag replaces its current expiry; clearing removes the current flag even if another administrator set it. `ExpiresAt` is Unix seconds, not milliseconds.
+
+The server expires the flag automatically. These methods do not poll, wait for expiry or perform automatic clearing; canceling a request does not undo a flag already accepted by the server. Callers should coordinate server-wide maintenance before replacing or clearing an existing flag.
+
+Live checks on Mattermost 12.0.0 passed busy activation with a future expiry, independent native metadata comparison, explicit and repeated clearing, native one-second automatic expiry and ordinary-bot permission rejection for both writes. The test server was idle before and after the checks. Effects on each non-critical service and cluster propagation were not inspected.
+
 ## Server maintenance
 
 ```csharp

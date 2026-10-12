@@ -58,5 +58,11 @@
 
         /// <summary>Maximum number of posts on either side of the unread boundary.</summary>
         public const int MaxPostsAroundUnread = 200;
+
+        /// <summary>Default server busy duration in seconds.</summary>
+        public const int DefaultServerBusySeconds = 3600;
+
+        /// <summary>Maximum server busy duration in seconds.</summary>
+        public const int MaxServerBusySeconds = 86400;
     }
 }
