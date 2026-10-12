@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 243/608 (40.0%)
+- Implemented specification operations: 245/608 (40.3%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -20,7 +20,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Channels | 47 / 61 |
 | Commands | 10 / 10 |
 | Emoji | 9 / 9 |
-| Files | 9 / 12 |
+| Files | 10 / 12 |
 | Integration Actions | 1 / 4 |
 | Jobs | 3 / 7 |
 | OAuth | 9 / 10 |
@@ -31,7 +31,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Roles | 4 / 5 |
 | Status | 6 / 7 |
 | System | 10 / 51 |
-| Teams | 29 / 38 |
+| Teams | 30 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
 | Users | 44 / 77 |
@@ -911,8 +911,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/files/search - Search files across the teams of the current user
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L521) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L521) | `IMattermostClient.SearchFilesAsync`
+✅ Implemented
 
 # Groups
 
@@ -2087,8 +2087,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/files/search - Search files in a team
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L445) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/files.yaml#L445) | `IMattermostClient.SearchTeamFilesAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/image - Sets the team icon
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1100) | `IMattermostClient.SetTeamImageAsync`

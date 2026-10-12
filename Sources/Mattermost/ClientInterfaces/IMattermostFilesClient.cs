@@ -1,4 +1,5 @@
 using Mattermost.Models;
+using Mattermost.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,33 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostFilesClient
     {
+        /// <summary>Search files in one team. Requires Mattermost 5.34 or later, enabled file search and view_team permission.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="terms">Nonblank native search expression, including in:channel, from:username or ext:extension filters.</param>
+        /// <param name="isOrSearch">Use OR rather than AND for search terms.</param>
+        /// <param name="page">Zero-based page; only supported by search backends that implement pagination.</param>
+        /// <param name="perPage">Positive page size; only supported by search backends that implement pagination.</param>
+        /// <param name="timeZoneOffset">Offset from UTC in seconds for date filters.</param>
+        /// <param name="includeDeletedChannels">Include files in archived channels when permitted.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Ordered, permission-filtered file metadata. Content matching requires enabled content extraction.</returns>
+        Task<FileSearchResponse> SearchTeamFilesAsync(string teamId, string terms, bool isOrSearch = false,
+            int page = 0, int perPage = 60, int timeZoneOffset = 0, bool includeDeletedChannels = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Search files across the current user's teams. Requires Mattermost 10.2 or later and enabled file search.</summary>
+        /// <param name="terms">Nonblank native search expression. Use SearchTeamFilesAsync to resolve ordinary channel names.</param>
+        /// <param name="isOrSearch">Use OR rather than AND for search terms.</param>
+        /// <param name="page">Zero-based page; only supported by search backends that implement pagination.</param>
+        /// <param name="perPage">Positive page size; only supported by search backends that implement pagination.</param>
+        /// <param name="timeZoneOffset">Offset from UTC in seconds for date filters.</param>
+        /// <param name="includeDeletedChannels">Include files in archived channels when permitted.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Ordered, permission-filtered file metadata. Content matching requires enabled content extraction.</returns>
+        Task<FileSearchResponse> SearchFilesAsync(string terms, bool isOrSearch = false,
+            int page = 0, int perPage = 60, int timeZoneOffset = 0, bool includeDeletedChannels = false,
+            CancellationToken cancellationToken = default);
+
         /// <summary>Download a file's preview image.</summary>
         /// <param name="fileId">File identifier.</param>
         /// <param name="cancellationToken">Cancels authentication and the download.</param>

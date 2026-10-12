@@ -1023,6 +1023,22 @@ FileDetails? completed = await client.UploadDataAsync(upload.Id, data, cancellat
 
 To resume, call `GetUploadAsync` and send bytes starting at its `FileOffset`. Read this offset again after an interrupted request rather than assuming how many bytes reached the server. The server removes the session on completion, so keep the returned file details. Uploading does not create a post; pass the completed file's ID to `CreatePostAsync`. The input chunk is copied before authentication and is not modified by the client.
 
+## File search
+
+```csharp
+using Mattermost.Models.Responses;
+
+FileSearchResponse teamFiles = await client.SearchTeamFilesAsync(teamId, "report in:documents ext:pdf",
+    cancellationToken: cancellationToken);
+FileSearchResponse allFiles = await client.SearchFilesAsync("report ext:pdf", cancellationToken: cancellationToken);
+```
+
+File search must be enabled. Team search requires Mattermost 5.34 or later and `view_team`; global search requires 10.2 or later. Results are filtered by the current account's access. Use `Order` to display files and `FileInfos` to look up their existing `FileDetails` metadata.
+
+Both methods support AND/OR terms, archived channels, zero-based pages, positive page sizes and a UTC offset in seconds for date filters. Pagination depends on the search backend; file-content matching requires enabled content extraction. Use team search when filtering an ordinary channel by name. On the test server, unqualified `in:channel` in global search returned the same empty result through the client and a direct request.
+
+Live verification passed for nonempty team/global searches, native order/map/cursors, independent file metadata readback, channel and extension filters, unmatched searches and AND/OR behavior. Optional pagination and search settings matched the native backend response.
+
 ## Post search and saved posts
 
 ```csharp
