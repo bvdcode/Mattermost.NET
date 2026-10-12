@@ -216,6 +216,7 @@ const string token = "your-personal-access-token-or-bot-token";
 
 var handler = new HttpClientHandler
 {
+    UseCookies = false,
     Proxy = new WebProxy("http://corp-proxy:8080")
 };
 
@@ -233,6 +234,8 @@ Console.WriteLine($"Authenticated as @{me.Username}");
 When an external `HttpClient` is provided, Mattermost.NET uses it only as transport and does not dispose it. The Mattermost server URL still comes from `server` / `serverUri`; `HttpClient.BaseAddress` is not used as the Mattermost server identity.
 
 Mattermost.NET sends authentication per request and does not mutate `HttpClient.DefaultRequestHeaders.Authorization`. Any default headers configured by the caller remain owned by the caller.
+
+The built-in transport disables cookies and uses Bearer tokens for both API-token authentication and username/password sessions. For an external `HttpClient`, set `HttpClientHandler.UseCookies = false` unless you deliberately manage cookie authentication and CSRF yourself. Mattermost gives an authentication cookie priority over a Bearer header, so a stored cookie can cause write requests to fail or authenticate as a different session. The library does not change a supplied handler's settings or cookie container.
 
 Available constructors:
 

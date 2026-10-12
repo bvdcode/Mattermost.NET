@@ -197,7 +197,7 @@ namespace Mattermost
 
             if (initialization.HttpClient == null)
             {
-                _http = new HttpClient
+                _http = new HttpClient(new HttpClientHandler { UseCookies = false })
                 {
                     Timeout = TimeSpan.FromSeconds(DefaultHttpClientTimeoutSeconds)
                 };
