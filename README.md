@@ -1063,6 +1063,40 @@ Analytics requires Mattermost 4.0+. `AnalyticsReport` in `Mattermost.Enums` sele
 
 Busy-state reads require Mattermost 5.20+ and return `ServerBusyState` in `Mattermost.Models.Responses`. `ExpiresAt` is Unix seconds, not milliseconds, and may be negative while idle; `ExpiresTimestamp` preserves the server's readable timestamp. This method does not set or clear the busy flag.
 
+## Test server connections and query structured logs
+
+```csharp
+await client.TestSiteUrlAsync("https://mattermost.example", cancellationToken);
+await client.TestFileStoreConnectionAsync(cancellationToken);
+string loggedMessage = await client.AddClientLogAsync("Integration error", error: true,
+    cancellationToken: cancellationToken);
+IDictionary<string, IList<JsonElement>> entries = await client.QueryServerLogsAsync(logsPerPage: 100,
+    logLevels: new[] { "error" }, from: DateTimeOffset.UtcNow.AddHours(-1),
+    cancellationToken: cancellationToken);
+```
+
+Site URL testing requires Mattermost 5.16+, `test_site_url` and a non-restricted administrator. It asks the server to ping the supplied absolute HTTP/HTTPS address without changing the configured URL. File-store testing requires Mattermost 11.10+ and `test_s3`; it tests the current local, S3 or Azure backend with temporary storage operations without saving configuration.
+
+`AddClientLogAsync` submits DEBUG by default or ERROR with `error: true`. It preserves input whitespace and returns the server's prefixed message. The server may truncate long input and downgrade ordinary users' ERROR requests to DEBUG when developer mode is disabled. The active log sink and configured levels determine whether a message is stored; a successful response alone does not prove persistence. This method uses an authenticated session.
+
+`QueryServerLogsAsync` requires `get_logs` and a non-restricted administrator. Results are grouped by native node name and retain each producer's JSON fields. Null or empty node/level lists impose no filter. Level strings are case-sensitive; JSON logs commonly use `"error"`, unlike the uppercase level requested when adding a client log. Dates retain their offsets and use the server's millisecond/offset layout; null bounds are unbounded. Paging is zero-based with 1–10,000 entries per node. Handle returned logs as sensitive data.
+
+Live checks on Mattermost 12.0.0 passed both connection tests, client-message prefix/whitespace and server truncation, actual error-log readback through the structured query, level/node/date filters, empty matches, paging and administrative permission errors. An ordinary authenticated bot could submit a client log but not query server logs.
+
+## Patch server configuration
+
+```csharp
+IDictionary<string, JsonElement> config = await client.PatchServerConfigAsync(
+    new Dictionary<string, JsonElement>
+    {
+        ["TeamSettings"] = JsonSerializer.SerializeToElement(new { SiteName = "Support" })
+    }, cancellationToken);
+```
+
+Requires Mattermost 5.20+ and a system console write permission. Supply native case-sensitive section names with JSON objects containing only the fields to change. The method copies input sections before authentication. Omitted configuration fields remain unchanged; environment overrides, server validation and security restrictions still apply. Plugin maps are not recursively field-patched. The returned configuration is permission-filtered and masks sensitive values. Cancellation cannot undo settings already applied.
+
+Live checks on Mattermost 12.0.0 passed changing and independently reading back one field, preserving every other section and team setting, restoring the original value and rejecting a non-administrator.
+
 ## Server configuration and release metadata
 
 ```csharp

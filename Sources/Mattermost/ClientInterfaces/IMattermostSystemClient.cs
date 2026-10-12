@@ -5,6 +5,7 @@ using Mattermost.Models.Plugins;
 using Mattermost.Models.Responses;
 using Mattermost.Models.Roles;
 using Mattermost.Models.Users;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
@@ -17,6 +18,47 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Patch selected server configuration fields. Requires Mattermost 5.20 or later.</summary>
+        /// <param name="configuration">Native case-sensitive configuration section names mapped to JSON objects containing selected fields.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; cannot undo applied settings.</param>
+        /// <returns>Updated permission-filtered configuration, with sensitive values masked by the server.</returns>
+        /// <remarks>Requires a system console write permission. Omitted fields are preserved; environment overrides and security restrictions still apply. Plugin maps are not recursively field-patched. Input JSON sections are copied before authentication.</remarks>
+        Task<IDictionary<string, JsonElement>> PatchServerConfigAsync(IDictionary<string, JsonElement> configuration,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Ask the server to test a Site URL with a Mattermost ping request. Requires Mattermost 5.16 or later.</summary>
+        /// <param name="siteUrl">Absolute HTTP or HTTPS URL; surrounding whitespace is removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires test_site_url and disallows restricted administrators. Does not change the configured Site URL.</remarks>
+        Task TestSiteUrlAsync(string siteUrl, CancellationToken cancellationToken = default);
+
+        /// <summary>Test connectivity and read/write access to the server's current file storage backend. Requires Mattermost 11.10 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires test_s3. Supports local, S3 and Azure storage on supporting servers. Uses current configuration and performs temporary storage operations without saving settings.</remarks>
+        Task TestFileStoreConnectionAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Submit a client message to the server log using an authenticated session.</summary>
+        /// <param name="message">Message sent unchanged; the server may truncate it and adds a client-log prefix.</param>
+        /// <param name="error">Request ERROR instead of DEBUG. Without manage_system, the server downgrades to DEBUG unless developer mode is enabled.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The prefixed message returned by the server, not proof that the active log sink recorded it.</returns>
+        Task<string> AddClientLogAsync(string message, bool error = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Query structured server logs grouped by node identifier.</summary>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="logsPerPage">Between one and MaxServerLogsPerPage entries per node.</param>
+        /// <param name="serverNames">Optional native server-name filters; null or empty selects all nodes.</param>
+        /// <param name="logLevels">Optional native case-sensitive level strings, such as "error"; null or empty selects all levels.</param>
+        /// <param name="from">Optional inclusive lower date bound with an explicit offset.</param>
+        /// <param name="to">Optional inclusive upper date bound with an explicit offset.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Native JSON log objects; individual fields depend on the log producer. Empty results contain no nodes.</returns>
+        /// <remarks>Requires get_logs and disallows restricted administrators. Dates use the native millisecond/offset layout. Server logging must be configured for entries to be available; logs can contain sensitive data.</remarks>
+        Task<IDictionary<string, IList<JsonElement>>> QueryServerLogsAsync(int page = 0,
+            int logsPerPage = MattermostApiLimits.MaxServerLogsPerPage, IEnumerable<string>? serverNames = null,
+            IEnumerable<string>? logLevels = null, DateTimeOffset? from = null, DateTimeOffset? to = null,
+            CancellationToken cancellationToken = default);
+
         /// <summary>Read the server configuration visible to the current account.</summary>
         /// <param name="removeMasked">Omit masked values. Requires Mattermost 10.4 or later.</param>
         /// <param name="removeDefaults">Omit default values. Requires Mattermost 10.4 or later.</param>

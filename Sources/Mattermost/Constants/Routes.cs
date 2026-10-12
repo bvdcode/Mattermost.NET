@@ -30,6 +30,8 @@
         internal const string ServerAnalytics = version + "/analytics/old";
         internal const string ServerBusy = version + "/server_busy";
         internal const string Config = version + "/config";
+        internal const string SiteUrlTest = version + "/site_url/test";
+        internal const string FileStoreTest = version + "/file/test";
         internal const string LatestVersion = version + "/latest_version";
         internal const string ClientConfig = version + "/config/client";
         internal const string License = version + "/license";
