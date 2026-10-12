@@ -19,6 +19,11 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Send a notification test message from the system bot to the current user.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request, not a message already created by the server.</param>
+        /// <remarks>Requires authentication. Creates a direct channel with the system bot if needed and posts a message with native forced-notification behavior. Successful completion does not confirm delivery of email or push notifications to a device. Does not change notification settings or test another user's account.</remarks>
+        Task SendTestNotificationAsync(CancellationToken cancellationToken = default);
+
         /// <summary>Get product notices selected for the current user in a team. Requires Mattermost 5.26 or later.</summary>
         /// <param name="teamId">Team identifier; surrounding whitespace is trimmed.</param>
         /// <param name="client">Web, desktop, iOS or Android client platform.</param>

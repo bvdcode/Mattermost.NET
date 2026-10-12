@@ -561,6 +561,16 @@ The response uses the existing `ChannelViewResponse`: status and channel IDs map
 
 Live checks on Mattermost 12.0.0 with the feature enabled passed actual DM/GM unread clearing, team channel and followed-thread unread clearing, exact native membership view times and preservation of other scopes. Both methods returned HTTP 403 for an ordinary bot attempting another user's read state. Server configuration remained unchanged. Disabled-feature responses and push notification delivery were not tested live.
 
+## Test notification delivery
+
+```csharp
+await client.SendTestNotificationAsync(cancellationToken);
+```
+
+Requires authentication. Mattermost creates a direct channel with its system bot if needed and posts a notification test message to the current user. The request has no body and does not change notification settings. Cancellation cannot undo a message already created. Successful completion confirms the server operation, not email or push delivery to a device.
+
+On Mattermost 12.0.0, a live check with a separate bot passed creation of exactly one direct message from `system-bot`, independent native post readback, and unchanged user notification preferences and server settings. Email and push delivery were not tested.
+
 ## Product notices
 
 ```csharp

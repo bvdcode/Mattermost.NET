@@ -38,6 +38,7 @@
         internal const string Database = version + "/database";
         internal const string SiteUrlTest = version + "/site_url/test";
         internal const string FileStoreTest = version + "/file/test";
+        internal const string NotificationTest = version + "/notifications/test";
         internal const string Usage = version + "/usage";
         internal const string UserReports = version + "/reports/users";
         internal const string EnterpriseUpgrade = version + "/upgrade_to_enterprise";
