@@ -1083,6 +1083,18 @@ Pagination uses a user ID and the exact value of the selected sort column, not p
 
 Live checks on Mattermost 12.0.0 passed list/count comparisons against a two-user fixture, both cursor directions with ascending/descending order and empty final pages, all seven sort columns, all four native statistics periods, positive team/role/activity filters, no-team precedence, bot exclusion and permission rejection. Guest-only filters excluded known non-guests and matched native responses; a nonempty guest cohort was not tested.
 
+## Import archives
+
+```csharp
+IList<string> imports = await client.GetImportsAsync(cancellationToken);
+// Delete only the archive selected by the application:
+await client.DeleteImportAsync(importName, cancellationToken);
+```
+
+These methods require Mattermost 5.31+. Listing requires a system administrator; deletion requires `manage_system`. The list contains filenames from the server's import directory, excluding unfinished uploads. Pass the exact returned name to deletion: names are not trimmed, paths and control characters are rejected, and the native delete route accepts only lowercase `.zip` names. An absent archive can be deleted repeatedly without error. Neither method starts import processing or removes already-imported users/posts.
+
+Live checks on Mattermost 12.0.0 passed nonempty native-equal listing, deletion/readback using a filename with spaces and Unicode, repeated absent deletion and permission rejection for both methods. A separate test archive remained available afterward; no import-processing job was created.
+
 ## Enterprise upgrade reads
 
 ```csharp

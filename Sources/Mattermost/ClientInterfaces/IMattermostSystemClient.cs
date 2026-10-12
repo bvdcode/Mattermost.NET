@@ -18,6 +18,17 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>List completed files in the server's import directory. Requires Mattermost 5.31 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires a system administrator. Returns filenames without paths; unfinished upload files are excluded. Listing does not process an import.</remarks>
+        Task<IList<string>> GetImportsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Delete an import archive. Requires Mattermost 5.31 or later.</summary>
+        /// <param name="importName">Exact filename from GetImportsAsync, ending in lowercase .zip. Paths and control characters are rejected; the name is not trimmed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. The native delete route accepts only .zip names. Deleting an absent archive succeeds; this operation removes a file, not an import-processing job or imported data.</remarks>
+        Task DeleteImportAsync(string importName, CancellationToken cancellationToken = default);
+
         /// <summary>Check whether the server supports an in-place upgrade to Enterprise Edition.</summary>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         /// <remarks>Requires manage_system. Completes when eligible; permission and platform failures remain native HTTP errors, not a false result. This read does not start an upgrade, download binaries or restart the server.</remarks>

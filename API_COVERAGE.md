@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 274/608 (45.1%)
+- Implemented specification operations: 276/608 (45.4%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -21,6 +21,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Commands | 10 / 10 |
 | Emoji | 9 / 9 |
 | Files | 10 / 12 |
+| Imports | 2 / 2 |
 | Integration Actions | 1 / 4 |
 | Jobs | 3 / 7 |
 | OAuth | 9 / 10 |
@@ -1039,12 +1040,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Imports
 
 ## DELETE /api/v4/imports/{import_name} - Delete an import file
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/imports.yaml#L26) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/imports.yaml#L26) | `IMattermostClient.DeleteImportAsync`
+✅ Implemented
 
 ## GET /api/v4/imports - List import files
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/imports.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/imports.yaml#L2) | `IMattermostClient.GetImportsAsync`
+✅ Implemented
 
 # Integration Actions
 
