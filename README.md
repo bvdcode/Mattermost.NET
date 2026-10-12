@@ -973,6 +973,15 @@ The OAuth service provider must be enabled. `GetOAuthServerMetadataAsync` reads 
 
 Live verification passed for confidential registration, nonempty paged reads, full updates with server-owned fields preserved, secret regeneration and readback, information-only reads by a non-administrator, authorized-app metadata after consent by a dedicated account, and deletion of a separate application with subsequent HTTP 404.
 
+## Mark the Plugin Marketplace visited
+
+```csharp
+await client.MarkMarketplaceVisitedByAdminAsync(cancellationToken);
+bool visited = await client.GetMarketplaceVisitedByAdminAsync(cancellationToken);
+```
+
+Requires Mattermost 5.33+ and `manage_system`. Marking sets the server-wide first-administrator visit flag to true and broadcasts the change. It does not install plugins and cannot clear the flag. Repeated marking, independent native flag readback and non-administrator HTTP 403 passed live checks on Mattermost 12.0.0.
+
 ## Plugin metadata
 
 ```csharp

@@ -129,6 +129,11 @@ namespace Mattermost
         /// <remarks>Requires manage_system. Does not mark the Marketplace as visited.</remarks>
         Task<bool> GetMarketplaceVisitedByAdminAsync(CancellationToken cancellationToken = default);
 
+        /// <summary>Record that a system administrator has visited the Plugin Marketplace. Requires Mattermost 5.33 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. Sets the server-wide visit flag to true and broadcasts its update; it does not install plugins or clear the flag.</remarks>
+        Task MarkMarketplaceVisitedByAdminAsync(CancellationToken cancellationToken = default);
+
         /// <summary>Get all roles. Requires Mattermost 5.33 or later and manage_system permission.</summary>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         Task<IList<Role>> GetRolesAsync(CancellationToken cancellationToken = default);
