@@ -94,6 +94,22 @@ namespace Mattermost
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         Task<Bot> AssignBotAsync(string botUserId, string userId, CancellationToken cancellationToken = default);
 
+        /// <summary>Convert a normal account into a bot. Requires Mattermost 5.26 or later and manage_system permission.</summary>
+        /// <param name="userId">Account identifier. The server clears external authentication credentials and revokes all account sessions.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; conversion may already have completed.</param>
+        /// <returns>Bot metadata for the same account identifier. The converted account becomes its own bot owner.</returns>
+        Task<Bot> ConvertUserToBotAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>Convert a bot into a normal account with a password. Requires Mattermost 5.26 or later and manage_system permission.</summary>
+        /// <param name="botUserId">Bot account identifier, retained by the converted account.</param>
+        /// <param name="password">New account password, preserved exactly and validated against the server password policy.</param>
+        /// <param name="email">Optional replacement email. Null preserves the existing email.</param>
+        /// <param name="setSystemAdmin">Ask the server to grant the system administrator role. False does not remove an existing administrator role.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; conversion may already have completed.</param>
+        /// <returns>The updated account profile. Use PatchUserAsync for other profile settings.</returns>
+        Task<User> ConvertBotToUserAsync(string botUserId, string password, string? email = null,
+            bool setSystemAdmin = false, CancellationToken cancellationToken = default);
+
         /// <summary>Create a personal access token. Requires Mattermost 4.1 or later.</summary>
         /// <param name="userId">User identifier or "me".</param>
         /// <param name="description">Nonblank description of the intended use.</param>

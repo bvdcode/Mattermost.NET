@@ -389,6 +389,18 @@ Reading owned bots requires `read_bots`; reading others' bots also requires `rea
 
 `PatchBotAsync` changes only supplied fields: null leaves a field unchanged, while an empty display name or description clears it. At least one field is required; usernames cannot be blank. Management methods require permission to manage the bot. Disabling preserves the account but prevents its credentials from authenticating; protected system bots may reject this operation. Assignment changes ownership to a non-bot user.
 
+On Mattermost 5.26 or later, administrators with `manage_system` can convert accounts in either direction:
+
+```csharp
+Bot convertedBot = await client.ConvertUserToBotAsync(userId, cancellationToken);
+User account = await client.ConvertBotToUserAsync(convertedBot.UserId, newPassword,
+    email: "account@example.com", cancellationToken: cancellationToken);
+```
+
+Both methods retain the account identifier. User-to-bot conversion makes the account its own bot owner, clears external authentication credentials and revokes its sessions. Bot-to-user conversion sets the supplied password and removes bot metadata. Null `email` preserves the existing address. `setSystemAdmin: true` requests administrator privileges; the default does not demote an existing administrator. Use `PatchUserAsync` for other profile fields.
+
+Live verification passed for both conversions on a dedicated account: preserved identifiers and profile fields, revoked pre-conversion session, login with the new password, replaced and omitted email, administrator-role readback and permission denial for a non-administrator. The account was retained without administrator privileges.
+
 ## Personal access tokens
 
 ```csharp
