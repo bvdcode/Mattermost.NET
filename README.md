@@ -636,6 +636,15 @@ team = await client.RestoreTeamAsync(teamId, cancellationToken);
 
 Batch member addition accepts at most 256 actual user IDs, not `me`. Match returned memberships by `UserId`; an error does not guarantee rollback of users already added. This method uses the normal fail-on-error endpoint mode. `RegenerateTeamInviteIdAsync` returns the updated team and invalidates its previous invite ID. `GetTeamInviteInfoAsync` requires an open team and returns only `Id`, `Name`, `DisplayName` and `Description`, without authentication; it does not return complete metadata for an update. HTTP errors are propagated.
 
+```csharp
+TeamMember membership = await client.JoinTeamFromInviteAsync(inviteId: inviteId, cancellationToken: cancellationToken);
+// For an email invitation, pass token instead of inviteId.
+```
+
+`JoinTeamFromInviteAsync` joins as the authenticated user and requires exactly one argument: a reusable team invitation ID or an email invitation token. Both are trimmed and query-escaped; the request has no JSON body. Guests cannot use reusable invitation IDs. The server validates invitation expiry, team restrictions and membership eligibility. Treat invitation tokens as secrets.
+
+Live checks on Mattermost 12.0.0 passed reusable invitation acceptance by a previously non-member account, independent membership/team-list readback and the invalid-invitation error. Email-token request construction is covered by tests; accepting an actual email invitation was not live-tested.
+
 ## Update channel membership settings and read state
 
 ```csharp

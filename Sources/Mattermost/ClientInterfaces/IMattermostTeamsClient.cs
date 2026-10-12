@@ -50,6 +50,15 @@ namespace Mattermost
         /// <remarks>Adding another user requires add_user_to_team permission. Joining as the current user requires an open team or appropriate membership permission.</remarks>
         Task<TeamMember> AddTeamMemberAsync(string teamId, string userId, CancellationToken cancellationToken = default);
 
+        /// <summary>Join a team as the current user using an invitation.</summary>
+        /// <param name="inviteId">Reusable team invitation identifier; mutually exclusive with token.</param>
+        /// <param name="token">Email invitation token; mutually exclusive with inviteId.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The current user's team membership.</returns>
+        /// <remarks>Exactly one invitation argument is required. Guests cannot use reusable invitation identifiers. The server validates invitations, team restrictions and membership eligibility.</remarks>
+        Task<TeamMember> JoinTeamFromInviteAsync(string? inviteId = null, string? token = null,
+            CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get team by specified identifier.
         /// </summary>
