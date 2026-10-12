@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 276/608 (45.4%)
+- Implemented specification operations: 279/608 (45.9%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -23,7 +23,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Files | 10 / 12 |
 | Imports | 2 / 2 |
 | Integration Actions | 1 / 4 |
-| Jobs | 3 / 7 |
+| Jobs | 6 / 7 |
 | OAuth | 9 / 10 |
 | Plugins | 5 / 13 |
 | Posts | 20 / 28 |
@@ -1098,16 +1098,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## PATCH /api/v4/jobs/{job_id}/status - Update the status of a job
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L288) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L288) | `IMattermostClient.UpdateJobStatusAsync`
+✅ Implemented
 
 ## POST /api/v4/jobs - Create a new job.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L66) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L66) | `IMattermostClient.CreateJobAsync`
+✅ Implemented
 
 ## POST /api/v4/jobs/{job_id}/cancel - Cancel a job.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L183) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/jobs.yaml#L183) | `IMattermostClient.CancelJobAsync`
+✅ Implemented
 
 # LDAP
 

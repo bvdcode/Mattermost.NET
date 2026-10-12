@@ -18,6 +18,27 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Create a server background job. Requires Mattermost 4.1 or later.</summary>
+        /// <param name="jobType">Native job type. The server validates support, permissions and worker availability.</param>
+        /// <param name="data">Optional job-specific string map, copied before authentication. Keys and values are preserved; values cannot be null.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not a job that has already been created.</param>
+        /// <remarks>Creation permission depends on the job type. Sends only type and data; the server assigns identity, time and status. Jobs can change server data as soon as a worker claims them. This method does not wait for completion.</remarks>
+        Task<Job> CreateJobAsync(string jobType, IDictionary<string, string>? data = null, CancellationToken cancellationToken = default);
+
+        /// <summary>Request cancellation of a background job. Requires Mattermost 4.1 or later.</summary>
+        /// <param name="jobId">Job identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires permission to create the job's type. Pending jobs become canceled immediately; running jobs receive a cancellation request. The server rejects already terminal jobs. Does not wait for worker shutdown or undo completed work.</remarks>
+        Task CancelJobAsync(string jobId, CancellationToken cancellationToken = default);
+
+        /// <summary>Update a background job's management status.</summary>
+        /// <param name="jobId">Job identifier.</param>
+        /// <param name="status">Pending, CancelRequested or Canceled; other statuses are not writable through this endpoint.</param>
+        /// <param name="force">Bypass native transition checks, not permission checks. Can requeue or cancel jobs unexpectedly.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires permission to manage the job's type. Native transitions are checked by default. CancelRequested cancels a pending job immediately rather than persisting that intermediate status. Does not wait for workers or undo completed work.</remarks>
+        Task UpdateJobStatusAsync(string jobId, JobStatusUpdate status, bool force = false, CancellationToken cancellationToken = default);
+
         /// <summary>List completed files in the server's import directory. Requires Mattermost 5.31 or later.</summary>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         /// <remarks>Requires a system administrator. Returns filenames without paths; unfinished upload files are excluded. Listing does not process an import.</remarks>

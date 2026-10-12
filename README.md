@@ -1083,6 +1083,19 @@ Pagination uses a user ID and the exact value of the selected sort column, not p
 
 Live checks on Mattermost 12.0.0 passed list/count comparisons against a two-user fixture, both cursor directions with ascending/descending order and empty final pages, all seven sort columns, all four native statistics periods, positive team/role/activity filters, no-team precedence, bot exclusion and permission rejection. Guest-only filters excluded known non-guests and matched native responses; a nonempty guest cohort was not tested.
 
+## Job management
+
+```csharp
+Job job = await client.CreateJobAsync(jobType, jobData, cancellationToken);
+await client.CancelJobAsync(job.Id, cancellationToken);
+```
+
+`Job` is in `Mattermost.Models.Jobs`; `JobStatusUpdate` is in `Mattermost.Enums`. Job types and data keys are defined by the server and its installed workers. Creation sends only the type and an optional string map; the server assigns identity, timestamps and initial status. Map keys/values are preserved and copied before authentication. A created job can begin changing server data immediately; request cancellation does not undo an already-created job or its completed work. Creation/cancellation require permission to create that job type; status updates require permission to manage it.
+
+Cancellation turns a pending job directly into `canceled`; running jobs receive a cancellation request. A terminal job cannot be canceled again. Alternatively, use `UpdateJobStatusAsync(job.Id, JobStatusUpdate.CancelRequested)` to request cancellation through the status endpoint. Status updates support only `Pending`, `CancelRequested` and `Canceled`. The server checks transitions by default; explicit `force: true` bypasses those checks, not permissions, and can unexpectedly requeue or cancel work. `CancelRequested` also cancels a pending job immediately. These methods do not wait for completion or worker shutdown; use `GetJobAsync` to read the actual state.
+
+Live checks on Mattermost 12.0.0 passed creation with exact string-map preservation and native metadata, pending cancellation, status-update cancellation, rejection of an unforced invalid transition, explicit forced pending/canceled updates and permission rejection for all three methods, including forced status updates. Separate `active_users` jobs were used with their metrics worker disabled; both remained canceled. Running-worker cancellation and execution of other job types were not tested.
+
 ## Import archives
 
 ```csharp
