@@ -561,6 +561,17 @@ The response uses the existing `ChannelViewResponse`: status and channel IDs map
 
 Live checks on Mattermost 12.0.0 with the feature enabled passed actual DM/GM unread clearing, team channel and followed-thread unread clearing, exact native membership view times and preservation of other scopes. Both methods returned HTTP 403 for an ordinary bot attempting another user's read state. Server configuration remained unchanged. Disabled-feature responses and push notification delivery were not tested live.
 
+## Product notices
+
+```csharp
+IList<ProductNotice> notices = await client.GetProductNoticesAsync(teamId,
+    ProductNoticeClientType.Web, "12.0.0", locale: "en", cancellationToken: cancellationToken);
+```
+
+Requires authentication and Mattermost 5.26 or later. The client platform is web, desktop, iOS or Android. Pass the calling client's version, not necessarily the server's version. The server selects notices using settings, roles, versions, notice conditions and previous views; an empty list is valid. Reading does not mark notices viewed. The optional locale is sent to the server, which determines the returned language.
+
+`ProductNotice` contains the selected message, optional button action and image, and administrator-audience flags. It is not the server's notice-source configuration. Markdown and `{{Mattermost}}` placeholders are preserved. Live checks on Mattermost 12.0.0 passed native JSON equality for all four platforms with and without a locale: a nonempty list for an ordinary bot and an empty list for an administrator. Server settings remained unchanged.
+
 ## Read teams and memberships
 
 ```csharp

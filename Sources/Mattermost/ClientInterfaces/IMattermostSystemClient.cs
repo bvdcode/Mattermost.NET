@@ -1,6 +1,7 @@
 using Mattermost.Constants;
 using Mattermost.Enums;
 using Mattermost.Models.Jobs;
+using Mattermost.Models.Notices;
 using Mattermost.Models.Plugins;
 using Mattermost.Models.Responses;
 using Mattermost.Models.Roles;
@@ -18,6 +19,17 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Get product notices selected for the current user in a team. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="teamId">Team identifier; surrounding whitespace is trimmed.</param>
+        /// <param name="client">Web, desktop, iOS or Android client platform.</param>
+        /// <param name="clientVersion">Nonblank client version, trimmed and passed to native notice filtering.</param>
+        /// <param name="locale">Optional client locale. Null or blank omits the query parameter; the server determines the returned language.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The server-selected list, which can be empty when no notice applies or notices are disabled.</returns>
+        /// <remarks>Requires authentication. Server settings, user roles, client and server versions, notice conditions and previous views determine eligibility. Does not mark notices viewed or change server settings.</remarks>
+        Task<IList<ProductNotice>> GetProductNoticesAsync(string teamId, ProductNoticeClientType client,
+            string clientVersion, string? locale = null, CancellationToken cancellationToken = default);
+
         /// <summary>Ask the server for a URL's first redirect location.</summary>
         /// <param name="url">Absolute HTTP or HTTPS URL. Surrounding whitespace is trimmed.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
