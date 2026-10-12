@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 253/608 (41.6%)
+- Implemented specification operations: 254/608 (41.8%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -25,7 +25,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Jobs | 3 / 7 |
 | OAuth | 9 / 10 |
 | Plugins | 5 / 13 |
-| Posts | 19 / 28 |
+| Posts | 20 / 28 |
 | Preferences | 5 / 5 |
 | Reactions | 3 / 3 |
 | Roles | 4 / 5 |
@@ -1371,8 +1371,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/posts/ephemeral - Create a ephemeral post
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L91) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L91) | `IMattermostClient.CreateEphemeralPostAsync`
+✅ Implemented
 
 ## POST /api/v4/posts/ids - Get posts by a list of ids
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/posts.yaml#L1092) | `IMattermostClient.GetPostsByIdsAsync`

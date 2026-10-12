@@ -282,6 +282,17 @@ await client.CreatePostAsync(
     replyToPostId: rootPostId);
 ```
 
+## Send an ephemeral message
+
+```csharp
+Post ephemeral = await client.CreateEphemeralPostAsync(userId, channelId, "Only you can see this",
+    cancellationToken: cancellationToken);
+```
+
+This method requires `create_post_ephemeral`, normally granted to system administrators. Supply the recipient's actual user ID, not `"me"`. The current account is the author; the server sends the message only to the recipient's WebSocket sessions without storing a normal post. HTTP success alone does not prove delivery to an offline recipient. Message whitespace is preserved, and the usual library message-length limit applies. Optional `replyToPostId` places the message in a thread; `PostProps` supports attachments, including attachment-only messages with empty text.
+
+Live checks on Mattermost 12.0.0 passed channel-level and thread messages with attachments, exact recipient WebSocket readback, normal post lookup returning HTTP 404, absence from persistent channel history, and non-administrator permission rejection.
+
 ## Edit a post
 
 ```csharp
