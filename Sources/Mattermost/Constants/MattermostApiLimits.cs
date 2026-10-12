@@ -27,6 +27,18 @@
         /// </summary>
         public const int MaxChannelMembersPerPage = 200;
 
+        /// <summary>Default number of operations in a channel membership update batch.</summary>
+        public const int DefaultChannelMemberBatchSize = 100;
+
+        /// <summary>Maximum number of operations in a channel membership update batch.</summary>
+        public const int MaxChannelMemberBatchSize = 1000;
+
+        /// <summary>Default delay between channel membership batches, in milliseconds.</summary>
+        public const int DefaultChannelMemberBatchDelayMilliseconds = 500;
+
+        /// <summary>Maximum delay between channel membership batches, in milliseconds.</summary>
+        public const int MaxChannelMemberBatchDelayMilliseconds = 10000;
+
         /// <summary>
         /// Maximum number of team memberships returned on a single page.
         /// </summary>

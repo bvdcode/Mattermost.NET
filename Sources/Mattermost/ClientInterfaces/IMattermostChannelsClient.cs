@@ -15,6 +15,20 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostChannelsClient
     {
+        /// <summary>Replace a public or private channel's membership. Requires Mattermost 11.7 or later.</summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="members">Complete desired membership, copied before authentication. May be empty for public channels.</param>
+        /// <param name="channelAdmins">Null preserves existing admin roles for remaining members; an empty list removes all admin roles. Listed administrators are also included in membership.</param>
+        /// <param name="batchSize">Operations per batch, from 1 through 1000.</param>
+        /// <param name="batchDelayMilliseconds">Native inter-batch delay, from 0 through 10000 milliseconds.</param>
+        /// <param name="cancellationToken">Cancels the request, not membership changes already applied.</param>
+        /// <returns>Buffered native batches, including per-user failures. An unchanged admin reconciliation can return an empty list.</returns>
+        /// <remarks>Requires manage_system. Removes users not in the desired membership before adding new users and reconciling admin roles. Rejects direct, group, group-constrained and membership-policy-controlled channels. Not atomic: inspect every batch's Errors and read back membership as needed. A terminal streamed error throws even with HTTP 200. Does not retry or roll back. The complete response is buffered; large updates may require a longer HttpClient timeout. An empty private-channel membership is rejected by the server.</remarks>
+        Task<IList<ChannelMembersUpdateResult>> SetChannelMembersAsync(string channelId, IEnumerable<string> members,
+            IEnumerable<string>? channelAdmins = null, int batchSize = MattermostApiLimits.DefaultChannelMemberBatchSize,
+            int batchDelayMilliseconds = MattermostApiLimits.DefaultChannelMemberBatchDelayMilliseconds,
+            CancellationToken cancellationToken = default);
+
         /// <summary>Read an administrative page of public and private channels across teams.</summary>
         /// <param name="page">Zero-based page.</param>
         /// <param name="perPage">Between one and MaxChannelsPerPage results.</param>

@@ -1118,6 +1118,27 @@ Ancillary permission lookup requires Mattermost 9.10 or later and any authentica
 
 Live checks on Mattermost 12.0.0 passed a log download containing a newly recorded marker and matching the native file bytes. Permission expansion returned the actual `read_other_users_teams` dependency, retained unknown names and matched native responses for both an administrator and ordinary bot without changing role metadata. The bot's log download was rejected with HTTP 403. Rotated log files and logging-disabled failures were not tested live.
 
+## Replace channel membership
+
+```csharp
+IList<ChannelMembersUpdateResult> batches = await client.SetChannelMembersAsync(
+    channelId, new[] { firstUserId, secondUserId },
+    channelAdmins: null, batchSize: 100, batchDelayMilliseconds: 500,
+    cancellationToken: cancellationToken);
+foreach (ChannelMemberUpdateError failure in batches.SelectMany(batch => batch.Errors))
+{
+    Console.WriteLine(failure.Error);
+}
+```
+
+Import `Mattermost.Models.Responses`. Requires Mattermost 11.7 or later and `manage_system`. This replaces the complete membership: users not listed are removed first. Direct/group, group-constrained and membership-policy-controlled channels are rejected. An empty desired membership is allowed for public channels, but rejected for private channels.
+
+`channelAdmins: null` preserves existing admin roles for remaining members. An empty list removes all channel admin roles. A nonempty list sets roles declaratively and automatically includes those administrators in membership, even if omitted from `members`. Both collections are copied before authentication; the server validates and deduplicates IDs. Batch size is 1–1000; native inter-batch delay is 0–10000 milliseconds. The server enforces its 12 MB request-body limit.
+
+Updates are not atomic: inspect every batch's `Errors`, and read back actual membership when needed. Per-user failures can accompany HTTP success and successful changes to other users. A terminal streamed error throws `MattermostClientException`, even with HTTP 200; `ResponseJson` retains the complete response, including earlier batches. The SDK buffers native NDJSON results without retrying or rolling back. Large updates may require a longer supplied `HttpClient.Timeout`. Cancellation cannot undo changes already applied. An unchanged admin reconciliation can return an empty batch list.
+
+Live checks on Mattermost 12.0.0 passed two separate addition batches, removals, administrator inclusion/promotion/demotion, preserved roles with null administrators, cleared roles with an empty list and an unchanged repeat returning no batches. Independent native membership reads matched each successful state. A missing-user error was preserved without losing existing members; ordinary-bot and empty-private-channel requests were rejected without changing membership. Unrelated channel metadata remained unchanged. Long-running cancellation and terminal stream failures were not tested live.
+
 ## Check direct-message eligibility
 
 ```csharp
