@@ -14,6 +14,21 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostUsersClient
     {
+        /// <summary>Count users matching administrator filters. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="teamId">Optional team filter.</param>
+        /// <param name="channelId">Optional channel filter.</param>
+        /// <param name="includeDeleted">Include deactivated accounts.</param>
+        /// <param name="includeBots">Include bot accounts.</param>
+        /// <param name="roles">Optional nonempty collection of system role names; matches any role.</param>
+        /// <param name="teamRoles">Optional nonempty collection of team role names; requires teamId.</param>
+        /// <param name="channelRoles">Optional nonempty collection of channel role names; requires channelId.</param>
+        /// <param name="includeRemoteUsers">Include remote accounts on supporting servers.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires sysconsole_read_user_management_users. Role names are trimmed. Native role filters are combined with OR; team and channel roles exclude system administrators.</remarks>
+        Task<long> GetFilteredUserCountAsync(string? teamId = null, string? channelId = null, bool includeDeleted = false,
+            bool includeBots = false, IEnumerable<string>? roles = null, IEnumerable<string>? teamRoles = null,
+            IEnumerable<string>? channelRoles = null, bool includeRemoteUsers = false, CancellationToken cancellationToken = default);
+
         /// <summary>Download a user's current profile image.</summary>
         /// <param name="userId">User identifier or me.</param>
         /// <param name="cancellationToken">Cancels authentication and the download.</param>

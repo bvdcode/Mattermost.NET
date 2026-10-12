@@ -464,6 +464,21 @@ Known IDs are users sharing any channel with the current account, including dire
 
 The user count is subject to server visibility restrictions. Group-channel lookup (Mattermost 5.14+) accepts 1–50 IDs, returns other members keyed by channel ID, excludes the current user, and omits channels the current user does not belong to. Membership listing (Mattermost 6.2+) always requests a JSON-array page, with team metadata on each `ChannelMemberWithTeamData`; increase `page` to retrieve more. Session and audit methods return metadata, not usable authentication tokens. Reading another user's memberships, sessions or audits requires `edit_other_users` permission.
 
+## Count users with administrator filters
+
+```csharp
+long members = await client.GetFilteredUserCountAsync(teamId: teamId, includeBots: true,
+    cancellationToken: cancellationToken);
+long administrators = await client.GetFilteredUserCountAsync(roles: new[] { "system_admin" },
+    cancellationToken: cancellationToken);
+```
+
+Requires Mattermost 5.26 or later and `sysconsole_read_user_management_users`. Counts are 64-bit. Deactivated accounts, bots and remote users are excluded by default; the server must support remote accounts for that option to have an effect. Team and channel IDs restrict membership. Optional role collections must be nonempty; names are trimmed, deduplicated and sent as native comma-separated filters.
+
+The server combines supplied system, team and channel role filters with OR. Team and channel role filters require their respective IDs and exclude system administrators. For example, `team_user` selects ordinary team users rather than team administrators or guests.
+
+Live checks on Mattermost 12.0.0 passed all eight inclusion-flag combinations against native responses, actual bot inclusion in a known team, positive team/channel user-role filters and system-administrator exclusion.
+
 ## Read user presence
 
 ```csharp
@@ -558,6 +573,21 @@ Membership reads require `read_channel` permission. Pages are zero-based and the
 `ChannelStats` contains active member and guest counts, pinned post count, and file count. Set `excludeFilesCount: true` to skip counting files; supporting servers return `-1` for `FilesCount`. `ChannelUnread` contains message, mention, root-post and urgent-mention counters. These counters are 64-bit (`long`). Reading unread counts does not mark messages as read and requires permission to access the user and read the channel.
 
 `GetChannelTimezonesAsync` requires Mattermost 5.6 or later and `read_channel` permission. It returns timezone names as reported by the server, or an empty list when members have no timezone configured.
+
+## Discover channels as an administrator
+
+```csharp
+ChannelListResponse page = await client.GetAllChannelsAsync(page: 0, perPage: 60,
+    includeDeleted: true, cancellationToken: cancellationToken);
+ChannelListResponse matches = await client.SearchAllChannelsAsync("project", teamIds: new[] { teamId },
+    channelType: ChannelType.Private, cancellationToken: cancellationToken);
+```
+
+These methods list or search public and private channels across teams, not just the current user's memberships. They require a system console permission to read channels, manage groups, or read retention policies. Pages are zero-based with 1–200 entries. `Channels` contains `ChannelWithTeamData` with team URL name, display name and update time; `TotalCount` counts all matching channels rather than only the page.
+
+Archived channels are excluded unless `includeDeleted` is true. `excludeDefaultChannels` excludes configured default channels. Search trims the term; an empty term matches all channels. `channelType` accepts Public, Private or null for both. Team filtering requires Mattermost 5.26 or later; null or an empty team list imposes no team filter. Native paging fields are sent in JSON with `system_console=true`.
+
+Live checks on Mattermost 12.0.0 passed native field/total comparisons, empty pages, actual private and archived public channel filtering, team/type/default filters, paging, no-match search and non-administrator permission errors.
 
 ## Edit and find channels
 

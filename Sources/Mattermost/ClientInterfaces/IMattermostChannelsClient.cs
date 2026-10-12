@@ -15,6 +15,32 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostChannelsClient
     {
+        /// <summary>Read an administrative page of public and private channels across teams.</summary>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Between one and MaxChannelsPerPage results.</param>
+        /// <param name="includeDeleted">Include archived channels.</param>
+        /// <param name="excludeDefaultChannels">Exclude configured default channels.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>A channel page with team metadata and the total matching count.</returns>
+        /// <remarks>Requires a system console permission to read channels, manage groups, or read retention policies. This is not a user-membership listing.</remarks>
+        Task<ChannelListResponse> GetAllChannelsAsync(int page = 0, int perPage = 60, bool includeDeleted = false,
+            bool excludeDefaultChannels = false, CancellationToken cancellationToken = default);
+
+        /// <summary>Search public and private channels across teams in administrative mode.</summary>
+        /// <param name="term">Search text; empty matches all channels. Surrounding whitespace is removed.</param>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Between one and MaxChannelsPerPage results.</param>
+        /// <param name="teamIds">Optional team identifiers. Team filtering requires Mattermost 5.26 or later.</param>
+        /// <param name="channelType">Public, Private, or null for both.</param>
+        /// <param name="includeDeleted">Include archived channels.</param>
+        /// <param name="excludeDefaultChannels">Exclude configured default channels.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>A channel page with team metadata and the total matching count.</returns>
+        /// <remarks>Requires a system console permission to read channels, manage groups, or read retention policies. Uses system_console=true and native JSON paging fields.</remarks>
+        Task<ChannelListResponse> SearchAllChannelsAsync(string term, int page = 0, int perPage = 60,
+            IEnumerable<string>? teamIds = null, ChannelType? channelType = null, bool includeDeleted = false,
+            bool excludeDefaultChannels = false, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get channel from the provided channel id string.
         /// </summary>

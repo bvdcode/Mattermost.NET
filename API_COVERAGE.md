@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 254/608 (41.8%)
+- Implemented specification operations: 257/608 (42.3%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -17,7 +17,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Category | Implemented / total |
 |---|---|
 | Bots | 9 / 9 |
-| Channels | 49 / 61 |
+| Channels | 51 / 61 |
 | Commands | 10 / 10 |
 | Emoji | 9 / 9 |
 | Files | 10 / 12 |
@@ -34,7 +34,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Teams | 31 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
-| Users | 44 / 77 |
+| Users | 45 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -253,8 +253,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/channels - Get a list of all channels
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2) | `IMattermostClient.GetAllChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/channels/{channel_id} - Get a channel
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L480) | `IMattermostClient.GetChannelAsync`
@@ -405,8 +405,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/channels/search - Search all private and open type channels across all teams
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L210) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L210) | `IMattermostClient.SearchAllChannelsAsync`
+✅ Implemented
 
 ## POST /api/v4/channels/stats/member_count - Get member counts for multiple channels
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2027) | `IMattermostClient.GetChannelsMemberCountsAsync`
@@ -2321,8 +2321,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/users/stats/filtered - Get total count of users in the system matching the specified filters
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L984) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L984) | `IMattermostClient.GetFilteredUserCountAsync`
+✅ Implemented
 
 ## GET /api/v4/users/tokens - Get user access tokens
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2528) | `IMattermostClient.GetAllUserAccessTokensAsync`
