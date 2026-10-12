@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 251/608 (41.3%)
+- Implemented specification operations: 253/608 (41.6%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -17,7 +17,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Category | Implemented / total |
 |---|---|
 | Bots | 9 / 9 |
-| Channels | 47 / 61 |
+| Channels | 49 / 61 |
 | Commands | 10 / 10 |
 | Emoji | 9 / 9 |
 | Files | 10 / 12 |
@@ -365,8 +365,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/channels/{channel_id}/convert_to_channel - Convert group message to private channel
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L3006) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L3006) | `IMattermostClient.ConvertGroupMessageToChannelAsync`
+✅ Implemented
 
 ## POST /api/v4/channels/{channel_id}/members - Add user(s) to channel
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L1420) | `IMattermostClient.AddUserToChannelAsync`
@@ -377,8 +377,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/channels/{channel_id}/move - Move a channel
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L802) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L802) | `IMattermostClient.MoveChannelAsync`
+✅ Implemented
 
 ## POST /api/v4/channels/{channel_id}/restore - Restore a channel
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L769) | `IMattermostClient.RestoreChannelAsync`

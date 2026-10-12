@@ -158,6 +158,27 @@ namespace Mattermost
         /// <returns> Created channel info. </returns>
         Task<Channel> CreateGroupChannelAsync(params string[] userIds);
 
+        /// <summary>Move a public or private channel to another team. Requires Mattermost 5.26 or later.</summary>
+        /// <param name="channelId">Channel identifier.</param>
+        /// <param name="teamId">Destination team identifier.</param>
+        /// <param name="force">Remove channel members who do not belong to the destination team before moving.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The moved channel with its new team identifier.</returns>
+        /// <remarks>Requires manage_system. Direct and group channels cannot be moved. The server updates related threads, sidebar categories and channel webhooks. Deactivated members may be removed even when force is false; an error does not guarantee rollback.</remarks>
+        Task<Channel> MoveChannelAsync(string channelId, string teamId, bool force = false,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>Convert a group message into a private channel in a common team.</summary>
+        /// <param name="channelId">Group message channel identifier.</param>
+        /// <param name="teamId">Team shared by all group participants.</param>
+        /// <param name="name">New channel URL name.</param>
+        /// <param name="displayName">New channel display name.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The converted channel, retaining its identifier and messages.</returns>
+        /// <remarks>Requires group membership and create_private_channel in the destination team. Guests cannot convert group messages. The current user becomes channel administrator. This does not create a copy of the group message.</remarks>
+        Task<Channel> ConvertGroupMessageToChannelAsync(string channelId, string teamId, string name, string displayName,
+            CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Add user to channel.
         /// </summary>

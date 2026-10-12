@@ -570,6 +570,20 @@ Privacy conversion accepts only `Public` and `Private`, requires Mattermost 5.16
 
 Bulk lookup returns only active public channels in the requested team and requires `view_team`. Missing IDs may be omitted; a batch with no matches produces an API error. Team search matches channel name or display name; users without `list_team_channels` are limited to their memberships on Mattermost 5.16 or later. HTTP errors are propagated.
 
+## Move and convert channels
+
+```csharp
+Channel moved = await client.MoveChannelAsync(channelId, destinationTeamId, cancellationToken: cancellationToken);
+Channel converted = await client.ConvertGroupMessageToChannelAsync(groupChannelId, teamId,
+    "project-chat", "Project chat", cancellationToken);
+```
+
+`MoveChannelAsync` requires Mattermost 5.26+ and `manage_system`. It moves a public or private channel, retaining its identifier and messages. Active members must belong to the destination team; `force: true` removes members who do not. The server may remove deactivated members even with `force: false`, and updates related threads, sidebar categories and channel webhooks. An error does not guarantee rollback of server changes.
+
+`ConvertGroupMessageToChannelAsync` turns a group message into a private channel without copying it. Supply a team shared by all participants, plus the new channel name and display name. The caller must be a non-guest group member with `create_private_channel` permission in that team, and becomes channel administrator. IDs and names are trimmed; other validity rules are enforced by the server.
+
+Live checks on Mattermost 12.0.0 passed conversion with preserved identity, creation time, participants and an existing message; private-channel movement without forced removal; public-channel movement with forced removal; native metadata readback; non-administrator move rejection; and rejection of conversion on a non-group channel.
+
 ## User preferences
 
 ```csharp
