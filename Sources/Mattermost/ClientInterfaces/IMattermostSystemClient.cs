@@ -18,6 +18,13 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Ask the server for a URL's first redirect location.</summary>
+        /// <param name="url">Absolute HTTP or HTTPS URL. Surrounding whitespace is trimmed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The server's Location header, which may be relative, or an empty string when no location is available.</returns>
+        /// <remarks>Requires authentication. The server makes a HEAD request without following redirects and applies its outbound-request restrictions and cache. Returns an empty string when link previews are disabled, the target cannot be reached, no Location header exists or the header exceeds the server limit. Does not fetch the target from this client or resolve a redirect chain.</remarks>
+        Task<string> GetRedirectLocationAsync(string url, CancellationToken cancellationToken = default);
+
         /// <summary>Mark the server as busy, temporarily disabling non-critical services. Requires Mattermost 5.20 or later.</summary>
         /// <param name="seconds">Duration from 1 through 86400 seconds. Defaults to 3600; replaces the current busy expiry.</param>
         /// <param name="cancellationToken">Cancels authentication and the request, not a busy flag already set by the server.</param>

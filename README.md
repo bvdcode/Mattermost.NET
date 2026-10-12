@@ -1118,6 +1118,16 @@ Ancillary permission lookup requires Mattermost 9.10 or later and any authentica
 
 Live checks on Mattermost 12.0.0 passed a log download containing a newly recorded marker and matching the native file bytes. Permission expansion returned the actual `read_other_users_teams` dependency, retained unknown names and matched native responses for both an administrator and ordinary bot without changing role metadata. The bot's log download was rejected with HTTP 403. Rotated log files and logging-disabled failures were not tested live.
 
+## Resolve a first redirect
+
+```csharp
+string location = await client.GetRedirectLocationAsync("http://example.com/path", cancellationToken);
+```
+
+Requires authentication. The Mattermost server makes a HEAD request without following redirects and returns its first `Location` header, including relative locations. An empty string means no location is available: link previews may be disabled, the target may be unreachable or blocked by server outbound-request restrictions, or no acceptable header was returned. Results are cached by the server. The SDK does not contact the target or resolve further redirects.
+
+Live checks on Mattermost 12.0.0 passed two actual first-hop redirects, cached repeats and a non-redirect returning an empty string, with independent native response equality. Server configuration was unchanged.
+
 ## Custom brand image
 
 ```csharp
