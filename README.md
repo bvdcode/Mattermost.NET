@@ -867,6 +867,34 @@ Use `Mattermost.Models.Responses` for `SystemStatusResponse`. Health checks do n
 
 By default, unhealthy health checks return HTTP 500 and throw `MattermostClientException`, retaining the response body. On Mattermost 9.6 or later, `useRestSemantics: true` returns the status as data; check `health.Status` rather than assuming HTTP success means the server is healthy. Supported timezone names require authentication. Both endpoints require Mattermost 3.10 or later.
 
+## OAuth applications
+
+```csharp
+using Mattermost.Models.OAuth;
+
+OAuthApp application = await client.CreateOAuthAppAsync(new OAuthApp
+{
+    Name = "My integration",
+    Description = "Account integration",
+    Homepage = "https://example.com",
+    CallbackUrls = new List<string> { "https://example.com/oauth/callback" }
+});
+
+OAuthApp information = await client.GetOAuthAppInfoAsync(application.Id);
+IList<OAuthApp> authorized = await client.GetAuthorizedOAuthAppsAsync("me");
+
+application.Description = "Updated integration description";
+application = await client.UpdateOAuthAppAsync(application);
+```
+
+The OAuth service provider must be enabled. Registration, management reads, updates, deletion and secret regeneration require `manage_oauth`; managing another creator's application also requires `manage_system_wide_oauth`. Trust changes require `manage_system`. `CreateOAuthAppAsync` registers a confidential client with a server-generated secret; dynamic and public-client registration are not covered by this method.
+
+`GetOAuthAppAsync`, `GetOAuthAppsAsync`, creation and regeneration responses can contain client secrets: store them securely and do not log them. `GetOAuthAppInfoAsync` needs only authentication and returns an empty secret. `GetAuthorizedOAuthAppsAsync` also omits secrets and requires `edit_other_users` when reading another account.
+
+`UpdateOAuthAppAsync` replaces all editable settings, including callback URLs and the associated `MattermostAppId`; it is not a patch. Fetch the application first to retain values you are not changing. Creator, creation time, client secret and dynamic-registration state are preserved. Updates preserve custom-scheme callbacks and empty homepages of dynamic clients; the server applies the URL rules for the stored registration type. `RegenerateOAuthAppSecretAsync` returns the updated application; `DeleteOAuthAppAsync` removes the registration.
+
+Live verification passed for confidential registration, nonempty paged reads, full updates with server-owned fields preserved, secret regeneration and readback, information-only reads by a non-administrator, authorized-app metadata after consent by a dedicated account, and deletion of a separate application with subsequent HTTP 404.
+
 ## Plugin metadata
 
 ```csharp

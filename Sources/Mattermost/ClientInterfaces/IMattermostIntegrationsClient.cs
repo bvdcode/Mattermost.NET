@@ -1,4 +1,5 @@
 using Mattermost.Models.Dialogs;
+using Mattermost.Models.OAuth;
 using Mattermost.Models.SlashCommands;
 using Mattermost.Models.Webhooks;
 using System.Collections.Generic;
@@ -152,5 +153,52 @@ namespace Mattermost
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         Task<IList<CommandAutocompleteSuggestion>> GetCommandAutocompleteSuggestionsAsync(string teamId, string userInput,
             string? channelId = null, string? rootId = null, CancellationToken cancellationToken = default);
+
+        /// <summary>List registered OAuth applications, including client secrets. Requires enabled OAuth service provider and manage_oauth.</summary>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Without manage_system_wide_oauth, only applications created by the current account are returned.</remarks>
+        Task<IList<OAuthApp>> GetOAuthAppsAsync(int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
+        /// <summary>Get an OAuth application, including its secret. Requires enabled OAuth service provider and manage_oauth.</summary>
+        /// <param name="appId">Application client identifier. Another creator's app also requires manage_system_wide_oauth.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<OAuthApp> GetOAuthAppAsync(string appId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get OAuth application information without its client secret. Requires authentication and enabled OAuth service provider.</summary>
+        /// <param name="appId">Application client identifier.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<OAuthApp> GetOAuthAppInfoAsync(string appId, CancellationToken cancellationToken = default);
+
+        /// <summary>Register a confidential OAuth application. Requires enabled OAuth service provider and manage_oauth.</summary>
+        /// <param name="application">Name, description, icon, HTTP(S) callback URLs, homepage and trust flag. Trust requires manage_system; identity, timestamps and client secret are server-generated.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; registration may already have completed.</param>
+        /// <returns>The registered application, including its new client secret.</returns>
+        Task<OAuthApp> CreateOAuthAppAsync(OAuthApp application, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace an OAuth application's settings. Requires enabled OAuth service provider and manage_oauth.</summary>
+        /// <param name="application">Full application settings including Id and MattermostAppId. Another creator's app also requires manage_system_wide_oauth. Trust changes require manage_system.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; settings may already have changed.</param>
+        /// <remarks>Preserves creator, creation time, client secret and dynamic-registration flag. Unset editable fields are not preserved; this is not a patch.</remarks>
+        Task<OAuthApp> UpdateOAuthAppAsync(OAuthApp application, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete a registered OAuth application. Requires enabled OAuth service provider and manage_oauth.</summary>
+        /// <param name="appId">Application client identifier. Another creator's app also requires manage_system_wide_oauth.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; deletion may already have completed.</param>
+        Task DeleteOAuthAppAsync(string appId, CancellationToken cancellationToken = default);
+
+        /// <summary>Replace a confidential OAuth application's secret and return the updated application. Requires enabled OAuth service provider and manage_oauth.</summary>
+        /// <param name="appId">Application client identifier. Another creator's app also requires manage_system_wide_oauth. Public clients do not have a secret to regenerate.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request; the secret may already have changed.</param>
+        Task<OAuthApp> RegenerateOAuthAppSecretAsync(string appId, CancellationToken cancellationToken = default);
+
+        /// <summary>List OAuth applications authorized by a user, without client secrets. Requires enabled OAuth service provider.</summary>
+        /// <param name="userId">User identifier or me. Another account requires edit_other_users.</param>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        Task<IList<OAuthApp>> GetAuthorizedOAuthAppsAsync(string userId, int page = 0, int perPage = 60,
+            CancellationToken cancellationToken = default);
     }
 }

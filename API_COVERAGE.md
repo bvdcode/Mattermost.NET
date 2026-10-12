@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 232/608 (38.2%)
+- Implemented specification operations: 240/608 (39.5%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -23,6 +23,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Files | 9 / 12 |
 | Integration Actions | 1 / 4 |
 | Jobs | 3 / 7 |
+| OAuth | 8 / 10 |
 | Plugins | 5 / 13 |
 | Posts | 19 / 28 |
 | Preferences | 5 / 5 |
@@ -1196,44 +1197,44 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # OAuth
 
 ## DELETE /api/v4/oauth/apps/{app_id} - Delete an OAuth app
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L215) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L215) | `IMattermostClient.DeleteOAuthAppAsync`
+✅ Implemented
 
 ## GET /.well-known/oauth-authorization-server - Get OAuth 2.0 Authorization Server Metadata
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L323) | `—`
 ❌ Not implemented
 
 ## GET /api/v4/oauth/apps - Get OAuth apps
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L65) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L65) | `IMattermostClient.GetOAuthAppsAsync`
+✅ Implemented
 
 ## GET /api/v4/oauth/apps/{app_id} - Get an OAuth app
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L107) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L107) | `IMattermostClient.GetOAuthAppAsync`
+✅ Implemented
 
 ## GET /api/v4/oauth/apps/{app_id}/info - Get info on an OAuth app
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L288) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L288) | `IMattermostClient.GetOAuthAppInfoAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/oauth/apps/authorized - Get authorized OAuth apps
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L398) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L398) | `IMattermostClient.GetAuthorizedOAuthAppsAsync`
+✅ Implemented
 
 ## POST /api/v4/oauth/apps - Register OAuth app
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L2) | `IMattermostClient.CreateOAuthAppAsync`
+✅ Implemented
 
 ## POST /api/v4/oauth/apps/{app_id}/regen_secret - Regenerate OAuth app secret
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L251) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L251) | `IMattermostClient.RegenerateOAuthAppSecretAsync`
+✅ Implemented
 
 ## POST /api/v4/oauth/apps/register - Register OAuth client using Dynamic Client Registration
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L358) | `—`
 ❌ Not implemented
 
 ## PUT /api/v4/oauth/apps/{app_id} - Update an OAuth app
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L142) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/oauth.yaml#L142) | `IMattermostClient.UpdateOAuthAppAsync`
+✅ Implemented
 
 # Permissions
 
