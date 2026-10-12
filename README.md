@@ -1083,6 +1083,20 @@ Pagination uses a user ID and the exact value of the selected sort column, not p
 
 Live checks on Mattermost 12.0.0 passed list/count comparisons against a two-user fixture, both cursor directions with ascending/descending order and empty final pages, all seven sort columns, all four native statistics periods, positive team/role/activity filters, no-team precedence, bot exclusion and permission rejection. Guest-only filters excluded known non-guests and matched native responses; a nonempty guest cohort was not tested.
 
+## Log download and permission dependencies
+
+```csharp
+byte[] logFile = await client.DownloadServerLogsAsync(cancellationToken);
+IList<string> permissions = await client.GetAncillaryPermissionsAsync(
+    new[] { "sysconsole_read_user_management_users" }, cancellationToken);
+```
+
+Log download returns the current configured server log file, not a support archive or paged query. It requires `get_logs`; restricted administrators are rejected. The server must have an accessible log file. The response is buffered in memory and may contain sensitive server information.
+
+Ancillary permission lookup requires Mattermost 9.10 or later and any authenticated account. It appends the server's permission dependencies to the requested system-console subsection permissions. It does not grant permissions, update roles or calculate the current user's effective access. Input names are trimmed and copied before authentication; unknown names and duplicate entries in the native response are preserved.
+
+Live checks on Mattermost 12.0.0 passed a log download containing a newly recorded marker and matching the native file bytes. Permission expansion returned the actual `read_other_users_teams` dependency, retained unknown names and matched native responses for both an administrator and ordinary bot without changing role metadata. The bot's log download was rejected with HTTP 403. Rotated log files and logging-disabled failures were not tested live.
+
 ## Server maintenance
 
 ```csharp

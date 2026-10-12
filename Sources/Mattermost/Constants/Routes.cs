@@ -21,6 +21,7 @@
         internal const string Reactions = version + "/reactions";
         internal const string Emojis = version + "/emoji";
         internal const string Roles = version + "/roles";
+        internal const string Permissions = version + "/permissions";
         internal const string Teams = version + "/teams";
         internal const string Files = version + "/files";
         internal const string Uploads = version + "/uploads";

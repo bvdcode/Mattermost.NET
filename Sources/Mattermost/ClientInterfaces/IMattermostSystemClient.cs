@@ -18,6 +18,19 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Download the current server log file as bytes.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires get_logs; restricted administrators are rejected. Downloads the configured current log file, not a paged query or support archive. Server-side file logging must provide an accessible file. The complete response is buffered in memory and can contain sensitive server data.</remarks>
+        Task<byte[]> DownloadServerLogsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Expand system-console subsection permissions with their native ancillary permissions. Requires Mattermost 9.10 or later.</summary>
+        /// <param name="subsectionPermissions">Nonempty collection of nonblank permission names. Names are trimmed and copied before authentication.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The server's permission-name list, including requested permissions and their dependencies. Order is not guaranteed by the server.</returns>
+        /// <remarks>Requires authentication, not an administrator role. Calculates permission dependencies; does not grant permissions, update roles or report the current user's effective access.</remarks>
+        Task<IList<string>> GetAncillaryPermissionsAsync(IEnumerable<string> subsectionPermissions,
+            CancellationToken cancellationToken = default);
+
         /// <summary>Reload the server configuration from its configured storage.</summary>
         /// <param name="cancellationToken">Cancels authentication and the request, not a reload already accepted by the server.</param>
         /// <remarks>Requires reload_config; restricted administrators are rejected. Reads the server's configuration storage, not a local client file; externally changed persisted settings can take effect.</remarks>
