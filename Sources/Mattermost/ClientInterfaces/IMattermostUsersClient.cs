@@ -15,6 +15,15 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostUsersClient
     {
+        /// <summary>Record the current user's request to notify administrators about a paid feature.</summary>
+        /// <param name="requiredPlan">Native plan identifier, trimmed. The server accepts professional or enterprise for built-in paid features; plugin-specific requests can use an empty plan.</param>
+        /// <param name="requiredFeature">Nonblank native feature identifier, trimmed. The server validates support; this is not a display label.</param>
+        /// <param name="trialNotification">Whether the intent belongs to the trial-notification flow rather than the upgrade flow.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not an intent already saved by the server.</param>
+        /// <remarks>Requires authentication. Saves an intent for the server's later notification processing; successful completion does not confirm delivery to an administrator. Does not start a trial, buy a plan, install a license or change settings. The server rejects a repeated feature request from the same user, even when the plan or trial flag changes. Native validation and persistence failures are propagated without retries.</remarks>
+        Task NotifyAdminAsync(string requiredPlan, string requiredFeature, bool trialNotification = false,
+            CancellationToken cancellationToken = default);
+
         /// <summary>Find a user by the exact external authentication identifier.</summary>
         /// <param name="authData">Identifier containing 1 through 128 UTF-8 bytes. Whitespace and case are preserved.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>

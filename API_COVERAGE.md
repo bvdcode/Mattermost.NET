@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-12
-- Implemented specification operations: 302/608 (49.7%)
+- Implemented specification operations: 303/608 (49.8%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -41,7 +41,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
 | Usage | 3 / 3 |
-| Users | 53 / 77 |
+| Users | 54 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -2452,8 +2452,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/notify-admin - Save notify-admin intent
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L338) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L338) | `IMattermostClient.NotifyAdminAsync`
+✅ Implemented
 
 ## POST /api/v4/users/password/reset - Reset password
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1589) | `—`

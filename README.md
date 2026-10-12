@@ -561,6 +561,17 @@ The response uses the existing `ChannelViewResponse`: status and channel IDs map
 
 Live checks on Mattermost 12.0.0 with the feature enabled passed actual DM/GM unread clearing, team channel and followed-thread unread clearing, exact native membership view times and preservation of other scopes. Both methods returned HTTP 403 for an ordinary bot attempting another user's read state. Server configuration remained unchanged. Disabled-feature responses and push notification delivery were not tested live.
 
+## Request an administrator upgrade notification
+
+```csharp
+await client.NotifyAdminAsync("professional", "mattermost.feature.guest_accounts",
+    trialNotification: false, cancellationToken: cancellationToken);
+```
+
+Requires authentication. This records the current user's intent for later server-side administrator notification processing. It does not start a trial, buy a plan, install a license or confirm delivery of a notification. Pass native identifiers, not display labels. The server validates supported features and plans; built-in paid features use `professional` or `enterprise`. Plugin-specific feature requests can use an empty plan. Both strings are trimmed; the feature cannot be blank.
+
+A repeated request for the same user and feature is rejected, even when the plan or trial flag changes. Cancellation cannot undo a saved intent, and native errors are propagated without retries. On Mattermost 12.0.0, live checks with a separate bot passed upgrade and trial intent creation, persistent duplicate rejection through SDK and independent HTTP, and unchanged user profile and server settings. Administrator notification delivery was not tested.
+
 ## Test notification delivery
 
 ```csharp
