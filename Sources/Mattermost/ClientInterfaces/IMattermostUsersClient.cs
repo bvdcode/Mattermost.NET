@@ -15,6 +15,13 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostUsersClient
     {
+        /// <summary>Read users selected by the server's invalid-email report.</summary>
+        /// <param name="page">Zero-based page number.</param>
+        /// <param name="perPage">Number of users per page, from 1 through 200.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires sysconsole_read_user_management_users and EnableOpenServer=false. The server selects active, non-bot password accounts using its domain restrictions and role rules; this is not syntax or mailbox validation. With no configured domain restriction, eligible accounts can be returned even when their addresses are valid.</remarks>
+        Task<IList<User>> GetUsersWithInvalidEmailsAsync(int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
         /// <summary>Read a cursor-paged administrative user report, excluding bots.</summary>
         /// <param name="pageSize">Number of users, from 1 through 100.</param>
         /// <param name="sortColumn">Server-supported ordering column.</param>

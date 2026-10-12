@@ -5,6 +5,9 @@
     /// </summary>
     public static class MattermostApiLimits
     {
+        /// <summary>Maximum number of users returned by a normal paged user query.</summary>
+        public const int MaxUsersPerPage = 200;
+
         /// <summary>Maximum number of server log lines per page.</summary>
         public const int MaxServerLogsPerPage = 10000;
 

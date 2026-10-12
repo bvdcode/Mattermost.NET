@@ -1050,6 +1050,8 @@ Live checks on Mattermost 12.0.0 passed nonempty pages, single-job retrieval, ty
 
 ## Administrative user reports
 
+`GetUsersWithInvalidEmailsAsync(page: 0, perPage: 60, cancellationToken: cancellationToken)` reads the server's separate invalid-email report. It requires `sysconsole_read_user_management_users` and `EnableOpenServer=false`. The server selects eligible active password accounts using its domain restrictions and role rules, excluding bots and deactivated accounts. This is not email syntax or mailbox validation: without domain restrictions, valid addresses can appear. The SDK preserves that server selection. Live checks passed a nonempty native-equal result, known active/inactive/bot exclusions, paging, an empty final page and ordinary-bot permission rejection. A restricted-domain configuration was not tested.
+
 ```csharp
 IList<UserReport> users = await client.GetUserReportsAsync(
     pageSize: 50,
@@ -1080,6 +1082,17 @@ Pagination uses a user ID and the exact value of the selected sort column, not p
 `dateRange` limits post statistics, not account selection or the total count. `hasNoTeam` overrides `teamId`; a non-null `guestFilter` overrides `role` and includes only guests. `AllGuests` means all guest accounts, not all users. `hideActive` selects deactivated users, while `hideInactive` selects active users; they cannot both be true.
 
 Live checks on Mattermost 12.0.0 passed list/count comparisons against a two-user fixture, both cursor directions with ascending/descending order and empty final pages, all seven sort columns, all four native statistics periods, positive team/role/activity filters, no-team precedence, bot exclusion and permission rejection. Guest-only filters excluded known non-guests and matched native responses; a nonempty guest cohort was not tested.
+
+## Enterprise upgrade reads
+
+```csharp
+await client.CheckEnterpriseUpgradeAllowedAsync(cancellationToken);
+EnterpriseUpgradeStatus upgrade = await client.GetEnterpriseUpgradeStatusAsync(cancellationToken);
+```
+
+Both reads require `manage_system`. The eligibility check completes when the server allows an in-place upgrade; unsupported platforms and missing permissions remain native HTTP errors, not a `false` result. Status reading requires Mattermost 5.27+ and returns the native integer `Percentage` and nullable `Error`. An upgrade error can arrive inside HTTP 200, so inspect `Error`; zero progress with no error does not establish that an upgrade is running. Neither read starts an upgrade, downloads binaries or restarts the server.
+
+Live checks on Mattermost 12.0.0 passed eligibility, exact native idle-status field/value comparison and permission rejection for an ordinary bot. An actual upgrade and live failure/progress states were not tested.
 
 ## Server limits and usage
 

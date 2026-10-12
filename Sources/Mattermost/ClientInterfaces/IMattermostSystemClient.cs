@@ -18,6 +18,16 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Check whether the server supports an in-place upgrade to Enterprise Edition.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. Completes when eligible; permission and platform failures remain native HTTP errors, not a false result. This read does not start an upgrade, download binaries or restart the server.</remarks>
+        Task CheckEnterpriseUpgradeAllowedAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Read in-place Enterprise Edition upgrade progress. Requires Mattermost 5.27 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires manage_system. The server may report an upgrade error inside an HTTP 200 response; inspect Error. This read does not start an upgrade or restart the server.</remarks>
+        Task<EnterpriseUpgradeStatus> GetEnterpriseUpgradeStatusAsync(CancellationToken cancellationToken = default);
+
         /// <summary>Read server-reported seat and post-history limits.</summary>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         /// <remarks>Requires authentication. User/guest limits and counts require both system administrator status and sysconsole_read_user_management_users; otherwise those fields are zero, while history fields remain available.</remarks>

@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-11
-- Implemented specification operations: 271/608 (44.6%)
+- Implemented specification operations: 274/608 (45.1%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -31,12 +31,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Reports | 2 / 4 |
 | Roles | 4 / 5 |
 | Status | 6 / 7 |
-| System | 21 / 51 |
+| System | 23 / 51 |
 | Teams | 31 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
 | Usage | 3 / 3 |
-| Users | 48 / 77 |
+| Users | 49 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -1891,12 +1891,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## GET /api/v4/upgrade_to_enterprise/allowed - Check if the user is allowed to upgrade to Enterprise Edition
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1659) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1659) | `IMattermostClient.CheckEnterpriseUpgradeAllowedAsync`
+✅ Implemented
 
 ## GET /api/v4/upgrade_to_enterprise/status - Get the current status for the inplace upgrade from Team Edition to Enterprise Edition
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1627) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L1627) | `IMattermostClient.GetEnterpriseUpgradeStatusAsync`
+✅ Implemented
 
 ## GET /api/v4/websocket - Open a WebSocket connection
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/system.yaml#L106) | `IMattermostClient.StartReceivingAsync`
@@ -2307,8 +2307,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/users/invalid_emails - Get users with invalid emails
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3949) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3949) | `IMattermostClient.GetUsersWithInvalidEmailsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/known - Get user IDs of known users
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L935) | `IMattermostClient.GetKnownUserIdsAsync`
