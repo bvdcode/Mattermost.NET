@@ -19,6 +19,13 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Replace the complete permission list of a role.</summary>
+        /// <param name="roleId">Role identifier.</param>
+        /// <param name="permissions">Complete permission names, trimmed and copied before authentication. Empty removes all permissions.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not permission changes already applied.</param>
+        /// <remarks>Unprotected roles require sysconsole_write_user_management_permissions; protected system roles require manage_system instead. The server additionally checks sysconsole_write_user_management_permissions for its standard member/admin roles, or sysconsole_write_user_management_system_roles for other roles, including custom roles. Guest-role changes may require a license. The server validates permissions, removes duplicates and rejects protected permission changes. Read the role first to preserve other permissions. Does not merge or retry.</remarks>
+        Task<Role> UpdateRolePermissionsAsync(string roleId, IEnumerable<string> permissions, CancellationToken cancellationToken = default);
+
         /// <summary>Send a notification test message from the system bot to the current user.</summary>
         /// <param name="cancellationToken">Cancels authentication and the request, not a message already created by the server.</param>
         /// <remarks>Requires authentication. Creates a direct channel with the system bot if needed and posts a message with native forced-notification behavior. Successful completion does not confirm delivery of email or push notifications to a device. Does not change notification settings or test another user's account.</remarks>

@@ -1332,6 +1332,26 @@ Cancellation turns a pending job directly into `canceled`; running jobs receive 
 
 Live checks on Mattermost 12.0.0 passed creation with exact string-map preservation and native metadata, pending cancellation, status-update cancellation, rejection of an unforced invalid transition, explicit forced pending/canceled updates and permission rejection for all three methods, including forced status updates. Separate `active_users` jobs were used with their metrics worker disabled; both remained canceled. Running-worker cancellation and execution of other job types were not tested.
 
+## Role permissions and account emails
+
+```csharp
+Role role = await client.GetRoleByNameAsync("channel_user", cancellationToken);
+await client.UpdateRolePermissionsAsync(role.Id, permissions, cancellationToken);
+
+await client.InviteUsersToTeamAsync(teamId, new[] { "member@example.org" }, cancellationToken);
+await client.SendPasswordResetEmailAsync("member@example.org", cancellationToken);
+await client.SendVerificationEmailAsync("member@example.org", redirect: "/team-name",
+    cancellationToken: cancellationToken);
+```
+
+`UpdateRolePermissionsAsync` replaces the complete list, so preserve permissions you want to retain. An empty list removes all permissions. The input is copied before authentication; duplicates are handled by the native server. Unprotected roles require `sysconsole_write_user_management_permissions`; protected system roles require `manage_system` instead. A second check additionally requires `sysconsole_write_user_management_permissions` for the server's standard member/admin roles, or `sysconsole_write_user_management_system_roles` for other roles, including custom roles. For example, editing `system_admin` requires both `manage_system` and `sysconsole_write_user_management_system_roles`. License checks and restrictions on protected permissions remain native HTTP errors.
+
+`InviteUsersToTeamAsync` requires `invite_user` and `add_user_to_team`. It uses the native standard invitation mode with trimmed email recipients, not graceful per-recipient results. Server domain restrictions and invitation limits apply; a failure does not guarantee rollback of invitations already sent. Sending an invitation does not add its recipient as a member.
+
+Password recovery and verification requests do not require authentication and do not attach the client's stored token. They request email messages without changing the password or verifying the account. HTTP success does not prove account existence, mailbox validity or message delivery. Verification can hide email failures; hardened mode can also hide recovery errors. The optional verification redirect is passed to the server: null omits it and an empty string supplies an empty query value.
+
+Live checks on Mattermost 12.0.0 passed role permission replacement with independent readback, an effective action rejection after removal, exact restoration and successful action afterward, plus administrator permission rejection. Team invitations were accepted without creating memberships; an ordinary non-member bot was rejected. Anonymous verification and unknown-account recovery returned HTTP 200. Existing-account recovery returned an SMTP-related HTTP 500 matching an independent native request; the original password remained usable. Email delivery and token consumption were not tested.
+
 ## Export archives
 
 ```csharp

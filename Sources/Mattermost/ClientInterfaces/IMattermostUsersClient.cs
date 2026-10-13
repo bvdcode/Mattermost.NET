@@ -15,6 +15,19 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostUsersClient
     {
+        /// <summary>Request a password recovery email without authentication.</summary>
+        /// <param name="email">Email address; surrounding whitespace is trimmed.</param>
+        /// <param name="cancellationToken">Cancels the request, not an email already sent.</param>
+        /// <remarks>HTTP success does not establish that an account exists or that a message was delivered. Provider-managed and remote accounts can be rejected; hardened mode can hide these errors. Does not reset a password.</remarks>
+        Task SendPasswordResetEmailAsync(string email, CancellationToken cancellationToken = default);
+
+        /// <summary>Request an email verification message without authentication.</summary>
+        /// <param name="email">Email address; surrounding whitespace is trimmed.</param>
+        /// <param name="redirect">Optional server-side redirect after verification. Null omits the query parameter; empty supplies an empty value.</param>
+        /// <param name="cancellationToken">Cancels the request, not an email already sent.</param>
+        /// <remarks>The server can return HTTP success for unknown accounts or email failures to prevent account enumeration. Does not verify an email address or follow the redirect from this client.</remarks>
+        Task SendVerificationEmailAsync(string email, string? redirect = null, CancellationToken cancellationToken = default);
+
         /// <summary>Generate and store a new multi-factor authentication secret for an account.</summary>
         /// <param name="userId">User identifier or me for the current user.</param>
         /// <param name="cancellationToken">Cancels authentication and the request, not a secret already stored.</param>

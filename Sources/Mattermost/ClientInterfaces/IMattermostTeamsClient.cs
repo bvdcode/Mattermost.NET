@@ -13,6 +13,13 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostTeamsClient
     {
+        /// <summary>Send email invitations to join a team.</summary>
+        /// <param name="teamId">Team identifier.</param>
+        /// <param name="emails">Nonempty collection of email addresses, trimmed and copied before authentication.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not invitations already sent.</param>
+        /// <remarks>Requires invite_user and add_user_to_team. Uses the native fail-on-error mode, not graceful per-recipient results. The server applies domain restrictions and invitation limits. Errors do not guarantee that earlier invitations were rolled back; success does not confirm a valid mailbox, email delivery or add recipients as members.</remarks>
+        Task InviteUsersToTeamAsync(string teamId, IEnumerable<string> emails, CancellationToken cancellationToken = default);
+
         /// <summary>Create a team. Requires create_team permission.</summary>
         /// <param name="name">Team URL name. Surrounding whitespace is removed.</param>
         /// <param name="displayName">Team display name. Surrounding whitespace is removed.</param>

@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-13
-- Implemented specification operations: 308/608 (50.7%)
+- Implemented specification operations: 312/608 (51.3%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -34,15 +34,15 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Preferences | 5 / 5 |
 | Reactions | 3 / 3 |
 | Reports | 2 / 4 |
-| Roles | 4 / 5 |
+| Roles | 5 / 5 |
 | Shared Channels | 1 / 7 |
 | Status | 6 / 7 |
 | System | 33 / 51 |
-| Teams | 31 / 38 |
+| Teams | 32 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
 | Usage | 3 / 3 |
-| Users | 56 / 77 |
+| Users | 58 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -1613,8 +1613,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## PUT /api/v4/roles/{role_id}/patch - Patch a role
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L91) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/roles.yaml#L91) | `IMattermostClient.UpdateRolePermissionsAsync`
+✅ Implemented
 
 # Root
 
@@ -2107,8 +2107,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/teams/{team_id}/invite/email - Invite users to the team by email
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1390) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1390) | `IMattermostClient.InviteUsersToTeamAsync`
+✅ Implemented
 
 ## POST /api/v4/teams/{team_id}/members - Add user to team
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L627) | `IMattermostClient.AddTeamMemberAsync`
@@ -2405,8 +2405,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/email/verify/send - Send verification email
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2264) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2264) | `IMattermostClient.SendVerificationEmailAsync`
+✅ Implemented
 
 ## POST /api/v4/users/group_channels - Get users by group channels ids
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L726) | `IMattermostClient.GetUsersByGroupChannelIdsAsync`
@@ -2461,8 +2461,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ❌ Not implemented
 
 ## POST /api/v4/users/password/reset/send - Send password reset email
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1890) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L1890) | `IMattermostClient.SendPasswordResetEmailAsync`
+✅ Implemented
 
 ## POST /api/v4/users/search - Search users
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L800) | `IMattermostClient.SearchUsersAsync`
