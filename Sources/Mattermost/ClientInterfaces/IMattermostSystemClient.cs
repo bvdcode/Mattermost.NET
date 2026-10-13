@@ -109,6 +109,25 @@ namespace Mattermost
         /// <remarks>Requires permission to manage the job's type. Native transitions are checked by default. CancelRequested cancels a pending job immediately rather than persisting that intermediate status. Does not wait for workers or undo completed work.</remarks>
         Task UpdateJobStatusAsync(string jobId, JobStatusUpdate status, bool force = false, CancellationToken cancellationToken = default);
 
+        /// <summary>List available files in the server's export directory. Requires Mattermost 5.33 or later.</summary>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>Exact filenames without paths. The list can be empty.</returns>
+        /// <remarks>Requires a system administrator. Does not create an export or wait for an export job to finish.</remarks>
+        Task<IList<string>> GetExportsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Download an export archive. Requires Mattermost 5.33 or later.</summary>
+        /// <param name="exportName">Exact filename returned by GetExportsAsync. Paths and control characters are rejected; the name is not trimmed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <returns>The complete archive buffered in memory.</returns>
+        /// <remarks>Requires a system administrator. Export archives can contain sensitive workspace data and be large. An absent file produces the native HTTP 404 error.</remarks>
+        Task<byte[]> DownloadExportAsync(string exportName, CancellationToken cancellationToken = default);
+
+        /// <summary>Delete an export file. Requires Mattermost 5.33 or later.</summary>
+        /// <param name="exportName">Exact filename returned by GetExportsAsync. Paths and control characters are rejected; the name is not trimmed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not a deletion already applied.</param>
+        /// <remarks>Requires a system administrator. Deletes the server-side file, not the export job or workspace data. Deleting an absent file succeeds.</remarks>
+        Task DeleteExportAsync(string exportName, CancellationToken cancellationToken = default);
+
         /// <summary>List completed files in the server's import directory. Requires Mattermost 5.31 or later.</summary>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         /// <remarks>Requires a system administrator. Returns filenames without paths; unfinished upload files are excluded. Listing does not process an import.</remarks>

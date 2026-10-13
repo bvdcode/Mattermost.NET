@@ -1332,6 +1332,18 @@ Cancellation turns a pending job directly into `canceled`; running jobs receive 
 
 Live checks on Mattermost 12.0.0 passed creation with exact string-map preservation and native metadata, pending cancellation, status-update cancellation, rejection of an unforced invalid transition, explicit forced pending/canceled updates and permission rejection for all three methods, including forced status updates. Separate `active_users` jobs were used with their metrics worker disabled; both remained canceled. Running-worker cancellation and execution of other job types were not tested.
 
+## Export archives
+
+```csharp
+IList<string> exports = await client.GetExportsAsync(cancellationToken);
+byte[] archive = await client.DownloadExportAsync(exportName, cancellationToken);
+await client.DeleteExportAsync(exportName, cancellationToken);
+```
+
+These methods require a system administrator and Mattermost 5.33+. Pass the exact filename returned by listing; surrounding spaces are preserved, and paths and control characters are rejected. Downloads buffer the complete archive in memory, so allow enough memory for its size and treat workspace export data as sensitive. Deleting an absent file succeeds; downloading one returns the native HTTP 404 error. Deletion removes only the archive, not its job or the source workspace data. Listing does not create an export or wait for a running export job.
+
+Live checks on Mattermost 12.0.0 passed empty and nonempty listing matched against native HTTP, exact ZIP byte comparison, deletion with independent readback, repeated absent deletion, absent download rejection and non-administrator rejection for all three methods. Exports were limited to a separate test team without attachments; its team, completed jobs and a separate archive remained available afterward. Cloud presigned downloads are not covered by these methods.
+
 ## Import archives
 
 ```csharp

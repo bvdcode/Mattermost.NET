@@ -4,8 +4,8 @@ This document maps operations in the official Mattermost OpenAPI specification t
 
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
-- Last reviewed: 2026-10-12
-- Implemented specification operations: 305/608 (50.2%)
+- Last reviewed: 2026-10-13
+- Implemented specification operations: 308/608 (50.7%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -21,6 +21,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Channels | 54 / 61 |
 | Commands | 10 / 10 |
 | Emoji | 9 / 9 |
+| Exports | 3 / 4 |
 | Files | 10 / 12 |
 | Imports | 2 / 2 |
 | Integration Actions | 1 / 4 |
@@ -856,16 +857,16 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Exports
 
 ## DELETE /api/v4/exports/{export_name} - Delete an export file
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/exports.yaml#L57) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/exports.yaml#L57) | `IMattermostClient.DeleteExportAsync`
+✅ Implemented
 
 ## GET /api/v4/exports - List export files
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/exports.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/exports.yaml#L2) | `IMattermostClient.GetExportsAsync`
+✅ Implemented
 
 ## GET /api/v4/exports/{export_name} - Download an export file
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/exports.yaml#L25) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/exports.yaml#L25) | `IMattermostClient.DownloadExportAsync`
+✅ Implemented
 
 ## POST /api/v4/exports/{export_name}/presign-url - Create a presigned URL for export download
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/exports.yaml#L88) | `—`
