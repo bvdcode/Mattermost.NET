@@ -15,6 +15,10 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostChannelsClient
     {
+        /// <summary>Assign a nonempty channel permission scheme to a channel.</summary>
+        /// <remarks>Requires manage_system and a license. The scheme must have channel scope; the native endpoint rejects an empty scheme identifier.</remarks>
+        Task SetChannelSchemeAsync(string channelId, string schemeId, CancellationToken cancellationToken = default);
+
         /// <summary>Replace a public or private channel's membership. Requires Mattermost 11.7 or later.</summary>
         /// <param name="channelId">Channel identifier.</param>
         /// <param name="members">Complete desired membership, copied before authentication. May be empty for public channels.</param>

@@ -5,6 +5,7 @@ using Mattermost.Models.Notices;
 using Mattermost.Models.Plugins;
 using Mattermost.Models.Responses;
 using Mattermost.Models.Roles;
+using Mattermost.Models.Schemes;
 using Mattermost.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,40 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostSystemClient
     {
+        /// <summary>Get a page of permission schemes. Requires Mattermost 5.0 or later.</summary>
+        /// <param name="page">Zero-based page.</param>
+        /// <param name="perPage">Positive page size.</param>
+        /// <param name="scope">Optional team or channel scope filter.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Requires sysconsole_read_user_management_permissions. Does not retrieve every page automatically.</remarks>
+        Task<IList<Scheme>> GetSchemesAsync(int page = 0, int perPage = 60, SchemeScope? scope = null, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a permission scheme. Requires sysconsole_read_user_management_permissions.</summary>
+        Task<Scheme> GetSchemeAsync(string schemeId, CancellationToken cancellationToken = default);
+
+        /// <summary>Create a team or channel permission scheme with server-created default roles.</summary>
+        /// <param name="displayName">Nonblank display name.</param>
+        /// <param name="scope">Team or channel scope.</param>
+        /// <param name="name">Optional unique name; null lets the server generate it.</param>
+        /// <param name="description">Description, trimmed before sending.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not a creation already applied.</param>
+        /// <remarks>Requires sysconsole_write_user_management_permissions and a license supporting custom permission schemes. Does not assign the scheme to resources.</remarks>
+        Task<Scheme> CreateSchemeAsync(string displayName, SchemeScope scope, string? name = null, string description = "", CancellationToken cancellationToken = default);
+
+        /// <summary>Change selected permission scheme metadata. Null leaves a field unchanged; empty description clears it.</summary>
+        /// <remarks>Requires sysconsole_write_user_management_permissions and a supporting license. Scope and default roles are not changed; server name validation remains enforced.</remarks>
+        Task<Scheme> PatchSchemeAsync(string schemeId, string? name = null, string? displayName = null, string? description = null, CancellationToken cancellationToken = default);
+
+        /// <summary>Soft-delete a permission scheme and its associated roles.</summary>
+        /// <remarks>Requires sysconsole_write_user_management_permissions and a supporting license. Resources using the scheme revert to their applicable defaults.</remarks>
+        Task DeleteSchemeAsync(string schemeId, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of teams using a team-scoped scheme. Requires sysconsole_read_user_management_teams.</summary>
+        Task<IList<Mattermost.Models.Teams.Team>> GetSchemeTeamsAsync(string schemeId, int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
+        /// <summary>Get a page of channels using a channel-scoped scheme. Requires sysconsole_read_user_management_channels.</summary>
+        Task<IList<Mattermost.Models.Channels.Channel>> GetSchemeChannelsAsync(string schemeId, int page = 0, int perPage = 60, CancellationToken cancellationToken = default);
+
         /// <summary>Replace the complete permission list of a role.</summary>
         /// <param name="roleId">Role identifier.</param>
         /// <param name="permissions">Complete permission names, trimmed and copied before authentication. Empty removes all permissions.</param>

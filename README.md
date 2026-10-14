@@ -1332,6 +1332,27 @@ Cancellation turns a pending job directly into `canceled`; running jobs receive 
 
 Live checks on Mattermost 12.0.0 passed creation with exact string-map preservation and native metadata, pending cancellation, status-update cancellation, rejection of an unforced invalid transition, explicit forced pending/canceled updates and permission rejection for all three methods, including forced status updates. Separate `active_users` jobs were used with their metrics worker disabled; both remained canceled. Running-worker cancellation and execution of other job types were not tested.
 
+## Permission schemes
+
+```csharp
+IList<Scheme> schemes = await client.GetSchemesAsync(scope: SchemeScope.Team,
+    cancellationToken: cancellationToken);
+Scheme scheme = await client.CreateSchemeAsync("Project permissions", SchemeScope.Team,
+    name: "project_permissions", cancellationToken: cancellationToken);
+await client.SetTeamSchemeAsync(teamId, scheme.Id, cancellationToken);
+scheme = await client.PatchSchemeAsync(scheme.Id, description: "Project-specific roles",
+    cancellationToken: cancellationToken);
+IList<Team> teams = await client.GetSchemeTeamsAsync(scheme.Id, cancellationToken: cancellationToken);
+await client.SetTeamSchemeAsync(teamId, "", cancellationToken);
+await client.DeleteSchemeAsync(scheme.Id, cancellationToken);
+```
+
+The permission scheme API requires Mattermost 5.0+. List and individual reads require `sysconsole_read_user_management_permissions`; related-team and related-channel reads require their respective system-console read permissions. Creation, metadata changes and deletion require `sysconsole_write_user_management_permissions` and a license supporting custom schemes. The server creates role names and grants their initial permissions; use `UpdateRolePermissionsAsync` to update a scheme role's complete permission list.
+
+`PatchSchemeAsync` sends only supplied name, display name and description. Null omits a field, an empty description clears it, and the server validates names. It does not change scope or role definitions. Team assignment accepts an empty scheme identifier to restore the system default. Channel assignment requires a nonempty channel-scoped scheme and `manage_system`; the native endpoint rejects an empty identifier. Both assignments change effective permissions and return completion status, not an updated resource. Use ordinary team/channel reads for subsequent inspection.
+
+Request, response, paging, optional-field and cancellation tests cover all nine methods. Live checks on an unlicensed Mattermost 12.0.0 server passed empty administrator listing, native missing-scheme responses and permission/license rejection, matched against independent HTTP requests. Creation, successful metadata changes, deletion and assignment require a licensed instance and were not verified live.
+
 ## Role permissions and account emails
 
 ```csharp

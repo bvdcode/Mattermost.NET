@@ -4,8 +4,8 @@ This document maps operations in the official Mattermost OpenAPI specification t
 
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
-- Last reviewed: 2026-10-13
-- Implemented specification operations: 312/608 (51.3%)
+- Last reviewed: 2026-10-14
+- Implemented specification operations: 321/608 (52.8%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -18,7 +18,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 |---|---|
 | Bots | 9 / 9 |
 | Brand | 2 / 3 |
-| Channels | 54 / 61 |
+| Channels | 55 / 61 |
 | Commands | 10 / 10 |
 | Emoji | 9 / 9 |
 | Exports | 3 / 4 |
@@ -35,10 +35,11 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Reactions | 3 / 3 |
 | Reports | 2 / 4 |
 | Roles | 5 / 5 |
+| Schemes | 7 / 7 |
 | Shared Channels | 1 / 7 |
 | Status | 6 / 7 |
 | System | 33 / 51 |
-| Teams | 32 / 38 |
+| Teams | 33 / 38 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
 | Usage | 3 / 3 |
@@ -469,8 +470,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## PUT /api/v4/channels/{channel_id}/scheme - Set a channel's scheme
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2355) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2355) | `IMattermostClient.SetChannelSchemeAsync`
+✅ Implemented
 
 ## PUT /api/v4/channels/members/{user_id}/direct/read - Mark all direct and group messages as read
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/channels.yaml#L2124) | `IMattermostClient.MarkAllDirectMessagesReadAsync`
@@ -1715,32 +1716,32 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Schemes
 
 ## DELETE /api/v4/schemes/{scheme_id} - Delete a scheme
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L136) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L136) | `IMattermostClient.DeleteSchemeAsync`
+✅ Implemented
 
 ## GET /api/v4/schemes - Get the schemes.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L2) | `IMattermostClient.GetSchemesAsync`
+✅ Implemented
 
 ## GET /api/v4/schemes/{scheme_id} - Get a scheme
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L104) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L104) | `IMattermostClient.GetSchemeAsync`
+✅ Implemented
 
 ## GET /api/v4/schemes/{scheme_id}/channels - Get a page of channels which use this scheme.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L283) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L283) | `IMattermostClient.GetSchemeChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/schemes/{scheme_id}/teams - Get a page of teams which use this scheme.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L228) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L228) | `IMattermostClient.GetSchemeTeamsAsync`
+✅ Implemented
 
 ## POST /api/v4/schemes - Create a scheme
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L53) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L53) | `IMattermostClient.CreateSchemeAsync`
+✅ Implemented
 
 ## PUT /api/v4/schemes/{scheme_id}/patch - Patch a scheme
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L171) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/schemes.yaml#L171) | `IMattermostClient.PatchSchemeAsync`
+✅ Implemented
 
 # Shared Channels
 
@@ -2159,8 +2160,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## PUT /api/v4/teams/{team_id}/scheme - Set a team's scheme
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1618) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/teams.yaml#L1618) | `IMattermostClient.SetTeamSchemeAsync`
+✅ Implemented
 
 # Terms Of Service
 

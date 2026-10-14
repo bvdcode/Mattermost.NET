@@ -13,6 +13,10 @@ namespace Mattermost
     /// </summary>
     public interface IMattermostTeamsClient
     {
+        /// <summary>Assign a team permission scheme. Empty schemeId restores the system default.</summary>
+        /// <remarks>Requires sysconsole_write_user_management_permissions and a supporting license. A supplied scheme must have team scope; assignment can change effective permissions.</remarks>
+        Task SetTeamSchemeAsync(string teamId, string schemeId, CancellationToken cancellationToken = default);
+
         /// <summary>Send email invitations to join a team.</summary>
         /// <param name="teamId">Team identifier.</param>
         /// <param name="emails">Nonempty collection of email addresses, trimmed and copied before authentication.</param>
