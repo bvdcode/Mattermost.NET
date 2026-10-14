@@ -10,6 +10,7 @@ namespace Mattermost
     /// Mattermost client interface.
     /// </summary>
     public interface IMattermostClient :
+        IMattermostGroupsClient,
         IMattermostUsersClient,
         IMattermostPostsClient,
         IMattermostChannelsClient,

@@ -45,6 +45,7 @@
         internal const string Imports = version + "/imports";
         internal const string Exports = version + "/exports";
         internal const string Schemes = version + "/schemes";
+        internal const string Groups = version + "/groups";
         internal const string ServerLimits = version + "/limits/server";
         internal const string LatestVersion = version + "/latest_version";
         internal const string ClientConfig = version + "/config/client";

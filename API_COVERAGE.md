@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-14
-- Implemented specification operations: 321/608 (52.8%)
+- Implemented specification operations: 346/608 (56.9%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -23,6 +23,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Emoji | 9 / 9 |
 | Exports | 3 / 4 |
 | Files | 10 / 12 |
+| Groups | 25 / 26 |
 | Imports | 2 / 2 |
 | Integration Actions | 1 / 4 |
 | Jobs | 6 / 7 |
@@ -926,108 +927,108 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Groups
 
 ## DELETE /api/v4/groups/{group_id} - Deletes a custom group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L180) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L180) | `IMattermostClient.DeleteGroupAsync`
+✅ Implemented
 
 ## DELETE /api/v4/groups/{group_id}/channels/{channel_id}/link - Unlink a channel from a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L432) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L432) | `IMattermostClient.UnlinkGroupFromChannelAsync`
+✅ Implemented
 
 ## DELETE /api/v4/groups/{group_id}/members - Removes members from a custom group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L800) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L800) | `IMattermostClient.RemoveGroupMembersAsync`
+✅ Implemented
 
 ## DELETE /api/v4/groups/{group_id}/teams/{team_id}/link - Unlink a team from a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L346) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L346) | `IMattermostClient.UnlinkGroupFromTeamAsync`
+✅ Implemented
 
 ## DELETE /api/v4/ldap/groups/{remote_id}/link - Delete a link for LDAP group
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/ldap.yaml#L215) | `—`
 ❌ Not implemented
 
 ## GET /api/v4/channels/{channel_id}/groups - Get channel groups
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L935) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L935) | `IMattermostClient.GetChannelGroupsAsync`
+✅ Implemented
 
 ## GET /api/v4/groups - Get groups
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L2) | `IMattermostClient.GetGroupsAsync`
+✅ Implemented
 
 ## GET /api/v4/groups/{group_id} - Get a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L146) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L146) | `IMattermostClient.GetGroupAsync`
+✅ Implemented
 
 ## GET /api/v4/groups/{group_id}/channels - Get channel syncables for a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L602) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L602) | `IMattermostClient.GetGroupChannelsAsync`
+✅ Implemented
 
 ## GET /api/v4/groups/{group_id}/channels/{channel_id} - Get a channel syncable for a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L520) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L520) | `IMattermostClient.GetGroupChannelAsync`
+✅ Implemented
 
 ## GET /api/v4/groups/{group_id}/members - Get group users
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L745) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L745) | `IMattermostClient.GetGroupMembersAsync`
+✅ Implemented
 
 ## GET /api/v4/groups/{group_id}/stats - Get group stats
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L893) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L893) | `IMattermostClient.GetGroupStatsAsync`
+✅ Implemented
 
 ## GET /api/v4/groups/{group_id}/teams - Get team syncables for a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L563) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L563) | `IMattermostClient.GetGroupTeamsAsync`
+✅ Implemented
 
 ## GET /api/v4/groups/{group_id}/teams/{team_id} - Get a team syncable for a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L477) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L477) | `IMattermostClient.GetGroupTeamAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/groups - Get team groups
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L992) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L992) | `IMattermostClient.GetTeamGroupsAsync`
+✅ Implemented
 
 ## GET /api/v4/teams/{team_id}/groups_by_channels - Get team groups by channels
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L1102) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L1102) | `IMattermostClient.GetTeamChannelGroupsAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/groups - Get groups for a userId
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L1166) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L1166) | `IMattermostClient.GetUserGroupsAsync`
+✅ Implemented
 
 ## POST /api/v4/groups - Create a custom group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L90) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L90) | `IMattermostClient.CreateGroupAsync`
+✅ Implemented
 
 ## POST /api/v4/groups/{group_id}/channels/{channel_id}/link - Link a channel to a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L388) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L388) | `IMattermostClient.LinkGroupToChannelAsync`
+✅ Implemented
 
 ## POST /api/v4/groups/{group_id}/members - Adds members to a custom group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L846) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L846) | `IMattermostClient.AddGroupMembersAsync`
+✅ Implemented
 
 ## POST /api/v4/groups/{group_id}/restore - Restore a previously deleted group.
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L268) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L268) | `IMattermostClient.RestoreGroupAsync`
+✅ Implemented
 
 ## POST /api/v4/groups/{group_id}/teams/{team_id}/link - Link a team to a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L305) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L305) | `IMattermostClient.LinkGroupToTeamAsync`
+✅ Implemented
 
 ## POST /api/v4/groups/names - Get groups by name
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L1196) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L1196) | `IMattermostClient.GetGroupsByNamesAsync`
+✅ Implemented
 
 ## PUT /api/v4/groups/{group_id}/channels/{channel_id}/patch - Patch a channel syncable for a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L693) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L693) | `IMattermostClient.PatchGroupChannelAsync`
+✅ Implemented
 
 ## PUT /api/v4/groups/{group_id}/patch - Patch a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L213) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L213) | `IMattermostClient.PatchGroupAsync`
+✅ Implemented
 
 ## PUT /api/v4/groups/{group_id}/teams/{team_id}/patch - Patch a team syncable for a group
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L641) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/groups.yaml#L641) | `IMattermostClient.PatchGroupTeamAsync`
+✅ Implemented
 
 # Health
 

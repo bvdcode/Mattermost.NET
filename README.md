@@ -46,7 +46,7 @@ await client.CreatePostAsync(channelId, "Hello from Mattermost.NET!");
 
 # Client interfaces
 
-`IMattermostClient` combines the complete API and connection management. A service can instead depend on the narrower `IMattermostUsersClient`, `IMattermostPostsClient`, `IMattermostChannelsClient`, `IMattermostTeamsClient`, `IMattermostFilesClient`, `IMattermostIntegrationsClient`, `IMattermostEmojisClient`, or `IMattermostSystemClient` contract.
+`IMattermostClient` combines the complete API and connection management. A service can instead depend on the narrower `IMattermostUsersClient`, `IMattermostPostsClient`, `IMattermostChannelsClient`, `IMattermostTeamsClient`, `IMattermostFilesClient`, `IMattermostIntegrationsClient`, `IMattermostEmojisClient`, `IMattermostGroupsClient`, or `IMattermostSystemClient` contract.
 
 ```csharp
 using Mattermost;
@@ -1352,6 +1352,33 @@ The permission scheme API requires Mattermost 5.0+. List and individual reads re
 `PatchSchemeAsync` sends only supplied name, display name and description. Null omits a field, an empty description clears it, and the server validates names. It does not change scope or role definitions. Team assignment accepts an empty scheme identifier to restore the system default. Channel assignment requires a nonempty channel-scoped scheme and `manage_system`; the native endpoint rejects an empty identifier. Both assignments change effective permissions and return completion status, not an updated resource. Use ordinary team/channel reads for subsequent inspection.
 
 Request, response, paging, optional-field and cancellation tests cover all nine methods. Live checks on an unlicensed Mattermost 12.0.0 server passed empty administrator listing, native missing-scheme responses and permission/license rejection, matched against independent HTTP requests. Creation, successful metadata changes, deletion and assignment require a licensed instance and were not verified live.
+
+## Groups
+
+```csharp
+Group group = await client.CreateGroupAsync("responders", "Incident responders", userIds,
+    cancellationToken: cancellationToken);
+group = await client.PatchGroupAsync(group.Id, description: "On-call responders",
+    cancellationToken: cancellationToken);
+GroupMemberList members = await client.GetGroupMembersAsync(group.Id,
+    cancellationToken: cancellationToken);
+await client.AddGroupMembersAsync(group.Id, additionalUserIds, cancellationToken);
+
+GroupSyncable link = await client.LinkGroupToTeamAsync(directoryGroupId, teamId,
+    autoAdd: true, cancellationToken: cancellationToken);
+link = await client.PatchGroupTeamAsync(directoryGroupId, teamId,
+    schemeAdmin: false, cancellationToken: cancellationToken);
+```
+
+Group operations require a supporting license. Custom group creation additionally requires `EnableCustomGroups` and `create_custom_group`; it always creates a mentionable group. Metadata changes, member management, soft deletion and restoration require the corresponding custom-group permissions. Directory groups require LDAP group support and native system-console or resource permissions. The server controls visibility and validates mention names. Group sources remain strings so plugin-defined sources can be read.
+
+`PatchGroupAsync` sends only supplied fields: null omits a field, false is an explicit value, and an empty description clears it. Custom groups cannot disable mentions. Member reads return user profiles and `TotalMemberCount`; addition and removal return membership rows, not profiles. Empty name/member batches are allowed. Inputs and search options are copied before authentication. Member additions do not directly add users to teams or channels.
+
+Directory links synchronize memberships and optionally administrator roles asynchronously. HTTP completion does not mean synchronization has finished. Supply `autoAdd` and `schemeAdmin` explicitly when creating or replacing links; omitted values follow the server's linking behavior. Link patches preserve omitted fields. Unlinking can remove memberships controlled by that group. Channel/team association responses contain `TotalGroupCount`, while `GetTeamChannelGroupsAsync` returns a map of channel identifiers to group associations. `paginate: false` requests the complete native result.
+
+For a team without group constraints, `LinkGroupToChannelAsync` can also create or update the group's link to the team containing that channel. This may change the parent-team link's `AutoAdd` and `SchemeAdmin` flags. These side effects are native Mattermost behavior; inspect the team's group links when those settings matter.
+
+Request, response, optional-field, paging and cancellation tests cover all 25 methods. On the unlicensed Mattermost 12.0.0 test server, all methods returned native HTTP 501 license errors, matching independent HTTP requests for administrator and bot accounts; server configuration was unchanged. Successful group mutations and membership synchronization were not verified live.
 
 ## Role permissions and account emails
 
