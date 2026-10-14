@@ -5,7 +5,7 @@ This document maps operations in the official Mattermost OpenAPI specification t
 - Mattermost API documentation: https://docs.mattermost.com/api
 - Mattermost OpenAPI source: https://github.com/mattermost/mattermost/tree/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source
 - Last reviewed: 2026-10-14
-- Implemented specification operations: 346/608 (56.9%)
+- Implemented specification operations: 351/608 (57.7%)
 - Additional Calls plugin routes: 3
 
 The SDK uses the current `/api/v4` protocol. Its version is independent of the Mattermost server release number.
@@ -28,6 +28,7 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Integration Actions | 1 / 4 |
 | Jobs | 6 / 7 |
 | Logs | 1 / 1 |
+| Metrics | 1 / 1 |
 | OAuth | 9 / 10 |
 | Permissions | 1 / 1 |
 | Plugins | 5 / 13 |
@@ -41,10 +42,11 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 | Status | 6 / 7 |
 | System | 33 / 51 |
 | Teams | 33 / 38 |
+| Terms Of Service | 2 / 2 |
 | Threads | 7 / 7 |
 | Uploads | 3 / 3 |
 | Usage | 3 / 3 |
-| Users | 58 / 77 |
+| Users | 60 / 77 |
 | Webhooks | 11 / 11 |
 
 ## Legend
@@ -1175,8 +1177,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Metrics
 
 ## POST /api/v4/client_perf - Report client performance metrics
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/metrics.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/metrics.yaml#L2) | `IMattermostClient.SubmitPerformanceReportAsync`
+✅ Implemented
 
 # Oauth
 
@@ -2167,12 +2169,12 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 # Terms Of Service
 
 ## GET /api/v4/terms_of_service - Get latest terms of service
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/service_terms.yaml#L2) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/service_terms.yaml#L2) | `IMattermostClient.GetTermsOfServiceAsync`
+✅ Implemented
 
 ## POST /api/v4/terms_of_service - Creates a new terms of service
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/service_terms.yaml#L24) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/service_terms.yaml#L24) | `IMattermostClient.CreateTermsOfServiceAsync`
+✅ Implemented
 
 # Threads
 
@@ -2291,8 +2293,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## GET /api/v4/users/{user_id}/terms_of_service - Fetches user's latest terms of service action if the latest action was
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3011) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L3011) | `IMattermostClient.GetUserTermsOfServiceAsync`
+✅ Implemented
 
 ## GET /api/v4/users/{user_id}/tokens - Get user access tokens
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2477) | `IMattermostClient.GetUserAccessTokensAsync`
@@ -2391,8 +2393,8 @@ Coverage counts unique HTTP method/path pairs from the canonical core API source
 ✅ Implemented
 
 ## POST /api/v4/users/{user_id}/terms_of_service - Records user action when they accept or decline custom terms of service
-[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2955) | `—`
-❌ Not implemented
+[Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2955) | `IMattermostClient.RegisterTermsOfServiceActionAsync`
+✅ Implemented
 
 ## POST /api/v4/users/{user_id}/tokens - Create a user access token
 [Mattermost API](https://github.com/mattermost/mattermost/blob/18c34098b13ba9b78c9613c517b913ef0a330650/api/v4/source/users.yaml#L2429) | `IMattermostClient.CreateUserAccessTokenAsync`

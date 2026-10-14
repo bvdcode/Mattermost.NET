@@ -1,5 +1,6 @@
 using Mattermost.Constants;
 using Mattermost.Enums;
+using Mattermost.Models;
 using Mattermost.Models.Jobs;
 using Mattermost.Models.Notices;
 using Mattermost.Models.Plugins;
@@ -441,5 +442,21 @@ namespace Mattermost
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         /// <returns>Ratio multiplied by 1000 and rounded: 1000 represents 100 percent. Returns zero when no license or licensed user limit is present. Bot and deleted accounts are excluded.</returns>
         Task<long> GetLicenseLoadMetricAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Get the latest custom terms of service. Requires authentication and Mattermost 5.4 or later.</summary>
+        /// <remarks>A server without published terms returns a native HTTP 404 error.</remarks>
+        Task<TermsOfService> GetTermsOfServiceAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Publish custom terms of service. Requires manage_system, a supporting license and Mattermost 5.4 or later.</summary>
+        /// <param name="text">Nonblank text; surrounding whitespace is removed.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Identical text returns the existing version. Does not enable enforcement or change server settings. New versions may require users to accept again according to server policy.</remarks>
+        Task<TermsOfService> CreateTermsOfServiceAsync(string text, CancellationToken cancellationToken = default);
+
+        /// <summary>Submit client performance measurements. Requires authentication and Mattermost 9.9 or later.</summary>
+        /// <param name="report">Native report, copied before authentication. Timestamps are Unix milliseconds; labels are string maps.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request, not already recorded samples.</param>
+        /// <remarks>The server returns success without recording data when client metrics or its backend are disabled. Unknown metric names are ignored. HTTP success does not confirm recording; this method does not enable metrics or change server settings.</remarks>
+        Task SubmitPerformanceReportAsync(PerformanceReport report, CancellationToken cancellationToken = default);
     }
 }

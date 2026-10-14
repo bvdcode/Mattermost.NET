@@ -611,5 +611,16 @@ namespace Mattermost
         /// <param name="preferences">Preference keys with the target user's actual UserId. Value is ignored by the server.</param>
         /// <param name="cancellationToken">Cancels authentication and the request.</param>
         Task DeletePreferencesAsync(string userId, IEnumerable<Preference> preferences, CancellationToken cancellationToken = default);
+
+        /// <summary>Get the current account's stored acceptance of custom terms of service. Requires Mattermost 5.6 or later.</summary>
+        /// <remarks>Operates on the authenticated account, not another user. No acceptance produces a native HTTP 404 error; the returned terms identifier need not be the latest published version.</remarks>
+        Task<UserTermsOfService> GetUserTermsOfServiceAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>Record the current account's acceptance or rejection of a published terms version. Requires Mattermost 5.4 or later.</summary>
+        /// <param name="termsOfServiceId">Published terms identifier; surrounding whitespace is removed.</param>
+        /// <param name="accepted">True stores acceptance. False removes acceptance for this version.</param>
+        /// <param name="cancellationToken">Cancels authentication and the request.</param>
+        /// <remarks>Operates on the authenticated account only. Does not delete or change the published terms. Native audit and policy behavior remains server-controlled.</remarks>
+        Task RegisterTermsOfServiceActionAsync(string termsOfServiceId, bool accepted, CancellationToken cancellationToken = default);
     }
 }

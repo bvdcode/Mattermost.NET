@@ -1380,6 +1380,38 @@ For a team without group constraints, `LinkGroupToChannelAsync` can also create 
 
 Request, response, optional-field, paging and cancellation tests cover all 25 methods. On the unlicensed Mattermost 12.0.0 test server, all methods returned native HTTP 501 license errors, matching independent HTTP requests for administrator and bot accounts; server configuration was unchanged. Successful group mutations and membership synchronization were not verified live.
 
+## Terms of service
+
+```csharp
+TermsOfService terms = await client.GetTermsOfServiceAsync(cancellationToken);
+await client.RegisterTermsOfServiceActionAsync(terms.Id, accepted: true,
+    cancellationToken: cancellationToken);
+UserTermsOfService acceptance = await client.GetUserTermsOfServiceAsync(cancellationToken);
+```
+
+Terms reads require authentication. Publishing with `CreateTermsOfServiceAsync(text)` requires `manage_system` and a license supporting custom terms; it does not enable enforcement or change server settings. Publishing identical text returns the existing version. Text is trimmed at its edges, with internal formatting preserved. Terms reads and publication require Mattermost 5.4+; reading an acceptance requires 5.6+.
+
+Acceptance methods operate only on the authenticated account. Passing `accepted: false` removes its acceptance for that terms version; it does not delete the published terms. No published terms or no stored acceptance produces a native HTTP 404 error. The stored acceptance may refer to an older version; compare identifiers when current acceptance matters. Policy and audit behavior remain server-controlled. The native request uses `termsOfServiceId` and a boolean `accepted`.
+
+Contract and cancellation tests cover all four methods. Live checks on an unlicensed Mattermost 12.0.0 server matched native missing-terms, missing-acceptance and publication license/permission errors for administrator and bot accounts. Publishing and successful acceptance/rejection were not verified live; configuration was unchanged.
+
+## Client performance metrics
+
+```csharp
+long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+await client.SubmitPerformanceReportAsync(new PerformanceReport
+{
+    Start = now - 1000,
+    End = now,
+    Labels = new Dictionary<string, string> { ["platform"] = "windows", ["agent"] = "other" },
+    Histograms = new List<MetricSample> { new MetricSample { Metric = "TTFB", Value = 125.5 } }
+}, cancellationToken);
+```
+
+Requires authentication and Mattermost 9.9+. Reports default to schema version `0.1.0`. Labels are string maps, report times are Unix milliseconds and measurement units depend on the metric; timing measurements generally use milliseconds. Fractional values are preserved. Reports must have finite ordered timestamps and non-null samples with finite values. The SDK copies the complete report before authentication, and the server validates schema support, age and metric names. Unknown metric names are ignored.
+
+The server returns HTTP 200 with an empty body when its metrics backend or client metrics are disabled. This method accepts that native success response without changing the shared JSON transport. HTTP success does not prove that samples were recorded. On the Mattermost 12.0.0 test server, administrator and bot submissions passed and matched direct HTTP 200 requests with empty bodies; its metrics backend was disabled, so recording was not verified. Server configuration was unchanged. Contract tests cover both native success response forms, nested input snapshots, validation, errors and cancellation.
+
 ## Role permissions and account emails
 
 ```csharp
