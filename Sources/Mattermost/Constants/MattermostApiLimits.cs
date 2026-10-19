@@ -15,10 +15,10 @@
         public const int MaxServerLogsPerPage = 10000;
 
         /// <summary>
-        /// Maximum length of the post text. <br/>
-        /// https://mattermost.com/blog/mattermost-5-0-intercept-and-modify-posts-advanced-permissions-longer-posts-and-more/#:~:text=Increased%20character%20limits%20on%20posts,better%20Markdown%20formatting%2C%20including%20tables.
+        /// Maximum number of Unicode code points in post text, supported by Mattermost 12 and later.
+        /// Older servers may enforce a lower limit.
         /// </summary>
-        public const int MaxPostMessageLength = 16383;
+        public const int MaxPostMessageLength = 262144;
 
         /// <summary>
         /// Maximum number of post IDs accepted by a single bulk lookup.

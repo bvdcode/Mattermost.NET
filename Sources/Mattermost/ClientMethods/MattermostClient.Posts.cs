@@ -33,11 +33,7 @@ namespace Mattermost
             bool requestedAck = false, bool persistentNotifications = false)
         {
             CheckDisposed();
-            if (message.Length > MattermostApiLimits.MaxPostMessageLength)
-            {
-                throw new ArgumentOutOfRangeException(nameof(message),
-                    $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
-            }
+            ValidatePostMessageLength(message, nameof(message));
 
             Dictionary<string, object> metadata = BuildPostMetadata(
                 priority,
@@ -75,11 +71,7 @@ namespace Mattermost
             bool requestedAck = false, bool persistentNotifications = false)
         {
             CheckDisposed();
-            if (message.Length > MattermostApiLimits.MaxPostMessageLength)
-            {
-                throw new ArgumentOutOfRangeException(nameof(message),
-                    $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
-            }
+            ValidatePostMessageLength(message, nameof(message));
 
             Dictionary<string, object> metadata = BuildPostMetadata(
                 priority,
@@ -167,11 +159,7 @@ namespace Mattermost
         public Task<Post> UpdatePostWithRawPropsAsync(string postId, string newText, IDictionary<string, object>? rawProps = null)
         {
             CheckDisposed();
-            if (newText.Length > MattermostApiLimits.MaxPostMessageLength)
-            {
-                throw new ArgumentOutOfRangeException(nameof(newText),
-                    $"The message length exceeds the maximum number of characters allowed ({newText.Length} > {MattermostApiLimits.MaxPostMessageLength})");
-            }
+            ValidatePostMessageLength(newText, nameof(newText));
             var body = new
             {
                 message = newText,
@@ -191,11 +179,7 @@ namespace Mattermost
         public Task<Post> UpdatePostAsync(string postId, string newText, PostProps? props = null)
         {
             CheckDisposed();
-            if (newText.Length > MattermostApiLimits.MaxPostMessageLength)
-            {
-                throw new ArgumentOutOfRangeException(nameof(newText),
-                    $"The message length exceeds the maximum number of characters allowed ({newText.Length} > {MattermostApiLimits.MaxPostMessageLength})");
-            }
+            ValidatePostMessageLength(newText, nameof(newText));
             var body = new
             {
                 message = newText,
@@ -216,11 +200,7 @@ namespace Mattermost
             Dictionary<string, object> body = new Dictionary<string, object>();
             if (text is string message)
             {
-                if (message.Length > MattermostApiLimits.MaxPostMessageLength)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(text),
-                        $"The message length exceeds the maximum number of characters allowed ({message.Length} > {MattermostApiLimits.MaxPostMessageLength})");
-                }
+                ValidatePostMessageLength(message, nameof(text));
                 body["message"] = message;
             }
             if (props is IDictionary<string, object> properties)
@@ -453,6 +433,30 @@ namespace Mattermost
             CheckDisposed();
             ValidatePostId(postId);
             return SendRequestAsync(HttpMethod.Post, Routes.Posts + "/" + Uri.EscapeDataString(postId) + "/unpin");
+        }
+
+        private static void ValidatePostMessageLength(string message, string parameterName)
+        {
+            int length = message.Length;
+            if (length <= MattermostApiLimits.MaxPostMessageLength)
+            {
+                return;
+            }
+
+            for (int index = 0; index < message.Length - 1; index++)
+            {
+                if (char.IsSurrogatePair(message, index))
+                {
+                    length--;
+                    index++;
+                }
+            }
+
+            if (length > MattermostApiLimits.MaxPostMessageLength)
+            {
+                throw new ArgumentOutOfRangeException(parameterName,
+                    $"The message length exceeds the maximum number of characters allowed ({length} > {MattermostApiLimits.MaxPostMessageLength})");
+            }
         }
 
         private static void ValidatePostId(string postId)

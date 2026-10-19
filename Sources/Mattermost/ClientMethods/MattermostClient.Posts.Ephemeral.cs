@@ -20,10 +20,7 @@ namespace Mattermost
             }
             if (string.IsNullOrWhiteSpace(channelId)) { throw new ArgumentException("Channel identifier cannot be null or empty.", nameof(channelId)); }
             if (message is null) { throw new ArgumentNullException(nameof(message)); }
-            if (message.Length > MattermostApiLimits.MaxPostMessageLength)
-            {
-                throw new ArgumentOutOfRangeException(nameof(message), "Message exceeds the maximum supported length.");
-            }
+            ValidatePostMessageLength(message, nameof(message));
             if (replyToPostId is null) { throw new ArgumentNullException(nameof(replyToPostId)); }
             cancellationToken.ThrowIfCancellationRequested();
             var post = new { channel_id = channelId.Trim(), message, root_id = replyToPostId.Trim(), props };

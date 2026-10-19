@@ -261,6 +261,8 @@ new MattermostClient(Uri serverUri, string apiKey, HttpClient httpClient);
 await client.CreatePostAsync(channelId, "Hello, World!");
 ```
 
+Post text supports up to 262,144 Unicode code points, matching Mattermost 12 and later. The same limit applies to post creation, editing, replacement, and ephemeral messages. Supplementary characters such as most emoji count as one code point; combining marks count separately. Server request-size limits also apply. Older servers may reject messages above their own limit, which is returned as a `MattermostClientException`.
+
 ## Send a priority message
 
 ```csharp

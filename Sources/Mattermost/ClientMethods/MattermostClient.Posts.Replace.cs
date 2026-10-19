@@ -18,10 +18,7 @@ namespace Mattermost
             if (post is null) { throw new ArgumentNullException(nameof(post)); }
             string identifier = EscapeReadIdentifier(post.Id, nameof(post));
             if (post.Text is null) { throw new ArgumentException("Post text cannot be null.", nameof(post)); }
-            if (post.Text.Length > MattermostApiLimits.MaxPostMessageLength)
-            {
-                throw new ArgumentOutOfRangeException(nameof(post), "Post text exceeds the maximum supported length.");
-            }
+            ValidatePostMessageLength(post.Text, nameof(post));
             cancellationToken.ThrowIfCancellationRequested();
 
             List<string>? files = null;
