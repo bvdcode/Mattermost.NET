@@ -108,6 +108,21 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        public async Task CustomStatus_SerializesExplicitZeroExpiry([Values(false, true)] bool removeRecent)
+        {
+            using HttpClient http = ApiTestHttp.Create(async (request, token) =>
+            {
+                using JsonDocument body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync(token));
+                Assert.That(body.RootElement.GetProperty("duration").GetString(), Is.Empty);
+                Assert.That(body.RootElement.GetProperty("expires_at").GetDateTimeOffset(), Is.EqualTo(DateTimeOffset.MinValue));
+                return ApiTestHttp.Json(HttpStatusCode.OK, "{\"status\":\"OK\"}");
+            });
+            using MattermostClient client = ApiTestHttp.Client(http);
+            if (removeRecent) { await client.DeleteRecentUserCustomStatusAsync("me", "rocket", "text", expiresAt: DateTimeOffset.MinValue); }
+            else { await client.UpdateUserCustomStatusAsync("me", "rocket", "text", expiresAt: DateTimeOffset.MinValue); }
+        }
+
+        [Test]
         public async Task RecentStatus_AllowsExpiredEntriesAndExplicitZeroExpiry()
         {
             using HttpClient http = ApiTestHttp.Create((request, _) =>

@@ -104,6 +104,21 @@ namespace Mattermost
         {
             if (application is null) { throw new ArgumentNullException(nameof(application)); }
             if (string.IsNullOrWhiteSpace(application.Name)) { throw new ArgumentException("An application name is required.", nameof(application)); }
+            List<string> callbacks = CopyOAuthCallbackUrls(application, requireManualUrls);
+            string homepage = application.Homepage?.Trim() ?? string.Empty;
+            if (requireManualUrls || homepage.Length > 0) { homepage = RequireOAuthHttpUrl(homepage, nameof(application)); }
+            string iconUrl = string.Empty;
+            if (!string.IsNullOrEmpty(application.IconUrl)) { iconUrl = RequireOAuthHttpUrl(application.IconUrl, nameof(application)); }
+            return new Dictionary<string, object>
+            {
+                ["name"] = application.Name.Trim(), ["description"] = application.Description,
+                ["icon_url"] = iconUrl, ["callback_urls"] = callbacks,
+                ["homepage"] = homepage, ["is_trusted"] = application.IsTrusted
+            };
+        }
+
+        private static List<string> CopyOAuthCallbackUrls(OAuthApp application, bool requireManualUrls)
+        {
             if (application.CallbackUrls is null || application.CallbackUrls.Count == 0)
             {
                 throw new ArgumentException("At least one callback URL is required.", nameof(application));
@@ -121,16 +136,7 @@ namespace Mattermost
                     callbacks.Add(callback!.Trim());
                 }
             }
-            string homepage = application.Homepage?.Trim() ?? string.Empty;
-            if (requireManualUrls || homepage.Length > 0) { homepage = RequireOAuthHttpUrl(homepage, nameof(application)); }
-            string iconUrl = string.Empty;
-            if (!string.IsNullOrEmpty(application.IconUrl)) { iconUrl = RequireOAuthHttpUrl(application.IconUrl, nameof(application)); }
-            return new Dictionary<string, object>
-            {
-                ["name"] = application.Name.Trim(), ["description"] = application.Description,
-                ["icon_url"] = iconUrl, ["callback_urls"] = callbacks,
-                ["homepage"] = homepage, ["is_trusted"] = application.IsTrusted
-            };
+            return callbacks;
         }
 
         private static string RequireOAuthHttpUrl(string value, string parameterName)

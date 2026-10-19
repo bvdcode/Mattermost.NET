@@ -97,6 +97,37 @@ namespace Mattermost.Tests
             });
         }
 
+        [TestCase("cursor://oauth/callback")]
+        [TestCase("com.example.client:/callback")]
+        public async Task Create_RejectsNonHttpCallbackUrls(string callback)
+        {
+            OAuthApp application = Application();
+            application.CallbackUrls[0] = callback;
+            using HttpClient http = ApiTestHttp.RejectRequests();
+            using MattermostClient client = ApiTestHttp.Client(http);
+            ArgumentException? error = await Assert.ThrowsAsync<ArgumentException>(() => client.CreateOAuthAppAsync(application));
+            Assert.That(error!.ParamName, Is.EqualTo("application"));
+        }
+
+        [Test]
+        public async Task Writes_ValidateCallbacksBeforeHomepage([Values(false, true)] bool update)
+        {
+            OAuthApp application = Application();
+            application.CallbackUrls[0] = "relative/callback";
+            application.Homepage = "invalid homepage";
+            using HttpClient http = ApiTestHttp.RejectRequests();
+            using MattermostClient client = ApiTestHttp.Client(http);
+            ArgumentException? error = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                if (update) { await client.UpdateOAuthAppAsync(application); }
+                else { await client.CreateOAuthAppAsync(application); }
+            });
+            Assert.That(error!.ParamName, Is.EqualTo("application"));
+            string message = update ? "OAuth callback URLs must be absolute URLs."
+                : "OAuth application URLs must be absolute HTTP or HTTPS URLs.";
+            Assert.That(error.Message, Does.StartWith(message));
+        }
+
         [TestCase("name", false)]
         [TestCase("homepage", false)]
         [TestCase("callbacks", false)]

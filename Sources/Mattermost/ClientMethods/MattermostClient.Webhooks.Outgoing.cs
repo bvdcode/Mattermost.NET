@@ -79,28 +79,10 @@ namespace Mattermost
         {
             if (webhook is null) { throw new ArgumentNullException(nameof(webhook)); }
             if (string.IsNullOrWhiteSpace(webhook.TeamId)) { throw new ArgumentException("A webhook must have a team identifier.", nameof(webhook)); }
-            List<string> triggers = new List<string>();
-            if (webhook.TriggerWords is IList<string> words)
-            {
-                foreach (string word in words)
-                {
-                    if (string.IsNullOrWhiteSpace(word)) { throw new ArgumentException("Trigger words cannot be blank.", nameof(webhook)); }
-                    triggers.Add(word);
-                }
-            }
+            List<string> triggers = CopyOutgoingWebhookTriggerWords(webhook);
             string channelId = webhook.ChannelId?.Trim() ?? string.Empty;
             if (channelId.Length == 0 && triggers.Count == 0) { throw new ArgumentException("Team-wide webhooks require trigger words.", nameof(webhook)); }
-            if (webhook.CallbackUrls is null || webhook.CallbackUrls.Count == 0) { throw new ArgumentException("A webhook must have callback URLs.", nameof(webhook)); }
-            List<string> callbacks = new List<string>();
-            foreach (string callback in webhook.CallbackUrls)
-            {
-                if (!Uri.TryCreate(callback?.Trim(), UriKind.Absolute, out Uri? uri)
-                    || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
-                {
-                    throw new ArgumentException("Callback URLs must be absolute HTTP or HTTPS URLs.", nameof(webhook));
-                }
-                callbacks.Add(callback!.Trim());
-            }
+            List<string> callbacks = CopyOutgoingWebhookCallbackUrls(webhook);
             int triggerWhen;
             switch (webhook.TriggerWhen)
             {
@@ -115,6 +97,36 @@ namespace Mattermost
                 ["description"] = webhook.Description, ["content_type"] = webhook.ContentType,
                 ["username"] = webhook.Username, ["icon_url"] = webhook.IconUrl
             };
+        }
+
+        private static List<string> CopyOutgoingWebhookTriggerWords(OutgoingWebhook webhook)
+        {
+            List<string> triggers = new List<string>();
+            if (webhook.TriggerWords is IList<string> words)
+            {
+                foreach (string word in words)
+                {
+                    if (string.IsNullOrWhiteSpace(word)) { throw new ArgumentException("Trigger words cannot be blank.", nameof(webhook)); }
+                    triggers.Add(word);
+                }
+            }
+            return triggers;
+        }
+
+        private static List<string> CopyOutgoingWebhookCallbackUrls(OutgoingWebhook webhook)
+        {
+            if (webhook.CallbackUrls is null || webhook.CallbackUrls.Count == 0) { throw new ArgumentException("A webhook must have callback URLs.", nameof(webhook)); }
+            List<string> callbacks = new List<string>();
+            foreach (string callback in webhook.CallbackUrls)
+            {
+                if (!Uri.TryCreate(callback?.Trim(), UriKind.Absolute, out Uri? uri)
+                    || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+                {
+                    throw new ArgumentException("Callback URLs must be absolute HTTP or HTTPS URLs.", nameof(webhook));
+                }
+                callbacks.Add(callback!.Trim());
+            }
+            return callbacks;
         }
     }
 }

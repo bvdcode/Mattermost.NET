@@ -88,18 +88,7 @@ namespace Mattermost
             {
                 throw new ArgumentException("A custom status requires an emoji or text.", nameof(text));
             }
-            string durationName;
-            switch (duration)
-            {
-                case CustomStatusDuration.Never: durationName = string.Empty; break;
-                case CustomStatusDuration.ThirtyMinutes: durationName = "thirty_minutes"; break;
-                case CustomStatusDuration.OneHour: durationName = "one_hour"; break;
-                case CustomStatusDuration.FourHours: durationName = "four_hours"; break;
-                case CustomStatusDuration.Today: durationName = "today"; break;
-                case CustomStatusDuration.ThisWeek: durationName = "this_week"; break;
-                case CustomStatusDuration.DateAndTime: durationName = "date_and_time"; break;
-                default: throw new ArgumentOutOfRangeException(nameof(duration));
-            }
+            string durationName = GetCustomStatusDurationName(duration);
             if (duration == CustomStatusDuration.Never)
             {
                 if (expiresAt is DateTimeOffset expiry && expiry != DateTimeOffset.MinValue)
@@ -120,6 +109,21 @@ namespace Mattermost
                 body["expires_at"] = expiration.ToUniversalTime();
             }
             return body;
+        }
+
+        private static string GetCustomStatusDurationName(CustomStatusDuration duration)
+        {
+            switch (duration)
+            {
+                case CustomStatusDuration.Never: return string.Empty;
+                case CustomStatusDuration.ThirtyMinutes: return "thirty_minutes";
+                case CustomStatusDuration.OneHour: return "one_hour";
+                case CustomStatusDuration.FourHours: return "four_hours";
+                case CustomStatusDuration.Today: return "today";
+                case CustomStatusDuration.ThisWeek: return "this_week";
+                case CustomStatusDuration.DateAndTime: return "date_and_time";
+                default: throw new ArgumentOutOfRangeException(nameof(duration));
+            }
         }
     }
 }

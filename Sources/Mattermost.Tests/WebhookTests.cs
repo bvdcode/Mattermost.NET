@@ -88,6 +88,76 @@ namespace Mattermost.Tests
         }
 
         [Test]
+        public async Task OutgoingWrite_PreservesTriggerWordsAndTrimsCallbacks([Values(false, true)] bool update)
+        {
+            OutgoingWebhook webhook = OutgoingFixture();
+            webhook.ChannelId = "";
+            webhook.TriggerWords = new[] { " hello ", "hello", "hello" };
+            webhook.CallbackUrls = new[] { " https://receiver.example/hook ", "http://receiver.example/other" };
+            string original = JsonSerializer.Serialize(webhook);
+            using HttpClient http = ApiTestHttp.Create(async (request, token) =>
+            {
+                using JsonDocument body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync(token));
+                Assert.That(body.RootElement.GetProperty("channel_id").GetString(), Is.Empty);
+                Assert.That(body.RootElement.GetProperty("trigger_words").EnumerateArray().Select(item => item.GetString()),
+                    Is.EqualTo(new[] { " hello ", "hello", "hello" }));
+                Assert.That(body.RootElement.GetProperty("callback_urls").EnumerateArray().Select(item => item.GetString()),
+                    Is.EqualTo(new[] { "https://receiver.example/hook", "http://receiver.example/other" }));
+                return ApiTestHttp.Json(HttpStatusCode.OK, OutgoingJson);
+            });
+            using MattermostClient client = ApiTestHttp.Client(http);
+            if (update) { await client.UpdateOutgoingWebhookAsync(webhook); }
+            else { await client.CreateOutgoingWebhookAsync(webhook); }
+            Assert.That(JsonSerializer.Serialize(webhook), Is.EqualTo(original));
+        }
+
+        [Test]
+        public async Task OutgoingWrite_AllowsNullTriggersForChannel([Values(false, true)] bool update)
+        {
+            OutgoingWebhook webhook = OutgoingFixture();
+            webhook.TriggerWords = null;
+            using HttpClient http = ApiTestHttp.Create(async (request, token) =>
+            {
+                using JsonDocument body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync(token));
+                Assert.That(body.RootElement.GetProperty("trigger_words").GetArrayLength(), Is.Zero);
+                return ApiTestHttp.Json(HttpStatusCode.OK, OutgoingJson);
+            });
+            using MattermostClient client = ApiTestHttp.Client(http);
+            if (update) { await client.UpdateOutgoingWebhookAsync(webhook); }
+            else { await client.CreateOutgoingWebhookAsync(webhook); }
+        }
+
+        [TestCase("triggers", "Trigger words cannot be blank.", false)]
+        [TestCase("triggers", "Trigger words cannot be blank.", true)]
+        [TestCase("team-wide", "Team-wide webhooks require trigger words.", false)]
+        [TestCase("team-wide", "Team-wide webhooks require trigger words.", true)]
+        [TestCase("callbacks", "A webhook must have callback URLs.", false)]
+        [TestCase("callbacks", "A webhook must have callback URLs.", true)]
+        [TestCase("callback", "Callback URLs must be absolute HTTP or HTTPS URLs.", false)]
+        [TestCase("callback", "Callback URLs must be absolute HTTP or HTTPS URLs.", true)]
+        public async Task OutgoingWrite_PreservesValidationErrors(string field, string message, bool update)
+        {
+            OutgoingWebhook webhook = OutgoingFixture();
+            switch (field)
+            {
+                case "triggers": webhook.TriggerWords = new[] { " " }; break;
+                case "team-wide": webhook.ChannelId = " "; webhook.TriggerWords = null; break;
+                case "callbacks": webhook.CallbackUrls = null!; break;
+                case "callback": webhook.CallbackUrls = new[] { "file:///data" }; break;
+                default: throw new ArgumentOutOfRangeException(nameof(field));
+            }
+            using HttpClient http = ApiTestHttp.RejectRequests();
+            using MattermostClient client = ApiTestHttp.Client(http);
+            ArgumentException? error = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                if (update) { await client.UpdateOutgoingWebhookAsync(webhook); }
+                else { await client.CreateOutgoingWebhookAsync(webhook); }
+            });
+            Assert.That(error!.ParamName, Is.EqualTo("webhook"));
+            Assert.That(error.Message, Does.StartWith(message));
+        }
+
+        [Test]
         public async Task Models_DeserializeFieldsAndLargeTimestamps()
         {
             using HttpClient http = ApiTestHttp.Create((request, _) => Task.FromResult(ApiTestHttp.Json(HttpStatusCode.OK,

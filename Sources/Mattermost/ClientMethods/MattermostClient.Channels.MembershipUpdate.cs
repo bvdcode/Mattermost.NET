@@ -4,6 +4,7 @@ using Mattermost.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -44,6 +45,12 @@ namespace Mattermost
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (!response.IsSuccessStatusCode) { throw CreateRequestException(response, content, HttpMethod.Put, route); }
+            return ParseChannelMembershipResponse(content, response.StatusCode, route, cancellationToken);
+        }
+
+        private List<ChannelMembersUpdateResult> ParseChannelMembershipResponse(string content, HttpStatusCode statusCode,
+            string route, CancellationToken cancellationToken)
+        {
             List<ChannelMembersUpdateResult> results = new List<ChannelMembersUpdateResult>();
             foreach (string line in content.Split('\n'))
             {
@@ -60,23 +67,28 @@ namespace Mattermost
                     }
                     throw new MattermostClientException(terminalError.GetString()!)
                     {
-                        StatusCode = response.StatusCode, ResponseJson = content,
+                        StatusCode = statusCode, ResponseJson = content,
                         RequestMethod = HttpMethod.Put.Method, RequestUri = BuildRequestUri(route).ToString()
                     };
                 }
-                if (!root.TryGetProperty("added", out JsonElement added) || added.ValueKind != JsonValueKind.Array
-                    || !root.TryGetProperty("removed", out JsonElement removed) || removed.ValueKind != JsonValueKind.Array)
-                {
-                    throw new JsonException("A membership batch must contain added and removed arrays.");
-                }
-                ChannelMembersUpdateResult result = JsonSerializer.Deserialize<ChannelMembersUpdateResult>(line)!;
-                if (result.Promoted is null || result.Demoted is null || result.Errors is null)
-                {
-                    throw new JsonException("Membership result collections cannot be null.");
-                }
-                results.Add(result);
+                results.Add(DeserializeChannelMembershipBatch(line, root));
             }
             return results;
+        }
+
+        private static ChannelMembersUpdateResult DeserializeChannelMembershipBatch(string line, JsonElement root)
+        {
+            if (!root.TryGetProperty("added", out JsonElement added) || added.ValueKind != JsonValueKind.Array
+                || !root.TryGetProperty("removed", out JsonElement removed) || removed.ValueKind != JsonValueKind.Array)
+            {
+                throw new JsonException("A membership batch must contain added and removed arrays.");
+            }
+            ChannelMembersUpdateResult result = JsonSerializer.Deserialize<ChannelMembersUpdateResult>(line)!;
+            if (result.Promoted is null || result.Demoted is null || result.Errors is null)
+            {
+                throw new JsonException("Membership result collections cannot be null.");
+            }
+            return result;
         }
 
         private static List<string> CopyChannelMembershipIdentifiers(IEnumerable<string> identifiers, string parameterName,

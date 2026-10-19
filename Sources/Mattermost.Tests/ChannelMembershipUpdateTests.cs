@@ -157,6 +157,8 @@ namespace Mattermost.Tests
         [TestCase("{\"added\":[],\"removed\":[],\"demoted\":null}")]
         [TestCase("{\"error\":null}")]
         [TestCase("{\"error\":\"\"}")]
+        [TestCase("{\"error\":42}")]
+        [TestCase("{\"error\":\" \",\"added\":[],\"removed\":[]}")]
         public async Task Set_RejectsMalformedBatch(string response)
         {
             using HttpClient http = ApiTestHttp.Create((_, _) => Task.FromResult(ApiTestHttp.Json(HttpStatusCode.OK, response)));
@@ -164,18 +166,19 @@ namespace Mattermost.Tests
             await Assert.CatchAsync<JsonException>(() => client.SetChannelMembersAsync("channel-1", Array.Empty<string>()));
         }
 
-        [Test]
-        public async Task Set_PreservesTerminalErrorEvenWithHttpSuccess()
+        [TestCase("{\"error\":\"operation interrupted\"}")]
+        [TestCase("{\"error\":\"operation interrupted\",\"added\":null,\"removed\":null}")]
+        public async Task Set_PreservesTerminalErrorEvenWithHttpSuccess(string terminalBatch)
         {
-            const string response = "{\"added\":[\"user-1\"],\"removed\":[]}\n{\"error\":\"operation interrupted\"}\n";
+            string response = "{\"added\":[\"user-1\"],\"removed\":[]}\n" + terminalBatch + "\n";
             using HttpClient http = ApiTestHttp.Create((_, _) => Task.FromResult(ApiTestHttp.Json(HttpStatusCode.OK, response)));
             using MattermostClient client = ApiTestHttp.Client(http);
-            MattermostClientException? error = await Assert.ThrowsAsync<MattermostClientException>(() => client.SetChannelMembersAsync("channel-1", new[] { "user-1" }));
+            MattermostClientException? error = await Assert.ThrowsAsync<MattermostClientException>(() => client.SetChannelMembersAsync(" channel/1 ", new[] { "user-1" }));
             Assert.That(error!.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(error.Message, Is.EqualTo("operation interrupted"));
             Assert.That(error.ResponseJson, Is.EqualTo(response));
             Assert.That(error.RequestMethod, Is.EqualTo("PUT"));
-            Assert.That(error.RequestUri, Does.Contain("/channels/channel-1/members?"));
+            Assert.That(error.RequestUri, Is.EqualTo("https://mattermost.example/chat/api/v4/channels/channel%2F1/members?batch_size=100&batch_delay_ms=500"));
         }
 
         [TestCase("")]
