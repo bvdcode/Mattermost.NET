@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest    
     outputs: 
-      Version: ${{ steps.gitversion.outputs.SemVer }}
+      Version: ${{ steps.gitversion.outputs.MajorMinorPatch }}
       CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }} 
 
     steps:
@@ -22,15 +22,15 @@ jobs:
         
     #Install and calculate the new version with GitVersion  
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.9.7
+      uses: GitTools/actions/gitversion/setup@v4.7.0
       with:
-        versionSpec: 5.x
+        versionSpec: 6.8.2
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0.9.7
+      uses: GitTools/actions/gitversion/execute@v4.7.0
       id: gitversion # step id used as reference for output values
     - name: Display GitVersion outputs
       run: |
-        echo "Version: ${{ steps.gitversion.outputs.SemVer }}"
+        echo "Version: ${{ steps.gitversion.outputs.MajorMinorPatch }}"
         echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
     
     #Build/pack the project
@@ -42,7 +42,7 @@ jobs:
       run: |
           cd Sources/Mattermost
           dotnet build --configuration Release
-          dotnet pack --configuration Release --output nupkg -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
+          dotnet pack --configuration Release --output nupkg -p:Version='${{ steps.gitversion.outputs.MajorMinorPatch }}'
     - name: Upload NuGet package to GitHub
       uses: actions/upload-artifact@v4
       with:
