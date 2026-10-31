@@ -14,7 +14,6 @@ using System.Text.Json;
 
 namespace Mattermost.Tests
 {
-    [Explicit("Requires secrets.json and access to a Mattermost server.")]
     [SingleThreaded]
     public class MattermostClientTests
     {
