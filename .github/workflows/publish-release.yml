@@ -15,36 +15,10 @@ concurrency:
 
 jobs:
   checks:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out source
-        uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - name: Select integration tests
-        id: test-settings
-        shell: bash
-        run: |
-          if [[ ! -f Sources/Mattermost.Tests/secrets.json ]]; then
-            settings="$RUNNER_TEMP/mattermost.runsettings"
-            cat > "$settings" <<'XML'
-          <RunSettings>
-            <RunConfiguration>
-              <TestCaseFilter>FullyQualifiedName!~Mattermost.Tests.MattermostClientTests</TestCaseFilter>
-            </RunConfiguration>
-            <NUnit>
-              <AssemblySelectLimit>2147483647</AssemblySelectLimit>
-            </NUnit>
-          </RunSettings>
-          XML
-            echo "path=$settings" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Check solution
-        uses: bvdcode/github-workflows/actions/dotnet-checks@v1
-        with:
-          project: Sources/Mattermost.sln
-          dotnet-version: 10.0.x
-          test-settings: ${{ steps.test-settings.outputs.path }}
+    uses: bvdcode/github-workflows/.github/workflows/dotnet-checks.yml@v1
+    with:
+      project: Sources/Mattermost.sln
+      dotnet-version: 10.0.x
 
   version:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
